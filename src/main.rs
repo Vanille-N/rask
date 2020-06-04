@@ -10,19 +10,46 @@ fn main() {
     match &args[1][..] {
         "parse" => {
             for i in 2..args.len() {
-                let v = split(&args[i]);
-                println!("{:?}", &v);
+                match split(&args[i]) {
+                    Ok(v) => println!("{:?}", &v),
+                    Err(e) => {
+                        match e {
+                            ParseErr::UnterminatedString(pos) => {
+                                eprintln!("Unterminated string literal");
+                                eprintln!("  Found in expression {}...", &args[i][0..10.min(args[i].len())]);
+                                eprintln!("  At position {}: {}...", pos, &args[i][pos..(pos+10).min(args[i].len())]);
+                            }
+                        }
+                    }
+                }
             }
         }
         _ => (),
     }
 }
 
-fn split(expr: &str) -> Vec<&str> {
+enum ParseErr {
+    UnterminatedString(usize),
+}
+
+fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
     let mut begin = 0;
     let mut len = 0;
     let mut items = Vec::new();
+    let mut string = false;
     for c in expr.chars() {
+        if c == '"' && !string {
+            string = true;
+            len += 1;
+            continue;
+        }
+        if string {
+            if c == '"' {
+                string = false;
+            }
+            len += 1;
+            continue;
+        }
         if ['(', ')', '[', ']', ' '].contains(&c) {
             if len > 0 { items.push(&expr[begin..begin+len]); }
             begin += len;
@@ -33,5 +60,9 @@ fn split(expr: &str) -> Vec<&str> {
             len += 1;
         }
     }
-    items
+    if begin == expr.len() {
+        Ok(items)
+    } else {
+        Err(ParseErr::UnterminatedString(begin))
+    }
 }
