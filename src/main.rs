@@ -37,20 +37,23 @@ fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
     let mut len = 0;
     let mut items = Vec::new();
     let mut string = false;
+    let mut escape = false;
     for c in expr.chars() {
-        if c == '"' && !string {
-            string = true;
-            len += 1;
-            continue;
-        }
         if string {
             if c == '"' {
                 string = false;
             }
             len += 1;
-            continue;
-        }
-        if ['(', ')', '[', ']', ' '].contains(&c) {
+        } else if escape {
+            len += 1;
+            escape = false;
+        } else if c == '"' && !string {
+            string = true;
+            len += 1;
+        } else if c == '\\' {
+            escape = true;
+            len += 1;
+        } else if ['(', ')', '[', ']', ' '].contains(&c) {
             if len > 0 { items.push(&expr[begin..begin+len]); }
             begin += len;
             if c != ' ' { items.push(&expr[begin..begin+1]); }
