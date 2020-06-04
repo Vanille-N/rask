@@ -19,6 +19,11 @@ fn main() {
                                 eprintln!("  Found in expression {}...", &args[i][0..10.min(args[i].len())]);
                                 eprintln!("  At position {}: {}...", pos, &args[i][pos..(pos+10).min(args[i].len())]);
                             }
+                            ParseErr::IncorrectSpacing(pos) => {
+                                eprintln!("Incorrect spacing between disctinct elements");
+                                eprintln!("  Found in expression {}...", &args[i][0..10.min(args[i].len())]);
+                                eprintln!("  At position {}: {}...", pos, &args[i][pos..(pos+10).min(args[i].len())]);
+                            }
                         }
                     }
                 }
@@ -30,6 +35,7 @@ fn main() {
 
 enum ParseErr {
     UnterminatedString(usize),
+    IncorrectSpacing(usize),
 }
 
 fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
@@ -63,9 +69,16 @@ fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
             len += 1;
         }
     }
-    if begin == expr.len() {
-        Ok(items)
+    if string {
+        if &expr[begin..begin+1] == "\"" {
+            Err(ParseErr::UnterminatedString(begin))
+        } else {
+            Err(ParseErr::IncorrectSpacing(begin))
+        }
     } else {
-        Err(ParseErr::UnterminatedString(begin))
+        if expr.len() > begin {
+            items.push(&expr[begin..begin+len]);
+        }
+        Ok(items)
     }
 }
