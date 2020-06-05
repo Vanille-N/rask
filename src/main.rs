@@ -1,7 +1,7 @@
 use std::env;
 use std::process;
 
-use rask::parse::{ParseErr, split};
+use rask::parse::{split, ParseErr};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -19,13 +19,24 @@ fn main() {
                         match e {
                             ParseErr::UnterminatedString(pos) => {
                                 eprintln!("Unterminated string literal");
-                                eprintln!("  Found in expression {}...", &arg[0..10.min(arg.len())]);
-                                eprintln!("  At position {}: {}...", pos, &arg[pos..(pos+10).min(n)]);
+                                eprintln!(
+                                    "  Found in expression {}...",
+                                    &arg[0..10.min(arg.len())]
+                                );
+                                eprintln!(
+                                    "  At position {}: {}...",
+                                    pos,
+                                    &arg[pos..(pos + 10).min(n)]
+                                );
                             }
                             ParseErr::IncorrectSpacing(pos) => {
                                 eprintln!("Incorrect spacing between disctinct elements");
                                 eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
-                                eprintln!("  At position {}: {}...", pos, &arg[pos..(pos+10).min(n)]);
+                                eprintln!(
+                                    "  At position {}: {}...",
+                                    pos,
+                                    &arg[pos..(pos + 10).min(n)]
+                                );
                             }
                             ParseErr::LoneNumbersign => {
                                 eprintln!("Number sign not followed by an interpreter directive nor a character");

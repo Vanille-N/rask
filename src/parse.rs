@@ -36,15 +36,19 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
             escape = true;
             len += 1;
         } else if c == ';' {
-            if len > 0 { items.push(&expr[begin..begin+len]); }
+            if len > 0 {
+                items.push(&expr[begin..begin + len]);
+            }
             comment = true;
             begin += 1;
             len = 0;
         } else if ['(', ')', '[', ']', ' ', '\t', '\n'].contains(&c) {
-            if len > 0 { items.push(&expr[begin..begin+len]); }
+            if len > 0 {
+                items.push(&expr[begin..begin + len]);
+            }
             begin += len;
             if ['(', ')', '[', ']'].contains(&c) {
-                items.push(&expr[begin..begin+1]);
+                items.push(&expr[begin..begin + 1]);
             }
             len = 0;
             begin += 1;
@@ -53,14 +57,14 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
         }
     }
     if string {
-        if &expr[begin..begin+1] == "\"" {
+        if &expr[begin..begin + 1] == "\"" {
             Err(ParseErr::UnterminatedString(begin))
         } else {
             Err(ParseErr::IncorrectSpacing(begin))
         }
     } else {
         if expr.len() > begin && !comment {
-            items.push(&expr[begin..begin+len]);
+            items.push(&expr[begin..begin + len]);
         }
         Ok(items)
     }
@@ -92,7 +96,7 @@ pub enum Token {
 }
 
 impl std::cmp::PartialEq for Token {
-    fn eq (&self, other: &Self) -> bool {
+    fn eq(&self, other: &Self) -> bool {
         macro_rules! identical {
             ( $id:tt ) => {
                 match other {
@@ -105,7 +109,7 @@ impl std::cmp::PartialEq for Token {
                     Token::$id(x) => x == $contents,
                     _ => false,
                 }
-            }
+            };
         }
         match self {
             Token::OpenBrace => identical!(OpenBrace),
@@ -125,7 +129,7 @@ impl std::cmp::PartialEq for Token {
             Token::Float(f) => match other {
                 Token::Float(g) => (g - f).abs() < 0.00000001,
                 _ => false,
-            }
+            },
         }
     }
 }
@@ -162,8 +166,11 @@ pub fn lex(item: &str) -> Result<Token, ParseErr> {
                         Some(lit) => Ok(Token::Literal(lit)),
                     }
                 }
-            } else if chars[0] == '"' { // Correct string ending already verified
-                Ok(Token::String(chars[1..chars.len()-1].iter().collect::<String>()))
+            } else if chars[0] == '"' {
+                // Correct string ending already verified
+                Ok(Token::String(
+                    chars[1..chars.len() - 1].iter().collect::<String>(),
+                ))
             } else if let Ok(i) = s.parse::<i64>() {
                 Ok(Token::Integer(i))
             } else if let Ok(f) = s.parse::<f64>() {
@@ -209,9 +216,9 @@ fn verify_literal(s: &str) -> Option<Literal> {
 
 fn is_valid_char_ident(c: char) -> bool {
     '0' <= c && c <= '9'
-    || 'a' <= c && c <= 'z'
-    || 'A' <= c && c <= 'Z'
-    || "+-?!~/_%=*<>$|^@&".contains(c)
+        || 'a' <= c && c <= 'z'
+        || 'A' <= c && c <= 'Z'
+        || "+-?!~/_%=*<>$|^@&".contains(c)
 }
 
 fn verify_identifier(s: &str) -> Option<String> {
@@ -321,11 +328,15 @@ mod test_lex {
     }
 
     macro_rules! ident {
-        ( $id:tt ) => { assert!(lex($id).is_ok()) }
+        ( $id:tt ) => {
+            assert!(lex($id).is_ok())
+        };
     }
 
     macro_rules! fail {
-        ( $id:tt ) => { assert!(lex($id).is_err()) }
+        ( $id:tt ) => {
+            assert!(lex($id).is_err())
+        };
     }
 
     #[test]
@@ -347,9 +358,9 @@ mod test_lex {
         ( $x:tt ) => {
             match split($x) {
                 Err(e) => panic!("{:?} failed to lex properly: returned {:?}", $x, e),
-                Ok(_) => {},
+                Ok(_) => {}
             }
-        }
+        };
     }
 
     #[test]
