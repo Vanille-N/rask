@@ -103,9 +103,9 @@ fn lex(item: &str) -> Result<Token, ParseErr> {
                 }
             } else if chars[0] == '"' { // Correct string ending already verified
                 Ok(Token::String(chars[1..chars.len()-1].iter().collect::<String>()))
-            } else if let Some(i) = verify_integer(&s) {
+            } else if let Some(i) = s.parse::<i64>().ok() {
                 Ok(Token::Integer(i))
-            } else if let Some(f) = verify_float(&s) {
+            } else if let Some(f) = s.parse::<f64>().ok() {
                 Ok(Token::Float(f))
             } else if let Some(id) = verify_identifier(&s) {
                 Ok(Token::Atom(id))
@@ -136,14 +136,6 @@ fn verify_char(s: &str) -> Option<char> {
             _ => None,
         }
     }
-}
-
-fn verify_integer(s: &str) -> Option<i64> {
-    unimplemented!()
-}
-
-fn verify_float(s: &str) -> Option<f64> {
-    unimplemented!()
 }
 
 fn verify_literal(s: &str) -> Option<Literal> {
