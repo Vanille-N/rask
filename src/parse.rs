@@ -247,3 +247,80 @@ mod test_split {
         test!("#true #f #\\t #\\em #\\tab" -> "#true" "#f" "#\\t" "#\\em" "#\\tab");
     }
 }
+
+#[cfg(test)]
+mod test_lex {
+    use super::*;
+
+    macro_rules! test {
+        ( $input:tt -> +$( $output:tt )+ ) => {
+            assert_eq!(lex($input).ok().unwrap(), Token::$( $output )+)
+        };
+        ( $input:tt -> -$( $output:tt )+ ) => {
+            assert_eq!(lex($input).err().unwrap(), ParseErr::$( $output )+)
+        }
+    }
+
+    #[test]
+    pub fn separators() {
+        test!("(" -> +OpenParen);
+        test!(")" -> +CloseParen);
+        test!("[" -> +OpenBrace);
+        test!("]" -> +CloseBrace);
+        test!("." -> +Dot);
+        test!("'" -> +Quote);
+        test!("," -> +Antiquote);
+        test!("`" -> +Quasiquote);
+    }
+
+    #[test]
+    pub fn literals_and_chars() {
+        test!("#" -> -LoneNumbersign);
+        test!("#\\" -> -InvalidChar(String::from("")));
+        test!("#\\a" -> +Char('a'));
+        test!("#\\\\" -> +Char('\\'));
+        test!("#\\)" -> +Char(')'));
+        test!("#\\abc" -> -InvalidChar(String::from("abc")));
+        test!("#\\tab" -> +Char('\t'));
+        test!("#\\newline" -> +Char('\n'));
+        test!("#newline" -> -InvalidLiteral(String::from("newline")));
+        test!("#t" -> +Bool(true));
+        test!("#f" -> +Bool(false));
+        test!("#load" -> +Literal(Literal::LoadSource));
+        test!("#exit" -> +Literal(Literal::Exit));
+        test!("#\\xy" -> -InvalidChar(String::from("xy")));
+    }
+
+    #[test]
+    pub fn numerics_and_strings() {
+        test!("1234" -> +Integer(1234));
+        test!("-125" -> +Integer(-125));
+        test!("1253.7" -> +Float(1253.7));
+        test!("12e-1" -> +Float(1.2));
+        test!("\"abc\"" -> +String(String::from("abc")));
+        test!("\"aaa\\\"bbb\"" -> +String(String::from("aaa\\\"bbb")));
+    }
+
+    macro_rules! ident {
+        ( $id:tt ) => { assert!(lex($id).is_ok()) }
+    }
+
+    macro_rules! fail {
+        ( $id:tt ) => { assert!(lex($id).is_err()) }
+    }
+
+    #[test]
+    pub fn identifiers() {
+        ident!("abc");
+        ident!("++1");
+        ident!("~00000-/71o%");
+        ident!("-_-");
+        ident!("^1@&$");
+        ident!("12+");
+        ident!("<=?");
+        fail!("{abc");
+        fail!("x\\");
+        fail!("yzabc#");
+        fail!("|)");
+    }
+}
