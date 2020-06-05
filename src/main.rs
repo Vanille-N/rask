@@ -26,6 +26,25 @@ fn main() {
                                 eprintln!("  Found in expression {}...", &args[i][0..10.min(args[i].len())]);
                                 eprintln!("  At position {}: {}...", pos, &args[i][pos..(pos+10).min(args[i].len())]);
                             }
+                            ParseErr::LoneNumbersign => {
+                                eprintln!("Number sign not followed by an interpreter directive nor a character");
+                                eprintln!("  Found in expression {}...", &args[i][0..10.min(args[i].len())]);
+                            }
+                            ParseErr::InvalidChar(chr) => {
+                                eprintln!("Invalid character literal");
+                                eprintln!("  Found in expression {}...", &args[i][0..10.min(args[i].len())]);
+                                eprintln!("  {} is not recognized", chr);
+                            }
+                            ParseErr::InvalidLiteral(lit) => {
+                                eprintln!("Not a valid interpreter directive");
+                                eprintln!("  Found in expression {}...", &args[i][0..10.min(args[i].len())]);
+                                eprintln!("  {} is not recognized", lit);
+                            }
+                            ParseErr::InvalidIdent(id) => {
+                                eprintln!("Not a valid identifier directive");
+                                eprintln!("  Found in expression {}...", &args[i][0..10.min(args[i].len())]);
+                                eprintln!("  {} contains invalid characters for an identifier", id);
+                            }
                         }
                     }
                 }
