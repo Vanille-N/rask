@@ -62,6 +62,9 @@ enum Token {
     CloseParen,
     OpenBrace,
     CloseBrace,
+    Quote,
+    Quasiquote,
+    Antiquote,
     Dot,
     Char(char),
     Atom(String),
@@ -78,6 +81,9 @@ fn lex(item: &str) -> Result<Token, ParseErr> {
         ")" => Ok(Token::CloseParen),
         "[" => Ok(Token::OpenBrace),
         "]" => Ok(Token::CloseBrace),
+        "'" => Ok(Token::Quote),
+        "`" => Ok(Token::Quasiquote),
+        "," => Ok(Token::Antiquote),
         "." => Ok(Token::Dot),
         s => {
             let chars = s.chars().collect::<Vec<_>>();
@@ -139,11 +145,27 @@ fn verify_char(s: &str) -> Option<char> {
 }
 
 fn verify_literal(s: &str) -> Option<Literal> {
-    unimplemented!()
+    match s {
+        "load" => Some(Literal::LoadSource),
+        "exit" => Some(Literal::Exit),
+        _ => None,
+    }
+}
+
+fn is_valid_char_ident(c: char) -> bool {
+    '0' <= c && c <= '9'
+    || 'a' <= c && c <= 'z'
+    || 'A' <= c && c <= 'Z'
+    || "+-?!~/_%=*<>$|^@&".contains(c)
 }
 
 fn verify_identifier(s: &str) -> Option<String> {
-    unimplemented!()
+    for c in s.chars() {
+        if !is_valid_char_ident(c) {
+            return None;
+        }
+    }
+    Some(String::from(s))
 }
 
 #[cfg(test)]
