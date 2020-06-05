@@ -1,3 +1,4 @@
+#[derive(Debug, PartialEq, Eq)]
 pub enum ParseErr {
     UnterminatedString(usize),
     IncorrectSpacing(usize),
@@ -52,11 +53,13 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Literal {
     LoadSource,
     Exit,
 }
 
+#[derive(Debug)]
 enum Token {
     OpenParen,
     CloseParen,
@@ -73,6 +76,45 @@ enum Token {
     Bool(bool),
     String(String),
     Literal(Literal),
+}
+
+impl std::cmp::PartialEq for Token {
+    fn eq (&self, other: &Self) -> bool {
+        macro_rules! identical {
+            ( $id:tt ) => {
+                match other {
+                    Token::$id => true,
+                    _ => false,
+                }
+            };
+            ( $id:tt($contents:tt) ) => {
+                match other {
+                    Token::$id(x) => x == $contents,
+                    _ => false,
+                }
+            }
+        }
+        match self {
+            Token::OpenBrace => identical!(OpenBrace),
+            Token::CloseBrace => identical!(CloseBrace),
+            Token::OpenParen => identical!(OpenParen),
+            Token::CloseParen => identical!(CloseParen),
+            Token::Quote => identical!(Quote),
+            Token::Quasiquote => identical!(Quasiquote),
+            Token::Antiquote => identical!(Antiquote),
+            Token::Dot => identical!(Dot),
+            Token::Char(c) => identical!(Char(c)),
+            Token::Atom(s) => identical!(Atom(s)),
+            Token::Integer(i) => identical!(Integer(i)),
+            Token::Bool(b) => identical!(Bool(b)),
+            Token::String(s) => identical!(String(s)),
+            Token::Literal(lit) => identical!(Literal(lit)),
+            Token::Float(f) => match other {
+                Token::Float(g) => (g - f).abs() < 0.00000001,
+                _ => false,
+            }
+        }
+    }
 }
 
 fn lex(item: &str) -> Result<Token, ParseErr> {
