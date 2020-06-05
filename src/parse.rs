@@ -1,6 +1,10 @@
 pub enum ParseErr {
     UnterminatedString(usize),
     IncorrectSpacing(usize),
+    LoneNumbersign,
+    InvalidChar(String),
+    InvalidLiteral(String),
+    InvalidIdent(String),
 }
 
 pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
@@ -48,6 +52,90 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
     }
 }
 
+enum Literal {
+    LoadSource,
+    Exit,
+}
+
+enum Token {
+    OpenParen,
+    CloseParen,
+    OpenBrace,
+    CloseBrace,
+    Dot,
+    Char(char),
+    Atom(String),
+    Integer(i64),
+    Float(f64),
+    Bool(bool),
+    String(String),
+    Literal(Literal),
+}
+
+fn lex(item: &str) -> Result<Token, ParseErr> {
+    match item {
+        "(" => Ok(Token::OpenParen),
+        ")" => Ok(Token::CloseParen),
+        "[" => Ok(Token::OpenBrace),
+        "]" => Ok(Token::CloseBrace),
+        "." => Ok(Token::Dot),
+        s => {
+            let chars = s.chars().collect::<Vec<_>>();
+            if chars[0] == '#' {
+                if chars.len() == 1 {
+                    Err(ParseErr::LoneNumbersign)
+                } else if chars[1] == '\\' {
+                    let c = chars[2..].iter().collect::<String>();
+                    match verify_char(&c[..]) {
+                        None => Err(ParseErr::InvalidChar(c)),
+                        Some(chr) => Ok(Token::Char(chr)),
+                    }
+                } else if item == "#t" {
+                    Ok(Token::Bool(true))
+                } else if item == "#f" {
+                    Ok(Token::Bool(false))
+                } else {
+                    let l = chars[1..].iter().collect::<String>();
+                    match verify_literal(&l[..]) {
+                        None => Err(ParseErr::InvalidLiteral(l)),
+                        Some(lit) => Ok(Token::Literal(lit)),
+                    }
+                }
+            } else if chars[0] == '"' { // Correct string ending already verified
+                Ok(Token::String(chars[1..chars.len()-1].iter().collect::<String>()))
+            } else if let Some(i) = verify_integer(&s) {
+                Ok(Token::Integer(i))
+            } else if let Some(f) = verify_float(&s) {
+                Ok(Token::Float(f))
+            } else if let Some(id) = verify_identifier(&s) {
+                Ok(Token::Atom(id))
+            } else {
+                Err(ParseErr::InvalidIdent(String::from(s)))
+            }
+        }
+    }
+}
+
+fn verify_char(s: &str) -> Option<char> {
+    unimplemented!()
+}
+
+fn verify_integer(s: &str) -> Option<i64> {
+    unimplemented!()
+}
+
+fn verify_float(s: &str) -> Option<f64> {
+    unimplemented!()
+}
+
+fn verify_literal(s: &str) -> Option<Literal> {
+    unimplemented!()
+}
+
+fn verify_identifier(s: &str) -> Option<String> {
+    unimplemented!()
+}
+
 #[cfg(test)]
 mod test_split {
     macro_rules! test {
@@ -77,10 +165,11 @@ mod test_split {
     }
 
     #[test]
-    pub fn char_escape() {
+    pub fn char_escape_and_literals() {
         test!("(\\a" -> "(" "\\a");
         test!("\\'" -> "\\'");
         test!("\\\"" -> "\\\"");
         test!("(abc de (f #\\\\) #\\\") (gh #\\) (#\\i ())" -> "(" "abc" "de" "(" "f" "#\\\\" ")" "#\\\"" ")" "(" "gh" "#\\)" "(" "#\\i" "(" ")" ")");
+        test!("#true #f #\\t #\\em #\\tab" -> "#true" "#f" "#\\t" "#\\em" "#\\tab");
     }
 }
