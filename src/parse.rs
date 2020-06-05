@@ -146,7 +146,7 @@ pub fn lex(item: &str) -> Result<Token, ParseErr> {
                 if chars.len() == 1 {
                     Err(ParseErr::LoneNumbersign)
                 } else if chars[1] == '\\' {
-                    let c = chars[2..].iter().collect::<String>();
+                    let c = chars.iter().skip(2).collect::<String>();
                     match verify_char(&c[..]) {
                         None => Err(ParseErr::InvalidChar(c)),
                         Some(chr) => Ok(Token::Char(chr)),
@@ -164,9 +164,9 @@ pub fn lex(item: &str) -> Result<Token, ParseErr> {
                 }
             } else if chars[0] == '"' { // Correct string ending already verified
                 Ok(Token::String(chars[1..chars.len()-1].iter().collect::<String>()))
-            } else if let Some(i) = s.parse::<i64>().ok() {
+            } else if let Ok(i) = s.parse::<i64>() {
                 Ok(Token::Integer(i))
-            } else if let Some(f) = s.parse::<f64>().ok() {
+            } else if let Ok(f) = s.parse::<f64>() {
                 Ok(Token::Float(f))
             } else if let Some(id) = verify_identifier(&s) {
                 Ok(Token::Atom(id))
