@@ -14,8 +14,14 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
     let mut items = Vec::new();
     let mut string = false;
     let mut escape = false;
+    let mut comment = false;
     for c in expr.chars() {
-        if string {
+        if comment {
+            if c == '\n' {
+                comment = false;
+            }
+            begin += 1;
+        } else if string {
             if c == '"' {
                 string = false;
             }
@@ -29,10 +35,17 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
         } else if c == '\\' {
             escape = true;
             len += 1;
-        } else if ['(', ')', '[', ']', ' '].contains(&c) {
+        } else if c == ';' {
+            if len > 0 { items.push(&expr[begin..begin+len]); }
+            comment = true;
+            begin += 1;
+            len = 0;
+        } else if ['(', ')', '[', ']', ' ', '\t', '\n'].contains(&c) {
             if len > 0 { items.push(&expr[begin..begin+len]); }
             begin += len;
-            if c != ' ' { items.push(&expr[begin..begin+1]); }
+            if ['(', ')', '[', ']'].contains(&c) {
+                items.push(&expr[begin..begin+1]);
+            }
             len = 0;
             begin += 1;
         } else {
@@ -46,7 +59,7 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
             Err(ParseErr::IncorrectSpacing(begin))
         }
     } else {
-        if expr.len() > begin {
+        if expr.len() > begin && !comment {
             items.push(&expr[begin..begin+len]);
         }
         Ok(items)
@@ -54,13 +67,13 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Literal {
+pub enum Literal {
     LoadSource,
     Exit,
 }
 
 #[derive(Debug)]
-enum Token {
+pub enum Token {
     OpenParen,
     CloseParen,
     OpenBrace,
@@ -117,7 +130,7 @@ impl std::cmp::PartialEq for Token {
     }
 }
 
-fn lex(item: &str) -> Result<Token, ParseErr> {
+pub fn lex(item: &str) -> Result<Token, ParseErr> {
     match item {
         "(" => Ok(Token::OpenParen),
         ")" => Ok(Token::CloseParen),
@@ -245,6 +258,12 @@ mod test_split {
         test!("\\\"" -> "\\\"");
         test!("(abc de (f #\\\\) #\\\") (gh #\\) (#\\i ())" -> "(" "abc" "de" "(" "f" "#\\\\" ")" "#\\\"" ")" "(" "gh" "#\\)" "(" "#\\i" "(" ")" ")");
         test!("#true #f #\\t #\\em #\\tab" -> "#true" "#f" "#\\t" "#\\em" "#\\tab");
+    }
+
+    #[test]
+    pub fn comments() {
+        test!(";abc\ndef;a" -> "def");
+        test!(";;; x y z \n a b c \n ;e" -> "a" "b" "c");
     }
 }
 
