@@ -117,7 +117,25 @@ fn lex(item: &str) -> Result<Token, ParseErr> {
 }
 
 fn verify_char(s: &str) -> Option<char> {
-    unimplemented!()
+    if s.len() == 1 {
+        Some(s.chars().next().unwrap())
+    } else {
+        match s {
+            "nul" => Some('\x00'),
+            "alarm" => Some('\x07'),
+            "backspace" => Some('\x08'),
+            "tab" => Some('\x09'),
+            "linefeed" => Some('\x0A'),
+            "newline" => Some('\x0A'),
+            "vtab" => Some('\x0B'),
+            "page" => Some('\x0C'),
+            "return" => Some('\x0D'),
+            "esc" => Some('\x1B'),
+            "space" => Some('\x20'),
+            "delete" => Some('\x7F'),
+            _ => None,
+        }
+    }
 }
 
 fn verify_integer(s: &str) -> Option<i64> {
