@@ -96,6 +96,7 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
 pub enum Literal {
     LoadSource,
     Exit,
+    Show,
 }
 
 #[derive(Debug)]
@@ -108,6 +109,7 @@ pub enum Token {
     Quasiquote,
     Antiquote,
     Dot,
+    Ellipsis,
     Char(char),
     Atom(String),
     Integer(i64),
@@ -148,6 +150,7 @@ impl std::cmp::PartialEq for Token {
             Token::Bool(b) => identical!(Bool(b)),
             Token::String(s) => identical!(String(s)),
             Token::Literal(lit) => identical!(Literal(lit)),
+            Token::Ellipsis => identical!(Ellipsis),
             Token::Float(f) => match other {
                 Token::Float(g) => (g - f).abs() < 0.00000001,
                 _ => false,
@@ -166,6 +169,7 @@ pub fn lex(item: &str) -> Result<Token, ParseErr> {
         "`" => Ok(Token::Quasiquote),
         "," => Ok(Token::Antiquote),
         "." => Ok(Token::Dot),
+        "..." => Ok(Token::Ellipsis),
         s => {
             let chars = s.chars().collect::<Vec<_>>();
             if chars[0] == '#' {
@@ -232,6 +236,7 @@ fn verify_literal(s: &str) -> Option<Literal> {
     match s {
         "load" => Some(Literal::LoadSource),
         "exit" => Some(Literal::Exit),
+        "show" => Some(Literal::Show),
         _ => None,
     }
 }
@@ -240,7 +245,7 @@ fn is_valid_char_ident(c: char) -> bool {
     '0' <= c && c <= '9'
         || 'a' <= c && c <= 'z'
         || 'A' <= c && c <= 'Z'
-        || "+-?!~/_%=*<>$|^@&".contains(c)
+        || ":!$%&*+./<=>?@^|-_~".contains(c)
 }
 
 fn verify_identifier(s: &str) -> Option<String> {
