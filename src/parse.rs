@@ -274,7 +274,7 @@ mod test_split {
         test!(") abc(" -> ")" "abc" "(");
         test!("abc de (a cfg (b d)) )" -> "abc" "de" "(" "a" "cfg" "(" "b" "d" ")" ")" ")");
         test!("+-123 // <e> (%1 11>1) ?~" -> "+-123" "//" "<e>" "(" "%1" "11>1" ")" "?~");
-        test!("[.(.{.}.].)" -> "[" "." "(" ".{.}." "]" "." ")");
+        test!("(f args ...)" -> "(" "f" "args" "..." ")");
     }
 
     #[test]
@@ -298,6 +298,9 @@ mod test_split {
     pub fn comments() {
         test!(";abc\ndef;a" -> "def");
         test!(";;; x y z \n a b c \n ;e" -> "a" "b" "c");
+        test!("this is an{~~ inline }comment" -> "this" "is" "an" "comment");
+        test!("[.(.{.}.].)" -> "[" "." "(" "." "." "]" "." ")");
+        test!("{comment}" -> );
     }
 }
 
@@ -324,6 +327,7 @@ mod test_lex {
         test!("'" -> +Quote);
         test!("," -> +Antiquote);
         test!("`" -> +Quasiquote);
+        test!("..." -> +Ellipsis);
     }
 
     #[test]
