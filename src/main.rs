@@ -57,6 +57,14 @@ fn main() {
                                 eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
                                 eprintln!("  {} contains invalid characters for an identifier", id);
                             }
+                            ParseErr::UnterminatedComment => {
+                                eprintln!("Found the start of an inline comment, but no matching terminator");
+                                eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
+                            }
+                            ParseErr::NoCommentStart => {
+                                eprintln!("Found an inline-comment terminator, but no matching beginning");
+                                eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
+                            }
                         }
                     }
                 }
