@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum ParseErr {
     UnterminatedString(usize),
@@ -8,6 +10,10 @@ pub enum ParseErr {
     InvalidIdent(String),
     UnterminatedComment,
     NoCommentStart,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum EvalErr {
 }
 
 pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
@@ -256,6 +262,32 @@ fn verify_identifier(s: &str) -> Option<String> {
     }
     Some(String::from(s))
 }
+
+pub enum Expr {
+    Nil,
+    Ellipsis,
+    Atom(String),
+    List(Vec<Expr>),
+    Integer(i64),
+    Float(f64),
+    String(String),
+    Bool(bool),
+    Fn(Func),
+    Lambda(Func, Envt),
+    Literal(Literal),
+    Cons(Vec<Expr>, Box<Expr>),
+}
+
+pub struct Func(Box<dyn Fn(Expr) -> Result<Expr, EvalErr>>);
+
+pub struct Envt(HashMap<String, Expr>);
+
+pub fn parse(tokens: Vec<Token>) -> Expr {
+    unimplemented!()
+}
+
+
+
 
 #[cfg(test)]
 mod test_split {
