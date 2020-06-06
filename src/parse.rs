@@ -6,6 +6,8 @@ pub enum ParseErr {
     InvalidChar(String),
     InvalidLiteral(String),
     InvalidIdent(String),
+    UnterminatedComment,
+    NoCommentStart,
 }
 
 pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
@@ -14,10 +16,19 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
     let mut items = Vec::new();
     let mut string = false;
     let mut escape = false;
+    let mut line_comment = false;
     let mut comment = false;
     for c in expr.chars() {
-        if comment {
+        if !(&expr[begin+len..begin+len+1] == format!("{}", c).as_str()) {
+            panic!("Lost sync: {} vs {} in {} at {}", &expr[begin+len..begin+len+1], c, expr, begin+len);
+        }
+        if line_comment {
             if c == '\n' {
+                line_comment = false;
+            }
+            begin += 1;
+        } else if comment {
+            if c == '}' {
                 comment = false;
             }
             begin += 1;
@@ -39,15 +50,24 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
             if len > 0 {
                 items.push(&expr[begin..begin + len]);
             }
-            comment = true;
-            begin += 1;
+            line_comment = true;
+            begin += len + 1;
             len = 0;
-        } else if ['(', ')', '[', ']', ' ', '\t', '\n'].contains(&c) {
+        } else if c == '{' {
+            if len > 0 {
+                items.push(&expr[begin..begin + len]);
+            }
+            comment = true;
+            begin += len + 1;
+            len = 0;
+        } else if c == '}' {
+            return Err(ParseErr::NoCommentStart);
+        } else if "()[] \t\n".contains(c) {
             if len > 0 {
                 items.push(&expr[begin..begin + len]);
             }
             begin += len;
-            if ['(', ')', '[', ']'].contains(&c) {
+            if "()[]".contains(c) {
                 items.push(&expr[begin..begin + 1]);
             }
             len = 0;
@@ -62,8 +82,10 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
         } else {
             Err(ParseErr::IncorrectSpacing(begin))
         }
+    } else if comment {
+        Err(ParseErr::UnterminatedComment)
     } else {
-        if expr.len() > begin && !comment {
+        if expr.len() > begin && !line_comment {
             items.push(&expr[begin..begin + len]);
         }
         Ok(items)
