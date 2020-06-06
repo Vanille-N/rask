@@ -13,8 +13,7 @@ pub enum ParseErr {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-pub enum EvalErr {
-}
+pub enum EvalErr {}
 
 pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
     let mut begin = 0;
@@ -24,18 +23,18 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
     let mut escape = false;
     let mut line_comment = false;
     let mut comment = 0;
-    while begin+len < expr.len() {
-        let c = expr[begin+len..begin+len+1].chars().next().unwrap();
+    while begin + len < expr.len() {
+        let c = expr[begin + len..begin + len + 1].chars().next().unwrap();
         if line_comment {
             if c == '\n' {
                 line_comment = false;
             }
             begin += 1;
         } else if comment > 0 {
-            if begin+len+1 < expr.len() && &expr[begin+len..begin+len+2] == "|#" {
+            if begin + len + 1 < expr.len() && &expr[begin + len..begin + len + 2] == "|#" {
                 comment -= 1;
                 begin += 1;
-            } else if begin+len+1 < expr.len() && &expr[begin+len..begin+len+2] == "#|" {
+            } else if begin + len + 1 < expr.len() && &expr[begin + len..begin + len + 2] == "#|" {
                 comment += 1;
                 begin += 1;
             }
@@ -61,14 +60,14 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
             line_comment = true;
             begin += len + 1;
             len = 0;
-        } else if begin+len+1 < expr.len() && &expr[begin+len..begin+len+2] == "#|" {
+        } else if begin + len + 1 < expr.len() && &expr[begin + len..begin + len + 2] == "#|" {
             if len > 0 {
                 items.push(&expr[begin..begin + len]);
             }
             comment = 1;
             begin += len + 2;
             len = 0;
-        } else if begin+len+1 < expr.len() && &expr[begin+len..begin+len+2] == "|#" {
+        } else if begin + len + 1 < expr.len() && &expr[begin + len..begin + len + 2] == "|#" {
             return Err(ParseErr::NoCommentStart);
         } else if "()[] \t\n".contains(c) {
             if len > 0 {
@@ -287,9 +286,6 @@ pub struct Envt(HashMap<String, Expr>);
 pub fn parse(tokens: Vec<Token>) -> Expr {
     unimplemented!()
 }
-
-
-
 
 #[cfg(test)]
 mod test_split {

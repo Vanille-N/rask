@@ -7,7 +7,9 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("split_and_lex", |b| {
         b.iter(|| {
             let sp = split(black_box(PROG)).ok().unwrap();
-            sp.into_iter().map(|s| lex(black_box(s))).collect::<Vec<_>>()
+            sp.into_iter()
+                .map(|s| lex(black_box(s)))
+                .collect::<Vec<_>>()
         })
     });
 }

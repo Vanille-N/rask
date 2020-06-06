@@ -62,7 +62,9 @@ fn main() {
                                 eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
                             }
                             ParseErr::NoCommentStart => {
-                                eprintln!("Found an inline-comment terminator, but no matching beginning");
+                                eprintln!(
+                                    "Found an inline-comment terminator, but no matching beginning"
+                                );
                                 eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
                             }
                         }
