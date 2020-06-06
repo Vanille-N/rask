@@ -23,19 +23,21 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
     let mut string = false;
     let mut escape = false;
     let mut line_comment = false;
-    let mut comment = false;
-    for c in expr.chars() {
-        if !(&expr[begin+len..begin+len+1] == format!("{}", c).as_str()) {
-            panic!("Lost sync: {} vs {} in {} at {}", &expr[begin+len..begin+len+1], c, expr, begin+len);
-        }
+    let mut comment = 0;
+    while begin+len < expr.len() {
+        let c = expr[begin+len..begin+len+1].chars().next().unwrap();
         if line_comment {
             if c == '\n' {
                 line_comment = false;
             }
             begin += 1;
-        } else if comment {
-            if c == '}' {
-                comment = false;
+        } else if comment > 0 {
+            if begin+len+1 < expr.len() && &expr[begin+len..begin+len+2] == "|#" {
+                comment -= 1;
+                begin += 1;
+            } else if begin+len+1 < expr.len() && &expr[begin+len..begin+len+2] == "#|" {
+                comment += 1;
+                begin += 1;
             }
             begin += 1;
         } else if string {
@@ -59,14 +61,14 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
             line_comment = true;
             begin += len + 1;
             len = 0;
-        } else if c == '{' {
+        } else if begin+len+1 < expr.len() && &expr[begin+len..begin+len+2] == "#|" {
             if len > 0 {
                 items.push(&expr[begin..begin + len]);
             }
-            comment = true;
-            begin += len + 1;
+            comment = 1;
+            begin += len + 2;
             len = 0;
-        } else if c == '}' {
+        } else if begin+len+1 < expr.len() && &expr[begin+len..begin+len+2] == "|#" {
             return Err(ParseErr::NoCommentStart);
         } else if "()[] \t\n".contains(c) {
             if len > 0 {
@@ -88,7 +90,7 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
         } else {
             Err(ParseErr::IncorrectSpacing(begin))
         }
-    } else if comment {
+    } else if comment > 0 {
         Err(ParseErr::UnterminatedComment)
     } else {
         if expr.len() > begin && !line_comment {
@@ -293,7 +295,7 @@ pub fn parse(tokens: Vec<Token>) -> Expr {
 mod test_split {
     macro_rules! test {
         ( $input:tt -> $( $output:tt )* ) => {
-            assert_eq!(split($input).ok(), Some(vec![ $( $output ),* ]));
+            assert_eq!(split($input).ok().unwrap(), vec![ $( $output ),* ] as Vec<&str>);
         }
     }
 
@@ -330,9 +332,10 @@ mod test_split {
     pub fn comments() {
         test!(";abc\ndef;a" -> "def");
         test!(";;; x y z \n a b c \n ;e" -> "a" "b" "c");
-        test!("this is an{~~ inline }comment" -> "this" "is" "an" "comment");
-        test!("[.(.{.}.].)" -> "[" "." "(" "." "." "]" "." ")");
-        test!("{comment}" -> );
+        test!("this is an#|~~ inline |#comment" -> "this" "is" "an" "comment");
+        test!("[.(.#|.|#.].)" -> "[" "." "(" "." "." "]" "." ")");
+        test!("#|comment|#" -> );
+        test!("a#| #| c|# d|# f" -> "a" "f");
     }
 }
 
