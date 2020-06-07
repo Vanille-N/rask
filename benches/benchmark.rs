@@ -23,6 +23,11 @@ fn criterion_split(c: &mut Criterion) {
 fn criterion_lex(c: &mut Criterion) {
     let assets = ["sort", "set-construct", "word-count", "printer", "interprete", "unification", "timer", "sprintf", "matrix"];
 
+    let crit = std::mem::replace(&mut*c, Criterion::default())
+        .measurement_time(Duration::new(3, 0))
+        .warm_up_time(Duration::new(1, 0));
+    std::mem::replace(&mut*c, crit);suh
+
     let mut group_lex = c.benchmark_group("lex");
     for file in assets.iter() {
         let prog = source(&("assets/".to_owned() + *file)).unwrap();
@@ -35,5 +40,5 @@ fn criterion_lex(c: &mut Criterion) {
 }
 
 
-criterion_group!(benches, criterion_split, criterion_lex);
+// criterion_group!(benches, criterion_split, criterion_lex);
 criterion_main!(benches);
