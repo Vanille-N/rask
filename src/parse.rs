@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use chainmap::ChainMap;
 use std::fs::File;
 use std::rc::Rc;
@@ -24,6 +23,11 @@ pub enum ParseErr {
     InvalidIdent(String),
     UnterminatedComment,
     NoCommentStart,
+    MismatchedOpenParen,
+    MismatchedCloseParen,
+    MismatchedOpenBrace,
+    MismatchedCloseBrace,
+    Unfinished,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -279,21 +283,26 @@ fn verify_identifier(s: &str) -> Option<String> {
 }
 
 pub enum Expr {
-    Nil,
-    Ellipsis,
     Atom(String),
     List(Vec<Expr>),
+    Quote(Box<Expr>),
+    Quasiquote(Box<Expr>),
+    Antiquote(Box<Expr>),
     Integer(i64),
     Float(f64),
     String(String),
-    Bool(bool),
-    Fn(Func),
+    Char(char),
+    Func(Func),
     Lambda(Func, Envt),
+    Nil,
+    Ellipsis,
+    Dot,
+    Bool(bool),
     Literal(Literal),
     Cons(Vec<Expr>, Box<Expr>),
 }
 
-pub struct Func(Box<dyn Fn(Expr) -> Result<Expr, EvalErr>>);
+pub struct Func(Box<dyn Fn(Vec<Expr>) -> Result<Expr, EvalErr>>);
 
 pub struct Envt(ChainMap<String, Rc<Expr>>);
 
