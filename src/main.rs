@@ -67,6 +67,35 @@ fn main() {
                                 );
                                 eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
                             }
+                            ParseErr::MismatchedOpenBrace => {
+                                eprintln!(
+                                    "Found an opening bracket `[` with no corresponding `]`"
+                                );
+                                eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
+                            }
+                            ParseErr::MismatchedCloseBrace => {
+                                eprintln!(
+                                    "Did not expect closing bracket `]` without matching `[` first"
+                                );
+                                eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
+                            }
+                            ParseErr::MismatchedOpenParen => {
+                                eprintln!(
+                                    "Found an opening parenthesis `(` with no corresponding `)`"
+                                );
+                                eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
+                            }
+                            ParseErr::MismatchedCloseParen => {
+                                eprintln!(
+                                    "Did not expect closing parenthesis `)` without matching `(` first"
+                                );
+                                eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
+                            }
+                            ParseErr::Unfinished => {
+                                eprintln!("Unexpected end of expression");
+                                eprintln!("  Check your usage of quotes in particular");
+                                eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
+                            }
                         }
                     }
                 }

@@ -306,8 +306,11 @@ pub struct Func(Box<dyn Fn(Vec<Expr>) -> Result<Expr, EvalErr>>);
 
 pub struct Envt(ChainMap<String, Rc<Expr>>);
 
-pub fn parse(tokens: Vec<Token>) -> Expr {
-    unimplemented!()
+pub fn parse(tokens: Vec<Token>) -> Result<Expr, ParseErr> {
+    // let idx = 0;
+    parse_helper(&tokens, &mut 0)
+}
+
 pub fn parse_helper(tokens: &Vec<Token>, idx: &mut usize) -> Result<Expr, ParseErr> {
     if *idx >= tokens.len() { return Err(ParseErr::Unfinished); }
     match &tokens[*idx] {
@@ -340,6 +343,16 @@ pub fn parse_helper(tokens: &Vec<Token>, idx: &mut usize) -> Result<Expr, ParseE
             *idx += 1;
             Ok(Expr::Antiquote(Box::new(parse_helper(tokens, idx)?)))
         }
+        Token::Dot => Ok(Expr::Dot),
+        Token::Ellipsis => Ok(Expr::Ellipsis),
+        Token::Char(c) => Ok(Expr::Char(*c)),
+        Token::Atom(a) => Ok(Expr::Atom(a.clone())),
+        Token::Integer(i) => Ok(Expr::Integer(*i)),
+        Token::Float(f) => Ok(Expr::Float(*f)),
+        Token::Bool(b) => Ok(Expr::Bool(*b)),
+        Token::String(s) => Ok(Expr::String(s.clone())),
+        Token::Literal(l) => Ok(Expr::Literal(l.clone())),
+    }
 }
 
 #[cfg(test)]
