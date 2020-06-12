@@ -308,6 +308,38 @@ pub struct Envt(ChainMap<String, Rc<Expr>>);
 
 pub fn parse(tokens: Vec<Token>) -> Expr {
     unimplemented!()
+pub fn parse_helper(tokens: &Vec<Token>, idx: &mut usize) -> Result<Expr, ParseErr> {
+    if *idx >= tokens.len() { return Err(ParseErr::Unfinished); }
+    match &tokens[*idx] {
+        sep @ Token::OpenParen | sep @ Token::OpenBrace => {
+            *idx += 1;
+            let mut v = Vec::new();
+            while tokens[*idx] != *sep {
+                v.push(parse_helper(tokens, idx)?);
+                if *idx == tokens.len() {
+                    return Err(match sep {
+                        Token::OpenParen => ParseErr::MismatchedOpenParen,
+                        Token::OpenBrace => ParseErr::MismatchedOpenBrace,
+                        _ => unreachable!(),
+                    });
+                }
+            }
+            Ok(Expr::List(v))
+        }
+        Token::CloseParen => Err(ParseErr::MismatchedCloseParen),
+        Token::CloseBrace => Err(ParseErr::MismatchedCloseBrace),
+        Token::Quote => {
+            *idx += 1;
+            Ok(Expr::Quote(Box::new(parse_helper(tokens, idx)?)))
+        }
+        Token::Quasiquote => {
+            *idx += 1;
+            Ok(Expr::Quasiquote(Box::new(parse_helper(tokens, idx)?)))
+        }
+        Token::Antiquote => {
+            *idx += 1;
+            Ok(Expr::Antiquote(Box::new(parse_helper(tokens, idx)?)))
+        }
 }
 
 #[cfg(test)]
