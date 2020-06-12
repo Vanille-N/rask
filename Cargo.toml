@@ -9,6 +9,9 @@ readme = "README.md"
 repository = "https://github.com/Vanille-N/rask"
 keywords = ["scheme", "interpreter"]
 
+[dependencies]
+chainmap = "0.1.1"
+
 [dev-dependencies]
 criterion = "0.3"
 

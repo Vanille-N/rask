@@ -1,5 +1,7 @@
 use std::collections::HashMap;
+use chainmap::ChainMap;
 use std::fs::File;
+use std::rc::Rc;
 use std::io::prelude::*;
 
 pub fn source(fname: &str) -> Option<String> {
@@ -293,7 +295,7 @@ pub enum Expr {
 
 pub struct Func(Box<dyn Fn(Expr) -> Result<Expr, EvalErr>>);
 
-pub struct Envt(HashMap<String, Expr>);
+pub struct Envt(ChainMap<String, Rc<Expr>>);
 
 pub fn parse(tokens: Vec<Token>) -> Expr {
     unimplemented!()
