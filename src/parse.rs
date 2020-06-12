@@ -399,8 +399,12 @@ mod test_lex {
         test!("-125" -> +Integer(-125));
         test!("1253.7" -> +Float(1253.7));
         test!("12e-1" -> +Float(1.2));
+        test!("0.5" -> +Float(0.5));
+        test!(".5" -> +Float(0.5));
+        test!("0." -> +Float(0.0));
         test!("\"abc\"" -> +String(String::from("abc")));
         test!("\"aaa\\\"bbb\"" -> +String(String::from("aaa\\\"bbb")));
+        test!("abc" -> +Atom(String::from("abc")));
     }
 
     macro_rules! ident {
