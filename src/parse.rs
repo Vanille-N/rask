@@ -311,7 +311,7 @@ pub fn parse(tokens: Vec<Token>) -> Result<Expr, ParseErr> {
     parse_helper(&tokens, &mut 0)
 }
 
-pub fn parse_helper(tokens: &Vec<Token>, idx: &mut usize) -> Result<Expr, ParseErr> {
+pub fn parse_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr> {
     if *idx >= tokens.len() { return Err(ParseErr::Unfinished); }
     match &tokens[*idx] {
         sep @ Token::OpenParen | sep @ Token::OpenBrace => {
@@ -351,7 +351,7 @@ pub fn parse_helper(tokens: &Vec<Token>, idx: &mut usize) -> Result<Expr, ParseE
         Token::Float(f) => Ok(Expr::Float(*f)),
         Token::Bool(b) => Ok(Expr::Bool(*b)),
         Token::String(s) => Ok(Expr::String(s.clone())),
-        Token::Literal(l) => Ok(Expr::Literal(l.clone())),
+        Token::Literal(l) => Ok(Expr::Literal(*l)),
     }
 }
 
