@@ -1,8 +1,8 @@
 use chainmap::ChainMap;
 use std::fs::File;
+use std::io::prelude::*;
 use std::rc::Rc;
 use std::{cmp, fmt};
-use std::io::prelude::*;
 
 pub fn source(fname: &str) -> Option<String> {
     if let Ok(mut file) = File::open(fname.to_owned() + ".scm") {
@@ -337,8 +337,14 @@ impl fmt::Debug for Expr {
             Expr::Nil => write!(f, "()"),
             Expr::Ellipsis => write!(f, "..."),
             Expr::Dot => write!(f, "."),
-            Expr::Bool(b) => if *b { write!(f, "#t") } else { write!(f, "#f") },
-            Expr::Literal(l) => write!(f, "<lit>"),
+            Expr::Bool(b) => {
+                if *b {
+                    write!(f, "#t")
+                } else {
+                    write!(f, "#f")
+                }
+            }
+            Expr::Literal(_) => write!(f, "<lit>"),
             Expr::Cons(v, e) => {
                 if v.len() == 0 {
                     write!(f, "(. {:?})", e)
@@ -359,7 +365,9 @@ pub fn parse(tokens: Vec<Token>) -> Result<Expr, ParseErr> {
 }
 
 pub fn parse_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr> {
-    if *idx >= tokens.len() { return Err(ParseErr::Unfinished); }
+    if *idx >= tokens.len() {
+        return Err(ParseErr::Unfinished);
+    }
     match &tokens[*idx] {
         sep @ Token::OpenParen | sep @ Token::OpenBrace => {
             *idx += 1;
@@ -399,15 +407,9 @@ pub fn parse_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr>
         }
         Token::CloseParen => Err(ParseErr::MismatchedCloseParen),
         Token::CloseBrace => Err(ParseErr::MismatchedCloseBrace),
-        Token::Quote => {
-            Ok(Expr::Quote(Box::new(parse_helper(tokens, idx)?)))
-        }
-        Token::Quasiquote => {
-            Ok(Expr::Quasiquote(Box::new(parse_helper(tokens, idx)?)))
-        }
-        Token::Antiquote => {
-            Ok(Expr::Antiquote(Box::new(parse_helper(tokens, idx)?)))
-        }
+        Token::Quote => Ok(Expr::Quote(Box::new(parse_helper(tokens, idx)?))),
+        Token::Quasiquote => Ok(Expr::Quasiquote(Box::new(parse_helper(tokens, idx)?))),
+        Token::Antiquote => Ok(Expr::Antiquote(Box::new(parse_helper(tokens, idx)?))),
         Token::Dot => Ok(Expr::Dot),
         Token::Ellipsis => Ok(Expr::Ellipsis),
         Token::Char(c) => Ok(Expr::Char(*c)),
@@ -440,54 +442,70 @@ fn corresponds(lt: &Expr, rt: &Expr) -> bool {
         Atom(s) => identical!(Atom(s)),
         List(v) => {
             if let List(w) = rt {
-            if v.len() == w.len() {
-                for i in 0..v.len() {
-                    if !corresponds(&v[i], &w[i]) {
-                        return false;
+                if v.len() == w.len() {
+                    for i in 0..v.len() {
+                        if !corresponds(&v[i], &w[i]) {
+                            return false;
+                        }
                     }
                 }
             }
-        }
             false
         }
-        Quote(e) => if let Quote(f) = rt {
-            corresponds(e, f)
-        } else {
-            false
+        Quote(e) => {
+            if let Quote(f) = rt {
+                corresponds(e, f)
+            } else {
+                false
+            }
         }
-        Quasiquote(e) => if let Quasiquote(f) = rt {
-            corresponds(e, f)
-        } else {
-            false
+        Quasiquote(e) => {
+            if let Quasiquote(f) = rt {
+                corresponds(e, f)
+            } else {
+                false
+            }
         }
-        Antiquote(e) => if let Antiquote(f) = rt {
-            corresponds(e, f)
-        } else {false}
+        Antiquote(e) => {
+            if let Antiquote(f) = rt {
+                corresponds(e, f)
+            } else {
+                false
+            }
+        }
         Integer(i) => identical!(Integer(i)),
-        Float(f) => if let Float(g)=rt{ (g - f).abs() < 0.00000001} else{false}
+        Float(f) => {
+            if let Float(g) = rt {
+                (g - f).abs() < 0.00000001
+            } else {
+                false
+            }
+        }
         String(s) => identical!(String(s)),
         Char(c) => identical!(Char(c)),
-        Func(c) => false,
+        Func(_) => false,
         Lambda(_, _) => false,
         Nil => identical!(Nil),
         Ellipsis => identical!(Ellipsis),
         Dot => identical!(Dot),
         Bool(b) => identical!(Bool(b)),
-        Literal(l) => false,
-        Cons(v, e) => if let Cons(w, f) = rt {
-            if v.len() == w.len() {
-                for i in 0..v.len() {
-                    if !corresponds(&v[i], &w[i]) {
-                        return false;
+        Literal(_) => false,
+        Cons(v, e) => {
+            if let Cons(w, f) = rt {
+                if v.len() == w.len() {
+                    for i in 0..v.len() {
+                        if !corresponds(&v[i], &w[i]) {
+                            return false;
+                        }
                     }
                 }
+                corresponds(e, f)
+            } else {
+                false
             }
-            corresponds(e, f)
-        } else {false}
+        }
     }
 }
-
-
 
 #[cfg(test)]
 mod test_split {
@@ -649,7 +667,11 @@ mod test_parse {
             let tokens = lex(split(s));
             let lt = parse(tokens).ok().unwrap();
             if !corresponds(lt, Expr::$e) {
-                panic!("Parsing mistake:\n    {:?} is not the same as \n    {:?}", lt, Expr::$e);
+                panic!(
+                    "Parsing mistake:\n    {:?} is not the same as \n    {:?}",
+                    lt,
+                    Expr::$e
+                );
             }
         };
         ( $s:expr -> -$e:expr ) => {

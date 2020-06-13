@@ -68,9 +68,7 @@ fn main() {
                                 eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
                             }
                             ParseErr::MismatchedOpenBrace => {
-                                eprintln!(
-                                    "Found an opening bracket `[` with no corresponding `]`"
-                                );
+                                eprintln!("Found an opening bracket `[` with no corresponding `]`");
                                 eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
                             }
                             ParseErr::MismatchedCloseBrace => {
