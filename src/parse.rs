@@ -306,6 +306,50 @@ pub struct Func(Box<dyn Fn(Vec<Expr>) -> Result<Expr, EvalErr>>);
 
 pub struct Envt(ChainMap<String, Rc<Expr>>);
 
+impl fmt::Debug for Expr {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match &self {
+            Expr::Atom(s) => write!(f, "Atom({:?})", &s),
+            Expr::List(v) => {
+                if v.len() == 0 {
+                    write!(f, "'()")
+                } else {
+                    write!(f, "({:?}", v[0])?;
+                    for item in v.iter().skip(1) {
+                        write!(f, " {:?}", &item)?;
+                    }
+                    write!(f, ")")
+                }
+            }
+            Expr::Quote(e) => write!(f, "'{:?}", &e),
+            Expr::Quasiquote(e) => write!(f, "`{:?}", &e),
+            Expr::Antiquote(e) => write!(f, ",{:?}", &e),
+            Expr::Integer(i) => write!(f, "Integer({})", i),
+            Expr::Float(x) => write!(f, "Float({})", x),
+            Expr::String(s) => write!(f, "\"{}\"", &s),
+            Expr::Char(c) => write!(f, "#\\{:?}", c),
+            Expr::Func(_) => write!(f, "<fun>"),
+            Expr::Lambda(_, _) => write!(f, "<lambda>"),
+            Expr::Nil => write!(f, "()"),
+            Expr::Ellipsis => write!(f, "..."),
+            Expr::Dot => write!(f, "."),
+            Expr::Bool(b) => if *b { write!(f, "#t") } else { write!(f, "#f") },
+            Expr::Literal(l) => write!(f, "<lit>"),
+            Expr::Cons(v, e) => {
+                if v.len() == 0 {
+                    write!(f, "(. {:?})", e)
+                } else {
+                    write!(f, "(")?;
+                    for item in v.iter() {
+                        write!(f, "{:?} ", &item)?;
+                    }
+                    write!(f, ". {:?})", e)
+                }
+            }
+        }
+    }
+}
+
 pub fn parse(tokens: Vec<Token>) -> Result<Expr, ParseErr> {
     // let idx = 0;
     parse_helper(&tokens, &mut 0)
