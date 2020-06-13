@@ -93,7 +93,11 @@ fn main() {
                             }
                             ParseErr::Unfinished => {
                                 eprintln!("Unexpected end of expression");
-                                eprintln!("  Check your usage of quotes in particular");
+                                eprintln!("  Check your usage of quotes and dots in particular");
+                                eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
+                            }
+                            ParseErr::InvalidCons => {
+                                eprintln!("Cannot make a cons of anything other than a list and an expression");
                                 eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
                             }
                         }
