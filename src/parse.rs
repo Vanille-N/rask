@@ -399,6 +399,75 @@ pub fn parse_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr>
     }
 }
 
+fn corresponds(lt: &Expr, rt: &Expr) -> bool {
+    macro_rules! identical {
+        ( $id:tt ) => {
+            match rt {
+                Expr::$id => true,
+                _ => false,
+            }
+        };
+        ( $id:tt($contents:tt) ) => {
+            match rt {
+                Expr::$id(x) => x == $contents,
+                _ => false,
+            }
+        };
+    }
+    use Expr::*;
+    match lt {
+        Atom(s) => identical!(Atom(s)),
+        List(v) => {
+            if let List(w) = rt {
+            if v.len() == w.len() {
+                for i in 0..v.len() {
+                    if !corresponds(&v[i], &w[i]) {
+                        return false;
+                    }
+                }
+            }
+        }
+            false
+        }
+        Quote(e) => if let Quote(f) = rt {
+            corresponds(e, f)
+        } else {
+            false
+        }
+        Quasiquote(e) => if let Quasiquote(f) = rt {
+            corresponds(e, f)
+        } else {
+            false
+        }
+        Antiquote(e) => if let Antiquote(f) = rt {
+            corresponds(e, f)
+        } else {false}
+        Integer(i) => identical!(Integer(i)),
+        Float(f) => if let Float(g)=rt{ (g - f).abs() < 0.00000001} else{false}
+        String(s) => identical!(String(s)),
+        Char(c) => identical!(Char(c)),
+        Func(c) => false,
+        Lambda(_, _) => false,
+        Nil => identical!(Nil),
+        Ellipsis => identical!(Ellipsis),
+        Dot => identical!(Dot),
+        Bool(b) => identical!(Bool(b)),
+        Literal(l) => false,
+        Cons(v, e) => if let Cons(w, f) = rt {
+            if v.len() == w.len() {
+                for i in 0..v.len() {
+                    if !corresponds(&v[i], &w[i]) {
+                        return false;
+                    }
+                }
+            }
+            corresponds(e, f)
+        } else {false}
+    }
+}
+
+
+
 #[cfg(test)]
 mod test_split {
     macro_rules! test {
