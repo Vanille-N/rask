@@ -1,13 +1,16 @@
 use chainmap::ChainMap;
 use std::fs::File;
 use std::rc::Rc;
+use std::{cmp, fmt};
 use std::io::prelude::*;
 
 pub fn source(fname: &str) -> Option<String> {
     if let Ok(mut file) = File::open(fname.to_owned() + ".scm") {
         let mut contents = String::new();
-        file.read_to_string(&mut contents);
-        Some(contents)
+        match file.read_to_string(&mut contents) {
+            Ok(_) => Some(contents),
+            Err(_) => None,
+        }
     } else {
         None
     }
@@ -28,6 +31,7 @@ pub enum ParseErr {
     MismatchedOpenBrace,
     MismatchedCloseBrace,
     Unfinished,
+    InvalidCons,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -144,7 +148,7 @@ pub enum Token {
     Literal(Literal),
 }
 
-impl std::cmp::PartialEq for Token {
+impl cmp::PartialEq for Token {
     fn eq(&self, other: &Self) -> bool {
         macro_rules! identical {
             ( $id:tt ) => {
@@ -351,7 +355,6 @@ impl fmt::Debug for Expr {
 }
 
 pub fn parse(tokens: Vec<Token>) -> Result<Expr, ParseErr> {
-    // let idx = 0;
     parse_helper(&tokens, &mut 0)
 }
 
@@ -376,15 +379,12 @@ pub fn parse_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr>
         Token::CloseParen => Err(ParseErr::MismatchedCloseParen),
         Token::CloseBrace => Err(ParseErr::MismatchedCloseBrace),
         Token::Quote => {
-            *idx += 1;
             Ok(Expr::Quote(Box::new(parse_helper(tokens, idx)?)))
         }
         Token::Quasiquote => {
-            *idx += 1;
             Ok(Expr::Quasiquote(Box::new(parse_helper(tokens, idx)?)))
         }
         Token::Antiquote => {
-            *idx += 1;
             Ok(Expr::Antiquote(Box::new(parse_helper(tokens, idx)?)))
         }
         Token::Dot => Ok(Expr::Dot),
