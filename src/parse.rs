@@ -364,8 +364,19 @@ pub fn parse_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr>
         sep @ Token::OpenParen | sep @ Token::OpenBrace => {
             *idx += 1;
             let mut v = Vec::new();
+            let mut dot_seen = false;
             while tokens[*idx] != *sep {
-                v.push(parse_helper(tokens, idx)?);
+                let expr = parse_helper(tokens, idx)?;
+                if let Expr::Dot = expr {
+                    if dot_seen {
+                        return Err(ParseErr::InvalidCons);
+                    } else {
+                        dot_seen = true;
+                        break;
+                    }
+                } else {
+                    v.push(expr);
+                }
                 if *idx == tokens.len() {
                     return Err(match sep {
                         Token::OpenParen => ParseErr::MismatchedOpenParen,
@@ -374,7 +385,17 @@ pub fn parse_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr>
                     });
                 }
             }
-            Ok(Expr::List(v))
+            *idx += 1;
+            if dot_seen {
+                let expr = parse_helper(tokens, idx)?;
+                if *idx < tokens.len() && tokens[*idx + 1] == *sep {
+                    Ok(Expr::Cons(v, Box::new(expr)))
+                } else {
+                    Err(ParseErr::InvalidCons)
+                }
+            } else {
+                Ok(Expr::List(v))
+            }
         }
         Token::CloseParen => Err(ParseErr::MismatchedCloseParen),
         Token::CloseBrace => Err(ParseErr::MismatchedCloseBrace),
