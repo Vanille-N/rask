@@ -580,6 +580,13 @@ mod test_split {
         test!("#|comment|#" -> );
         test!("a#| #| c|# d|# f" -> "a" "f");
     }
+
+    #[test]
+    pub fn quotes() {
+        test!("'a" -> "'" "a");
+        test!("`(ab ,c d)" -> "`" "(" "ab" "," "c" "d" ")");
+        test!("ab `c" -> "ab" "`" "c");
+    }
 }
 
 #[cfg(test)]
