@@ -101,6 +101,15 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
             }
             len = 0;
             begin += 1;
+        } else if c == '\'' {
+            begin += 1;
+            items.push("'");
+        } else if c == ',' {
+            begin += 1;
+            items.push(",");
+        } else if c == '`' {
+            begin += 1;
+            items.push("`");
         } else {
             len += 1;
         }
