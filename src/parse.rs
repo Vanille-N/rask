@@ -239,6 +239,14 @@ pub fn lex(item: &str) -> Result<Token, ParseErr> {
     }
 }
 
+pub fn distribute_lex(s: Vec<&str>) -> Result<Vec<Token>, ParseErr> {
+    let mut tokens = Vec::new();
+    for item in s {
+        tokens.push(lex(item)?);
+    }
+    Ok(tokens)
+}
+
 fn verify_char(s: &str) -> Option<char> {
     if s.len() == 1 {
         Some(s.chars().next().unwrap())
