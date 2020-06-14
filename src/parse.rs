@@ -384,12 +384,13 @@ pub fn parse_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr>
     if *idx >= tokens.len() {
         return Err(ParseErr::Unfinished);
     }
-    match &tokens[*idx] {
-        sep @ Token::OpenParen | sep @ Token::OpenBrace => {
-            *idx += 1;
+    *idx += 1;
+    match &tokens[*idx - 1] {
+        op @ Token::OpenParen | op @ Token::OpenBrace => {
+            let cl = close_separator(&op);
             let mut v = Vec::new();
             let mut dot_seen = false;
-            while tokens[*idx] != *sep {
+            while tokens[*idx] != cl {
                 let expr = parse_helper(tokens, idx)?;
                 if let Expr::Dot = expr {
                     if dot_seen {
@@ -402,7 +403,7 @@ pub fn parse_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr>
                     v.push(expr);
                 }
                 if *idx == tokens.len() {
-                    return Err(match sep {
+                    return Err(match op {
                         Token::OpenParen => ParseErr::MismatchedOpenParen,
                         Token::OpenBrace => ParseErr::MismatchedOpenBrace,
                         _ => unreachable!(),
@@ -412,7 +413,7 @@ pub fn parse_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr>
             *idx += 1;
             if dot_seen {
                 let expr = parse_helper(tokens, idx)?;
-                if *idx < tokens.len() && tokens[*idx + 1] == *sep {
+                if *idx < tokens.len() && tokens[*idx + 1] == cl {
                     Ok(Expr::Cons(v, Box::new(expr)))
                 } else {
                     Err(ParseErr::InvalidCons)
@@ -464,6 +465,7 @@ fn corresponds(lt: &Expr, rt: &Expr) -> bool {
                             return false;
                         }
                     }
+                    return true;
                 }
             }
             false
