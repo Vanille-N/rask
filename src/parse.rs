@@ -709,4 +709,27 @@ mod test_parse {
             assert_eq!(lt, ParseErr::$e);
         };
     }
+
+    macro_rules! list {
+        ( $( $elem:expr ),* ) => {
+            Expr::List(vec![$( $elem ),*])
+        }
+    }
+
+    macro_rules! atom {
+        ( $elem:tt ) => { Expr::Atom(String::from(stringify!($elem))) }
+    }
+
+    macro_rules! quote {
+        ( $elem:expr ) => { Expr::Quote(Box::new($elem)) }
+    }
+
+    macro_rules! int {
+        ( $elem:expr ) => {Expr::Integer($elem) }
+    }
+
+    macro_rules! corresp {
+        ( $lt:expr, $rt:expr ) => { assert!(corresponds(&$lt, &$rt)) }
+    }
+
 }
