@@ -372,6 +372,14 @@ pub fn parse(tokens: Vec<Token>) -> Result<Expr, ParseErr> {
     parse_helper(&tokens, &mut 0)
 }
 
+pub fn close_separator(op: &Token) -> Token {
+    match op {
+        Token::OpenParen => Token::CloseParen,
+        Token::OpenBrace => Token::CloseBrace,
+        _ => panic!("{:?} is not closable", op),
+    }
+}
+
 pub fn parse_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr> {
     if *idx >= tokens.len() {
         return Err(ParseErr::Unfinished);
