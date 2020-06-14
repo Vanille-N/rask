@@ -681,18 +681,29 @@ mod test_lex {
 mod test_parse {
     use super::*;
     macro_rules! check {
-        ( $s:expr -> +$e:expr ) => {
-            let tokens = lex(split(s));
-            let lt = parse(tokens).ok().unwrap();
-            if !corresponds(lt, Expr::$e) {
+        ( $s:tt -> +$e:expr ) => {
+            let sp = split($s);
+            if let Err(e) = sp {
+                panic!("Failed to split: {:?}", e);
+            }
+            let tokens = distribute_lex(sp.ok().unwrap());
+            if let Err(e) = tokens {
+                panic!("Failed to lex: {:?}", e);
+            }
+            let lt = parse(tokens.ok().unwrap());
+            if let Err(e) = lt {
+                panic!("Failed to parse: {:?}", e);
+            }
+            let lt = lt.ok().unwrap();
+            if !corresponds(&lt, &$e) {
                 panic!(
                     "Parsing mistake:\n    {:?} is not the same as \n    {:?}",
                     lt,
-                    Expr::$e
+                    $e
                 );
             }
         };
-        ( $s:expr -> -$e:expr ) => {
+        ( $s:tt -> -$e:expr ) => {
             let tokens = lex(split(s));
             let lt = parse(tokens).err().unwrap();
             assert_eq!(lt, ParseErr::$e);
