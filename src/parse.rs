@@ -732,4 +732,9 @@ mod test_parse {
         ( $lt:expr, $rt:expr ) => { assert!(corresponds(&$lt, &$rt)) }
     }
 
+    #[test]
+    fn check_corresponds() {
+        corresp!(atom!(a), atom!(a));
+        corresp!(list!(atom!(a), atom!(b), atom!(c)), list!(atom!(a), atom!(b), atom!(c)));
+    }
 }
