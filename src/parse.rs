@@ -753,4 +753,12 @@ mod test_parse {
         corresp!(atom!(a), atom!(a));
         corresp!(list!(atom!(a), atom!(b), atom!(c)), list!(atom!(a), atom!(b), atom!(c)));
     }
+
+    #[test]
+    fn simple_lists() {
+        check!("(f x y)" -> +list!(atom!(f), atom!(x), atom!(y)));
+        check!("(f (g x) y z)" -> +list!(atom!(f), list!(atom!(g), atom!(x)), atom!(y), atom!(z)));
+        check!("(f '(g x) y z)" -> +list!(atom!(f), quote!(list!(atom!(g), atom!(x))), atom!(y), atom!(z)));
+        check!("(fff '(0 1 2 'x))" -> +list!(atom!(fff), quote!(list!(int!(0), int!(1), int!(2), quote!(atom!(x))))));
+    }
 }
