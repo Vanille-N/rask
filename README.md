@@ -4,6 +4,7 @@
 
 [![](https://img.shields.io/badge/github-Vanille--N/rask-8da0cb?logo=github)](https://github.com/Vanille-N/rask)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![codecov](https://codecov.io/gh/Vanille-N/rask/branch/master/graph/badge.svg)](https://codecov.io/gh/Vanille-N/rask)
 
 `rask` [![crates.io](http://meritbadge.herokuapp.com/rask)](https://crates.io/crates/rask)
 [![API](https://docs.rs/rask/badge.svg)](https://docs.rs/rask)
