@@ -1,4 +1,4 @@
-use crate::parse::{ParseErr};
+use crate::parse::ParseErr;
 
 pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
     let mut begin = 0;
@@ -92,7 +92,6 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
         Ok(items)
     }
 }
-
 
 #[cfg(test)]
 mod test {

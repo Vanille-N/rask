@@ -1,9 +1,9 @@
-mod util;
-mod split;
-mod lex;
 mod build;
+mod lex;
+mod split;
+mod util;
 
-pub use util::*;
-pub use split::split;
-pub use lex::distribute_lex as lex;
 pub use build::build;
+pub use lex::distribute_lex as lex;
+pub use split::split;
+pub use util::*;

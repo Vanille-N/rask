@@ -1,6 +1,6 @@
-use std::{cmp, fmt};
 use chainmap::ChainMap;
 use std::rc::Rc;
+use std::{cmp, fmt};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum ParseErr {

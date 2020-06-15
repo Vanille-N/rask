@@ -1,4 +1,4 @@
-use crate::parse::{Expr, Token, ParseErr};
+use crate::parse::{Expr, ParseErr, Token};
 
 pub fn build(tokens: Vec<Token>) -> Result<Expr, ParseErr> {
     build_helper(&tokens, &mut 0)
@@ -72,11 +72,10 @@ fn build_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr> {
     }
 }
 
-
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::parse::{lex, split, corresponds};
+    use crate::parse::{corresponds, lex, split};
     macro_rules! check {
         ( $s:tt -> $e:expr ) => {
             let sp = split($s);
@@ -95,11 +94,10 @@ mod test {
             if !corresponds(&lt, &$e) {
                 panic!(
                     "Parsing mistake:\n    {:?} is not the same as \n    {:?}",
-                    lt,
-                    $e
+                    lt, $e
                 );
             }
-        }
+        };
     }
 
     macro_rules! fails {
@@ -124,19 +122,27 @@ mod test {
     }
 
     macro_rules! atom {
-        ( $elem:tt ) => { Expr::Atom(String::from(stringify!($elem))) }
+        ( $elem:tt ) => {
+            Expr::Atom(String::from(stringify!($elem)))
+        };
     }
 
     macro_rules! quote {
-        ( $elem:expr ) => { Expr::Quote(Box::new($elem)) }
+        ( $elem:expr ) => {
+            Expr::Quote(Box::new($elem))
+        };
     }
 
     macro_rules! int {
-        ( $elem:expr ) => {Expr::Integer($elem) }
+        ( $elem:expr ) => {
+            Expr::Integer($elem)
+        };
     }
 
     macro_rules! corresp {
-        ( $lt:expr, $rt:expr ) => { assert!(corresponds(&$lt, &$rt)) }
+        ( $lt:expr, $rt:expr ) => {
+            assert!(corresponds(&$lt, &$rt))
+        };
     }
 
     macro_rules! cons {
@@ -146,7 +152,10 @@ mod test {
     #[test]
     fn check_corresponds() {
         corresp!(atom!(a), atom!(a));
-        corresp!(list!(atom!(a), atom!(b), atom!(c)), list!(atom!(a), atom!(b), atom!(c)));
+        corresp!(
+            list!(atom!(a), atom!(b), atom!(c)),
+            list!(atom!(a), atom!(b), atom!(c))
+        );
     }
 
     #[test]

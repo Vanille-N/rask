@@ -1,4 +1,4 @@
-use crate::parse::{ParseErr, Token, Literal};
+use crate::parse::{Literal, ParseErr, Token};
 
 pub fn lex(item: &str) -> Result<Token, ParseErr> {
     match item {
@@ -109,8 +109,8 @@ fn verify_identifier(s: &str) -> Option<String> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::source;
     use crate::parse::split;
+    use crate::source;
     macro_rules! test {
         ( $input:tt -> +$( $output:tt )+ ) => {
             assert_eq!(lex($input).ok().unwrap(), Token::$( $output )+)
