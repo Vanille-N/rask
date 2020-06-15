@@ -697,7 +697,7 @@ mod test_lex {
 mod test_parse {
     use super::*;
     macro_rules! check {
-        ( $s:tt -> +$e:expr ) => {
+        ( $s:tt -> $e:expr ) => {
             let sp = split($s);
             if let Err(e) = sp {
                 panic!("Failed to split: {:?}", e);
@@ -718,11 +718,21 @@ mod test_parse {
                     $e
                 );
             }
-        };
-        ( $s:tt -> -$e:expr ) => {
-            let tokens = lex(split(s));
-            let lt = parse(tokens).err().unwrap();
-            assert_eq!(lt, ParseErr::$e);
+        }
+    }
+
+    macro_rules! fails {
+        ( $s:tt -> $e:ident ) => {
+            let sp = split($s);
+            if let Err(e) = sp {
+                panic!("Failed to split: {:?}", e);
+            }
+            let tokens = distribute_lex(sp.ok().unwrap());
+            if let Err(e) = tokens {
+                panic!("Failed to lex: {:?}", e);
+            }
+            let lt = parse(tokens.ok().unwrap());
+            assert_eq!(lt.err().unwrap(), ParseErr::$e);
         };
     }
 
@@ -748,6 +758,10 @@ mod test_parse {
         ( $lt:expr, $rt:expr ) => { assert!(corresponds(&$lt, &$rt)) }
     }
 
+    macro_rules! cons {
+        ( $( $elem:expr ),* ; $end:expr ) => {Expr::Cons(vec![$( $elem ),*], Box::new($end))}
+    }
+
     #[test]
     fn check_corresponds() {
         corresp!(atom!(a), atom!(a));
@@ -756,9 +770,22 @@ mod test_parse {
 
     #[test]
     fn simple_lists() {
-        check!("(f x y)" -> +list!(atom!(f), atom!(x), atom!(y)));
-        check!("(f (g x) y z)" -> +list!(atom!(f), list!(atom!(g), atom!(x)), atom!(y), atom!(z)));
-        check!("(f '(g x) y z)" -> +list!(atom!(f), quote!(list!(atom!(g), atom!(x))), atom!(y), atom!(z)));
-        check!("(fff '(0 1 2 'x))" -> +list!(atom!(fff), quote!(list!(int!(0), int!(1), int!(2), quote!(atom!(x))))));
+        check!("(f x y)" -> list!(atom!(f), atom!(x), atom!(y)));
+        check!("(f (g x) y z)" -> list!(atom!(f), list!(atom!(g), atom!(x)), atom!(y), atom!(z)));
+        check!("(f '(g x) y z)" -> list!(atom!(f), quote!(list!(atom!(g), atom!(x))), atom!(y), atom!(z)));
+        check!("(fff '(0 1 2 'x))" -> list!(atom!(fff), quote!(list!(int!(0), int!(1), int!(2), quote!(atom!(x))))));
+        check!("'()" -> quote!(list!()));
+        check!("(let [(a 1) (b 2)] (+ (* a 2) (/ b -3)))" -> list!(atom!(let), list!(list!(atom!(a), int!(1)), list!(atom!(b), int!(2))), list!(atom!(+), list!(atom!(*), atom!(a), int!(2)), list!(atom!(/), atom!(b), int!(-3)))));
+        check!("(a b . c)" -> cons!(atom!(a), atom!(b) ; atom!(c)));
+    }
+
+    #[test]
+    fn parse_failures() {
+        fails!("(a b c" -> MismatchedOpenParen);
+        fails!("(a ]" -> MismatchedCloseBrace);
+        fails!("(a . b . c)" -> InvalidCons);
+        fails!("'" -> Unfinished);
+        // fails!("(       a)]" -> MismatchedCloseBrace);
+        // fails!("a b c)" -> MismatchedCloseParen);
     }
 }
