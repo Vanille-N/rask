@@ -406,6 +406,7 @@ pub fn parse_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr>
                         return Err(ParseErr::InvalidCons);
                     } else {
                         dot_seen = true;
+                        // *idx += 1;
                         break;
                     }
                 } else {
@@ -419,15 +420,15 @@ pub fn parse_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr>
                     });
                 }
             }
-            *idx += 1;
             if dot_seen {
                 let expr = parse_helper(tokens, idx)?;
-                if *idx < tokens.len() && tokens[*idx + 1] == cl {
+                if *idx < tokens.len() && tokens[*idx] == cl {
                     Ok(Expr::Cons(v, Box::new(expr)))
                 } else {
                     Err(ParseErr::InvalidCons)
                 }
             } else {
+                *idx += 1;
                 Ok(Expr::List(v))
             }
         }
