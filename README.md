@@ -22,4 +22,4 @@ Todo before 0.1.0 is released:
 - [X] **Lex** (symbols → tokens)
 - [ ] **Parse** (tokens → expression tree)
 - [ ] **Eval** (expression tree → expression)
-- [ ] **REPL** (interactive text → expression loop)
+- [ ] **REPL** (interactive [text → expression] loop)
