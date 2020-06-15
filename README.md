@@ -9,6 +9,10 @@
 `rask` [![crates.io](http://meritbadge.herokuapp.com/rask)](https://crates.io/crates/rask)
 [![API](https://docs.rs/rask/badge.svg)](https://docs.rs/rask)
 
+`chainmap` [![](http://meritbadge.herokuapp.com/chainmap)](https://crates.io/crates/chainmap)
+[![API](https://docs.rs/chainmap/badge.svg)](https://docs.rs/chainmap) (dependency)
+
+
 ---
 > **rask** (Norwegian) *{adj.}*: **fast**, **swift**, **nimble**<br>Rust + Racket → Rask
 
