@@ -7,3 +7,10 @@
 
 `rask` [![crates.io](http://meritbadge.herokuapp.com/rask)](https://crates.io/crates/rask)
 [![API](https://docs.rs/rask/badge.svg)](https://docs.rs/rask)
+
+---
+> **rask** (Norwegian) *{adj.}*: **fast**, **swift**, **nimble**<br>Rust + Racket → Rask
+
+**I could've gone for 'rasket', but as that one means 'trash'/'heavy' depending on the language, I decided against it.*
+
+---
