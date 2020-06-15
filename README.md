@@ -14,3 +14,12 @@
 **I could've gone for 'rasket', but as that one means 'trash'/'heavy' depending on the language, I decided against it.*
 
 ---
+
+Rask is under development.
+
+Todo before 0.1.0 is released:
+- [X] **Split** (text → symbols)
+- [X] **Lex** (symbols → tokens)
+- [ ] **Parse** (tokens → expression tree)
+- [ ] **Eval** (expression tree → expression)
+- [ ] **REPL** (interactive text → expression loop)
