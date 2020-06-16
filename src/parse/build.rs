@@ -56,6 +56,7 @@ fn build_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr> {
             if dot_seen {
                 let expr = build_helper(tokens, idx)?;
                 if *idx < tokens.len() && tokens[*idx] == cl {
+                    *idx += 1;
                     Ok(Expr::Cons(v, Box::new(expr)))
                 } else {
                     Err(ParseErr::InvalidCons)
