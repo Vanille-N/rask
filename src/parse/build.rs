@@ -140,14 +140,25 @@ mod test {
     }
 
     macro_rules! atom {
-        ( $elem:tt ) => {
-            Expr::Atom(String::from(stringify!($elem)))
+        ( $( $elem:tt )* ) => {
+            Expr::Atom(String::from(concat!($( stringify!($elem) ),*)))
         };
     }
 
     macro_rules! quote {
         ( $elem:expr ) => {
             Expr::Quote(Box::new($elem))
+        };
+    }
+
+    macro_rules! quasiquote {
+        ( $elem:expr ) => {
+            Expr::Quasiquote(Box::new($elem))
+        };
+    }
+    macro_rules! antiquote {
+        ( $elem:expr ) => {
+            Expr::Antiquote(Box::new($elem))
         };
     }
 
