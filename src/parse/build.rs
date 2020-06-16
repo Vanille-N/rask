@@ -87,32 +87,38 @@ mod test {
                 panic!("Failed to lex: {:?}", e);
             }
             let lt = build(tokens.ok().unwrap());
-            if let Err(e) = lt {
-                panic!("Failed to parse: {:?}", e);
+            let target: Vec<Result<Expr, ParseErr>> = vec![ $( $e ),* ];
+            if target.len() != lt.len() {
+                panic!("Not the right number of elements to compare: {} vs {} in \n {:?}", lt.len(), target.len(), &lt);
             }
-            let lt = lt.ok().unwrap();
-            if !corresponds(&lt, &$e) {
-                panic!(
-                    "Parsing mistake:\n    {:?} is not the same as \n    {:?}",
-                    lt, $e
-                );
+            for i in 0..lt.len() {
+                match &target[i] {
+                    Err(target) => {
+                        match &lt[i] {
+                            Err(lt) => assert_eq!(target, lt),
+                            Ok(lt) => panic!("Expected {:?} but obtained {:?}", target, lt),
+                        }
+                    }
+                    Ok(target) => {
+                        match &lt[i] {
+                            Err(lt) => panic!("Expected {:?} but obtained {:?}", target, lt),
+                            Ok(lt) => {
+                                if !corresponds(&lt, &target) {
+                                    panic!(
+                                        "Parsing mistake:\n    {:?} is not the same as \n    {:?}",
+                                        lt, target
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
             }
         };
     }
 
-    macro_rules! fails {
-        ( $s:tt -> $e:ident ) => {
-            let sp = split($s);
-            if let Err(e) = sp {
-                panic!("Failed to split: {:?}", e);
-            }
-            let tokens = lex(sp.ok().unwrap());
-            if let Err(e) = tokens {
-                panic!("Failed to lex: {:?}", e);
-            }
-            let lt = build(tokens.ok().unwrap());
-            assert_eq!(lt.err().unwrap(), ParseErr::$e);
-        };
+    macro_rules! err {
+        ( $e:ident ) => { Err(ParseErr::$e) }
     }
 
     macro_rules! list {
