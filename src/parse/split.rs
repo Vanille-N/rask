@@ -24,19 +24,19 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
                 begin += 1;
             }
             begin += 1;
+        } else if escape {
+            len += 1;
+            escape = false;
+        } else if c == '\\' {
+            escape = true;
+            len += 1;
         } else if string {
             if c == '"' {
                 string = false;
             }
             len += 1;
-        } else if escape {
-            len += 1;
-            escape = false;
         } else if c == '"' && !string {
             string = true;
-            len += 1;
-        } else if c == '\\' {
-            escape = true;
             len += 1;
         } else if c == ';' {
             if len > 0 {
