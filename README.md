@@ -25,7 +25,7 @@ Rask is under development.
 #### 0.1 roadmap:
 - [X] **Split** (text → symbols)
 - [X] **Lex** (symbols → tokens)
-- [ ] **Parse** (tokens → expression tree)
+- [X] **Parse** (tokens → expression tree)
 - [ ] **Eval** (expression tree → expression)
 - [ ] **Cov** (decent test coverage)
 

@@ -130,8 +130,12 @@ mod test {
     }
 
     macro_rules! err {
-        ( $e:ident *) => { Err(ParseErr::$e(0)) };
-        ( $e:ident ) => { Err(ParseErr::$e) };
+        ( $e:ident *) => {
+            Err(ParseErr::$e(0))
+        };
+        ( $e:ident ) => {
+            Err(ParseErr::$e)
+        };
     }
 
     macro_rules! list {

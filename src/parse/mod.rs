@@ -42,8 +42,15 @@ mod integrate {
             for expr in exprs.iter() {
                 if let Err(e) = expr {
                     match e {
-                        ParseErr::MismatchedOpenBrace(n) | ParseErr::MismatchedOpenParen(n) | ParseErr::MismatchedCloseBrace(n) | ParseErr::MismatchedCloseParen(n) =>
-                            panic!("Could not build {} properly: {:?}\nContext: {:?}", file, e, &tokens[n-5..n+5]),
+                        ParseErr::MismatchedOpenBrace(n)
+                        | ParseErr::MismatchedOpenParen(n)
+                        | ParseErr::MismatchedCloseBrace(n)
+                        | ParseErr::MismatchedCloseParen(n) => panic!(
+                            "Could not build {} properly: {:?}\nContext: {:?}",
+                            file,
+                            e,
+                            &tokens[n - 5..n + 5]
+                        ),
                         e => panic!("Could not build {} properly: {:?}", file, e),
                     }
                 }

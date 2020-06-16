@@ -1,7 +1,7 @@
 use core::time::Duration;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
-use rask::parse::{split, lex, build};
+use rask::parse::{build, lex, split};
 use rask::source;
 
 const ASSETS: [&str; 9] = [
@@ -17,7 +17,7 @@ const ASSETS: [&str; 9] = [
 ];
 
 fn criterion_split(c: &mut Criterion) {
-let crit = std::mem::replace(&mut *c, Criterion::default())
+    let crit = std::mem::replace(&mut *c, Criterion::default())
         .measurement_time(Duration::new(3, 0))
         .warm_up_time(Duration::new(1, 0));
     std::mem::replace(&mut *c, crit);
