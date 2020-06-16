@@ -207,4 +207,18 @@ mod test {
         check!("(       a)]" -> Ok(list!(atom!(a))), err!(MismatchedCloseBrace));
         check!("a b c)" -> Ok(atom!(a)), Ok(atom!(b)), Ok(atom!(c)), err!(MismatchedCloseParen));
     }
+
+    #[test]
+    fn complex_statements() {
+        check!(
+            "(define primitive-environment
+            `((apply . ,apply) (assq . ,assq) (call/cc . ,call/cc)
+                (car . ,car) (cadr . ,cadr) (caddr . ,caddr)
+                (cadddr . ,cadddr) (cddr . ,cddr) (cdr . ,cdr)
+                (cons . ,cons) (eq? . ,eq?) (list . ,list) (map . ,map)
+                (memv . ,memv) (null? . ,null?) (pair? . ,pair?)
+                (read . ,read) (set-car! . ,set-car!)
+                (set-cdr! . ,set-cdr!) (symbol? . ,symbol?)))"
+            -> Ok(list!(atom!(define), atom!(primitive-environment),
+                quasiquote!(list!(cons!(atom!(apply); antiquote!(atom!(apply))), cons!(atom!(assq); antiquote!(atom!(assq))), cons!(atom!(call/cc); antiquote!(atom!(call/cc))), cons!(atom!(car); antiquote!(atom!(car))), cons!(atom!(cadr); antiquote!(atom!(cadr))), cons!(atom!(caddr); antiquote!(atom!(caddr))), cons!(atom!(cadddr); antiquote!(atom!(cadddr))), cons!(atom!(cddr); antiquote!(atom!(cddr))), cons!(atom!(cdr); antiquote!(atom!(cdr))), cons!(atom!(cons); antiquote!(atom!(cons))), cons!(atom!(eq?); antiquote!(atom!(eq?))), cons!(atom!(list); antiquote!(atom!(list))), cons!(atom!(map); antiquote!(atom!(map))), cons!(atom!(memv); antiquote!(atom!(memv))), cons!(atom!(null?); antiquote!(atom!(null?))), cons!(atom!(pair?); antiquote!(atom!(pair?))), cons!(atom!(read); antiquote!(atom!(read))), cons!(atom!(set-car!); antiquote!(atom!(set-car!))), cons!(atom!(set-cdr!); antiquote!(atom!(set-cdr!))), cons!(atom!(symbol?); antiquote!(atom!(symbol?))))))));
 }
