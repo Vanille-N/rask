@@ -18,5 +18,5 @@ criterion = "0.3"
 
 [[bench]]
 name = "benchmark"
-path = "benches/benchmark"
+path = "benches/benchmark.rs"
 harness = false

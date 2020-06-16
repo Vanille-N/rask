@@ -78,7 +78,7 @@
 (define type-error
    (lambda (what)
       (error 'mul
-         \"~s is not a number or matrix\"
+         "~s is not a number or matrix"
          what)))
 
 ;; match-error is called to complain when mul receives a pair of
@@ -86,7 +86,7 @@
 (define match-error
    (lambda (what1 what2)
       (error 'mul
-         \"~s and ~s are incompatible operands\"
+         "~s and ~s are incompatible operands"
          what1
          what2)))
 
