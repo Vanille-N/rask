@@ -67,36 +67,41 @@ fn main() {
                                 );
                                 eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
                             }
-                            ParseErr::MismatchedOpenBrace => {
+                            ParseErr::MismatchedOpenBrace(idx) => {
                                 eprintln!("Found an opening bracket `[` with no corresponding `]`");
                                 eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
+                                eprintln!("  Token identifier: {}", idx);
                             }
-                            ParseErr::MismatchedCloseBrace => {
+                            ParseErr::MismatchedCloseBrace(idx) => {
                                 eprintln!(
                                     "Did not expect closing bracket `]` without matching `[` first"
                                 );
                                 eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
+                                eprintln!("  Token identifier: {}", idx);
                             }
-                            ParseErr::MismatchedOpenParen => {
+                            ParseErr::MismatchedOpenParen(idx) => {
                                 eprintln!(
                                     "Found an opening parenthesis `(` with no corresponding `)`"
                                 );
                                 eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
+                                eprintln!("  Token identifier: {}", idx);
                             }
-                            ParseErr::MismatchedCloseParen => {
+                            ParseErr::MismatchedCloseParen(idx) => {
                                 eprintln!(
                                     "Did not expect closing parenthesis `)` without matching `(` first"
                                 );
                                 eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
+                                eprintln!("  Token identifier: {}", idx);
                             }
                             ParseErr::Unfinished => {
                                 eprintln!("Unexpected end of expression");
                                 eprintln!("  Check your usage of quotes and dots in particular");
                                 eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
                             }
-                            ParseErr::InvalidCons => {
+                            ParseErr::InvalidCons(idx) => {
                                 eprintln!("Cannot make a cons of anything other than a list and an expression");
                                 eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
+                                eprintln!("  Token identifier: {}", idx);
                             }
                         }
                     }

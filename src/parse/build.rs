@@ -36,7 +36,7 @@ fn build_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr> {
                 let expr = build_helper(tokens, idx)?;
                 if let Expr::Dot = expr {
                     if dot_seen {
-                        return Err(ParseErr::InvalidCons);
+                        return Err(ParseErr::InvalidCons(*idx));
                     } else {
                         dot_seen = true;
                         // *idx += 1;
@@ -47,8 +47,8 @@ fn build_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr> {
                 }
                 if *idx == tokens.len() {
                     return Err(match op {
-                        Token::OpenParen => ParseErr::MismatchedOpenParen,
-                        Token::OpenBrace => ParseErr::MismatchedOpenBrace,
+                        Token::OpenParen => ParseErr::MismatchedOpenParen(*idx),
+                        Token::OpenBrace => ParseErr::MismatchedOpenBrace(*idx),
                         _ => unreachable!(),
                     });
                 }
@@ -59,15 +59,15 @@ fn build_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr> {
                     *idx += 1;
                     Ok(Expr::Cons(v, Box::new(expr)))
                 } else {
-                    Err(ParseErr::InvalidCons)
+                    Err(ParseErr::InvalidCons(*idx))
                 }
             } else {
                 *idx += 1;
                 Ok(Expr::List(v))
             }
         }
-        Token::CloseParen => Err(ParseErr::MismatchedCloseParen),
-        Token::CloseBrace => Err(ParseErr::MismatchedCloseBrace),
+        Token::CloseParen => Err(ParseErr::MismatchedCloseParen(*idx)),
+        Token::CloseBrace => Err(ParseErr::MismatchedCloseBrace(*idx)),
         Token::Quote => Ok(Expr::Quote(Box::new(build_helper(tokens, idx)?))),
         Token::Quasiquote => Ok(Expr::Quasiquote(Box::new(build_helper(tokens, idx)?))),
         Token::Antiquote => Ok(Expr::Antiquote(Box::new(build_helper(tokens, idx)?))),
@@ -130,7 +130,8 @@ mod test {
     }
 
     macro_rules! err {
-        ( $e:ident ) => { Err(ParseErr::$e) }
+        ( $e:ident *) => { Err(ParseErr::$e(0)) };
+        ( $e:ident ) => { Err(ParseErr::$e) };
     }
 
     macro_rules! list {
