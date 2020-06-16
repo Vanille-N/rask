@@ -86,8 +86,9 @@ fn build_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr> {
 mod test {
     use super::*;
     use crate::parse::{corresponds, lex, split};
+
     macro_rules! check {
-        ( $s:tt -> $e:expr ) => {
+        ( $s:tt -> $( $e:expr ),* ) => {
             let sp = split($s);
             if let Err(e) = sp {
                 panic!("Failed to split: {:?}", e);
@@ -176,22 +177,22 @@ mod test {
 
     #[test]
     fn simple_lists() {
-        check!("(f x y)" -> list!(atom!(f), atom!(x), atom!(y)));
-        check!("(f (g x) y z)" -> list!(atom!(f), list!(atom!(g), atom!(x)), atom!(y), atom!(z)));
-        check!("(f '(g x) y z)" -> list!(atom!(f), quote!(list!(atom!(g), atom!(x))), atom!(y), atom!(z)));
-        check!("(fff '(0 1 2 'x))" -> list!(atom!(fff), quote!(list!(int!(0), int!(1), int!(2), quote!(atom!(x))))));
-        check!("'()" -> quote!(list!()));
-        check!("(let [(a 1) (b 2)] (+ (* a 2) (/ b -3)))" -> list!(atom!(let), list!(list!(atom!(a), int!(1)), list!(atom!(b), int!(2))), list!(atom!(+), list!(atom!(*), atom!(a), int!(2)), list!(atom!(/), atom!(b), int!(-3)))));
-        check!("(a b . c)" -> cons!(atom!(a), atom!(b) ; atom!(c)));
+        check!("(f x y)" -> Ok(list!(atom!(f), atom!(x), atom!(y))));
+        check!("(f (g x) y z)" -> Ok(list!(atom!(f), list!(atom!(g), atom!(x)), atom!(y), atom!(z))));
+        check!("(f '(g x) y z)" -> Ok(list!(atom!(f), quote!(list!(atom!(g), atom!(x))), atom!(y), atom!(z))));
+        check!("(fff '(0 1 2 'x))" -> Ok(list!(atom!(fff), quote!(list!(int!(0), int!(1), int!(2), quote!(atom!(x)))))));
+        check!("'()" -> Ok(quote!(list!())));
+        check!("(let [(a 1) (b 2)] (+ (* a 2) (/ b -3)))" -> Ok(list!(atom!(let), list!(list!(atom!(a), int!(1)), list!(atom!(b), int!(2))), list!(atom!(+), list!(atom!(*), atom!(a), int!(2)), list!(atom!(/), atom!(b), int!(-3))))));
+        check!("(a b . c)" -> Ok(cons!(atom!(a), atom!(b) ; atom!(c))));
     }
 
     #[test]
     fn build_failures() {
-        fails!("(a b c" -> MismatchedOpenParen);
-        fails!("(a ]" -> MismatchedCloseBrace);
-        fails!("(a . b . c)" -> InvalidCons);
-        fails!("'" -> Unfinished);
-        // fails!("(       a)]" -> MismatchedCloseBrace);
-        // fails!("a b c)" -> MismatchedCloseParen);
+        check!("(a b c" -> err!(MismatchedOpenParen));
+        check!("(a ]" -> err!(MismatchedCloseBrace));
+        check!("(a . b . c)" -> err!(InvalidCons));
+        check!("'" -> err!(Unfinished));
+        check!("(       a)]" -> Ok(list!(atom!(a))), err!(MismatchedCloseBrace));
+        check!("a b c)" -> Ok(atom!(a)), Ok(atom!(b)), Ok(atom!(c)), err!(MismatchedCloseParen));
     }
 }
