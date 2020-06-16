@@ -2,7 +2,7 @@ use chainmap::ChainMap;
 use std::rc::Rc;
 use std::{cmp, fmt};
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug)]
 pub enum ParseErr {
     UnterminatedString(usize),
     IncorrectSpacing(usize),
@@ -12,13 +12,56 @@ pub enum ParseErr {
     InvalidIdent(String),
     UnterminatedComment,
     NoCommentStart,
-    MismatchedOpenParen,
-    MismatchedCloseParen,
-    MismatchedOpenBrace,
-    MismatchedCloseBrace,
+    MismatchedOpenParen(usize),
+    MismatchedCloseParen(usize),
+    MismatchedOpenBrace(usize),
+    MismatchedCloseBrace(usize),
     Unfinished,
-    InvalidCons,
+    InvalidCons(usize),
 }
+
+impl cmp::PartialEq for ParseErr {
+    fn eq(&self, other: &Self) -> bool {
+        macro_rules! identical {
+            ( $id:tt ) => {
+                match other {
+                    ParseErr::$id => true,
+                    _ => false,
+                }
+            };
+            ( $id:tt(_) ) => {
+                match other {
+                    ParseErr::$id(_) => true,
+                    _ => false,
+                }
+            };
+            ( $id:tt($contents:tt) ) => {
+                match other {
+                    ParseErr::$id(x) => x == $contents,
+                    _ => false,
+                }
+            };
+        }
+        match self {
+            ParseErr::UnterminatedString(_) => identical!(UnterminatedString(_)),
+            ParseErr::IncorrectSpacing(_) => identical!(IncorrectSpacing(_)),
+            ParseErr::LoneNumbersign => identical!(LoneNumbersign),
+            ParseErr::InvalidChar(s) => identical!(InvalidChar(s)),
+            ParseErr::InvalidLiteral(l) => identical!(InvalidLiteral(l)),
+            ParseErr::InvalidIdent(s) => identical!(InvalidIdent(s)),
+            ParseErr::UnterminatedComment => identical!(UnterminatedComment),
+            ParseErr::NoCommentStart => identical!(NoCommentStart),
+            ParseErr::MismatchedOpenParen(_) => identical!(MismatchedOpenParen(_)),
+            ParseErr::MismatchedCloseParen(_) => identical!(MismatchedCloseParen(_)),
+            ParseErr::MismatchedOpenBrace(_) => identical!(MismatchedOpenBrace(_)),
+            ParseErr::MismatchedCloseBrace(_) => identical!(MismatchedCloseBrace(_)),
+            ParseErr::Unfinished => identical!(Unfinished),
+            ParseErr::InvalidCons(_) => identical!(InvalidCons(_)),
+        }
+    }
+}
+
+impl cmp::Eq for ParseErr {}
 
 pub enum EvalErr {}
 
@@ -29,7 +72,7 @@ pub enum Literal {
     Show,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Token {
     OpenParen,
     CloseParen,
