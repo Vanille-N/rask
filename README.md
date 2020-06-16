@@ -31,8 +31,9 @@ Rask is under development.
 
 #### 0.2 roadmap:
 - [ ] **Def** (defines and variable bindings)
+- [ ] **Boot** (basic constructs: if, let, letrec, let*, ...)
 - [ ] **REPL** (interactive [text → expression] loop)
 - [ ] **Disp** (pretty-print expressions)
-- [ ] **Boot** (basic constructs: if, let, letrec, let*, ...)
+- [ ] **Err** (better error messages)
 
-Towards 0.3, a standard library will be built.
+From 0.3 onwards, a standard library will be built.
