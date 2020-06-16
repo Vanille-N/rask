@@ -18,4 +18,5 @@ criterion = "0.3"
 
 [[bench]]
 name = "benchmark"
+path = "benches/benchmark"
 harness = false
