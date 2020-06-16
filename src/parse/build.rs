@@ -177,6 +177,9 @@ mod test {
     macro_rules! cons {
         ( $( $elem:expr ),* ; $end:expr ) => {Expr::Cons(vec![$( $elem ),*], Box::new($end))}
     }
+    macro_rules! string {
+        ( $e:expr ) => { Expr::String(String::from($e)) }
+    }
 
     #[test]
     fn check_corresponds() {
@@ -221,4 +224,18 @@ mod test {
                 (set-cdr! . ,set-cdr!) (symbol? . ,symbol?)))"
             -> Ok(list!(atom!(define), atom!(primitive-environment),
                 quasiquote!(list!(cons!(atom!(apply); antiquote!(atom!(apply))), cons!(atom!(assq); antiquote!(atom!(assq))), cons!(atom!(call/cc); antiquote!(atom!(call/cc))), cons!(atom!(car); antiquote!(atom!(car))), cons!(atom!(cadr); antiquote!(atom!(cadr))), cons!(atom!(caddr); antiquote!(atom!(caddr))), cons!(atom!(cadddr); antiquote!(atom!(cadddr))), cons!(atom!(cddr); antiquote!(atom!(cddr))), cons!(atom!(cdr); antiquote!(atom!(cdr))), cons!(atom!(cons); antiquote!(atom!(cons))), cons!(atom!(eq?); antiquote!(atom!(eq?))), cons!(atom!(list); antiquote!(atom!(list))), cons!(atom!(map); antiquote!(atom!(map))), cons!(atom!(memv); antiquote!(atom!(memv))), cons!(atom!(null?); antiquote!(atom!(null?))), cons!(atom!(pair?); antiquote!(atom!(pair?))), cons!(atom!(read); antiquote!(atom!(read))), cons!(atom!(set-car!); antiquote!(atom!(set-car!))), cons!(atom!(set-cdr!); antiquote!(atom!(set-cdr!))), cons!(atom!(symbol?); antiquote!(atom!(symbol?))))))));
+
+        check!(
+            "(define try-subst
+               (lambda (u v s ks kf)
+                 (let ([u (s u)])
+                   (if (not (symbol? u))
+                     (uni u v s ks kf)
+                     (let ([v (s v)])
+                       (cond
+                           [(eq? u v) (ks s)]
+                           [(occurs? u v) (kf \"cycle\")]
+                           [else (ks (sigma u v s))]))))))"
+                           -> Ok(list!(atom!(define), atom!(try-subst), list!(atom!(lambda), list!(atom!(u), atom!(v), atom!(s), atom!(ks), atom!(kf)), list!(atom!(let), list!(list!(atom!(u), list!(atom!(s), atom!(u)))), list!(atom!(if), list!(atom!(not), list!(atom!(symbol?), atom!(u))), list!(atom!(uni), atom!(u), atom!(v), atom!(s), atom!(ks), atom!(kf)), list!(atom!(let), list!(list!(atom!(v), list!(atom!(s), atom!(v)))), list!(atom!(cond), list!(list!(atom!(eq?), atom!(u), atom!(v)), list!(atom!(ks), atom!(s))), list!(list!(atom!(occurs?), atom!(u), atom!(v)), list!(atom!(kf), string!("cycle"))), list!(atom!(else), list!(atom!(ks), list!(atom!(sigma), atom!(u), atom!(v), atom!(s))))))))))));
+    }
 }
