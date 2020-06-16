@@ -1,7 +1,17 @@
 use crate::parse::{Expr, ParseErr, Token};
 
-pub fn build(tokens: Vec<Token>) -> Result<Expr, ParseErr> {
-    build_helper(&tokens, &mut 0)
+pub fn build(tokens: Vec<Token>) -> Vec<Result<Expr, ParseErr>> {
+    let mut exprs = Vec::new();
+    let mut idx = 0;
+    while idx < tokens.len() {
+        let expr = build_helper(&tokens, &mut idx);
+        if expr.is_err() {
+            exprs.push(expr);
+            return exprs;
+        }
+        exprs.push(expr);
+    }
+    exprs
 }
 
 fn close_separator(op: &Token) -> Token {
