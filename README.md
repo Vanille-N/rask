@@ -22,9 +22,17 @@
 
 Rask is under development.
 
-Todo before 0.1.0 is released:
+#### 0.1 roadmap:
 - [X] **Split** (text → symbols)
 - [X] **Lex** (symbols → tokens)
 - [ ] **Parse** (tokens → expression tree)
 - [ ] **Eval** (expression tree → expression)
+- [ ] **Cov** (decent test coverage)
+
+#### 0.2 roadmap:
+- [ ] **Def** (defines and variable bindings)
 - [ ] **REPL** (interactive [text → expression] loop)
+- [ ] **Disp** (pretty-print expressions)
+- [ ] **Boot** (basic constructs: if, let, letrec, let*, ...)
+
+Towards 0.3, a standard library will be built.
