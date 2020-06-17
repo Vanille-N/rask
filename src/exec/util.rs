@@ -4,8 +4,7 @@ use std::rc::Rc;
 pub enum EvalErr {
     UnknownIdentifier(String),
     UselessAntiquote(Rc<Expr>),
-    CannotEvalFn(Rc<Expr>),
-    CannotEvalEllipsis,
-    CannotEvalDot,
+    CannotEval(Rc<Expr>),
+    CannotApply(Rc<Expr>),
     ProperListRequired,
 }
