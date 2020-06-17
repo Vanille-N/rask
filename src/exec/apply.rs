@@ -16,8 +16,11 @@ pub fn apply(lst: &Vec<Rc<Expr>>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
                 _ => Err(EvalErr::CannotApply(result.clone())),
             }
         }
+        Expr::Atom(a) => apply_atom(&a[..], &lst[1..], ctx),
         _ => unreachable!(),
     }
 }
+
+pub fn apply_atom(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     unimplemented!()
 }
