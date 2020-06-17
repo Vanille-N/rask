@@ -1,4 +1,5 @@
 use crate::parse::{Expr, ParseErr, Token};
+use std::rc::Rc;
 
 pub fn build(tokens: &[Token]) -> Vec<Result<Expr, ParseErr>> {
     let mut exprs = Vec::new();
@@ -57,29 +58,29 @@ fn build_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr> {
                 let expr = build_helper(tokens, idx)?;
                 if *idx < tokens.len() && tokens[*idx] == cl {
                     *idx += 1;
-                    Ok(Expr::Cons(v, Box::new(expr)))
+                    Ok(Expr::Cons(Rc::new(v), Rc::new(expr)))
                 } else {
                     Err(ParseErr::InvalidCons(*idx))
                 }
             } else {
                 *idx += 1;
-                Ok(Expr::List(v))
+                Ok(Expr::List(Rc::new(v)))
             }
         }
         Token::CloseParen => Err(ParseErr::MismatchedCloseParen(*idx)),
         Token::CloseBrace => Err(ParseErr::MismatchedCloseBrace(*idx)),
-        Token::Quote => Ok(Expr::Quote(Box::new(build_helper(tokens, idx)?))),
-        Token::Quasiquote => Ok(Expr::Quasiquote(Box::new(build_helper(tokens, idx)?))),
-        Token::Antiquote => Ok(Expr::Antiquote(Box::new(build_helper(tokens, idx)?))),
+        Token::Quote => Ok(Expr::Quote(Rc::new(build_helper(tokens, idx)?))),
+        Token::Quasiquote => Ok(Expr::Quasiquote(Rc::new(build_helper(tokens, idx)?))),
+        Token::Antiquote => Ok(Expr::Antiquote(Rc::new(build_helper(tokens, idx)?))),
         Token::Dot => Ok(Expr::Dot),
         Token::Ellipsis => Ok(Expr::Ellipsis),
         Token::Char(c) => Ok(Expr::Char(*c)),
-        Token::Atom(a) => Ok(Expr::Atom(a.clone())),
+        Token::Atom(a) => Ok(Expr::Atom(Rc::new(a.clone()))),
         Token::Integer(i) => Ok(Expr::Integer(*i)),
         Token::Float(f) => Ok(Expr::Float(*f)),
         Token::Bool(b) => Ok(Expr::Bool(*b)),
-        Token::String(s) => Ok(Expr::String(s.clone())),
         Token::Literal(l) => Ok(Expr::Literal(*l)),
+        Token::String(s) => Ok(Expr::String(Rc::new(s.clone()))),
     }
 }
 
@@ -140,30 +141,30 @@ mod test {
 
     macro_rules! list {
         ( $( $elem:expr ),* ) => {
-            Expr::List(vec![$( $elem ),*])
+            Expr::List(Rc::new(vec![$( $elem ),*]))
         }
     }
 
     macro_rules! atom {
         ( $( $elem:tt )* ) => {
-            Expr::Atom(String::from(concat!($( stringify!($elem) ),*)))
+            Expr::Atom(Rc::new(String::from(concat!($( stringify!($elem) ),*))))
         };
     }
 
     macro_rules! quote {
         ( $elem:expr ) => {
-            Expr::Quote(Box::new($elem))
+            Expr::Quote(Rc::new($elem))
         };
     }
 
     macro_rules! quasiquote {
         ( $elem:expr ) => {
-            Expr::Quasiquote(Box::new($elem))
+            Expr::Quasiquote(Rc::new($elem))
         };
     }
     macro_rules! antiquote {
         ( $elem:expr ) => {
-            Expr::Antiquote(Box::new($elem))
+            Expr::Antiquote(Rc::new($elem))
         };
     }
 
@@ -180,11 +181,11 @@ mod test {
     }
 
     macro_rules! cons {
-        ( $( $elem:expr ),* ; $end:expr ) => {Expr::Cons(vec![$( $elem ),*], Box::new($end))}
+        ( $( $elem:expr ),* ; $end:expr ) => {Expr::Cons(Rc::new(vec![$( $elem ),*]), Rc::new($end))}
     }
     macro_rules! string {
         ( $e:expr ) => {
-            Expr::String(String::from($e))
+            Expr::String(Rc::new(String::from($e)))
         };
     }
 

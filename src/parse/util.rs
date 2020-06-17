@@ -132,14 +132,14 @@ impl cmp::PartialEq for Token {
 }
 
 pub enum Expr {
-    Atom(String),
-    List(Vec<Expr>),
-    Quote(Box<Expr>),
-    Quasiquote(Box<Expr>),
-    Antiquote(Box<Expr>),
+    Atom(Rc<String>),
+    List(Rc<Vec<Expr>>),
+    Quote(Rc<Expr>),
+    Quasiquote(Rc<Expr>),
+    Antiquote(Rc<Expr>),
     Integer(i64),
     Float(f64),
-    String(String),
+    String(Rc<String>),
     Char(char),
     Func(Func),
     Lambda(Func, Envt),
@@ -148,12 +148,12 @@ pub enum Expr {
     Dot,
     Bool(bool),
     Literal(Literal),
-    Cons(Vec<Expr>, Box<Expr>),
+    Cons(Rc<Vec<Expr>>, Rc<Expr>),
 }
 
-pub struct Func(Box<dyn Fn(Vec<Expr>) -> Result<Expr, EvalErr>>);
+pub type Func = Rc<dyn Fn(Vec<Expr>) -> Result<Expr, crate::exec::EvalErr>>;
 
-pub struct Envt(ChainMap<String, Rc<Expr>>);
+pub type Envt = ChainMap<String, Rc<Expr>>;
 
 impl fmt::Debug for Expr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
