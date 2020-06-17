@@ -63,7 +63,6 @@ impl cmp::PartialEq for ParseErr {
 
 impl cmp::Eq for ParseErr {}
 
-pub enum EvalErr {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Literal {
