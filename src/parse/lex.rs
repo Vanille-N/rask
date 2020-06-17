@@ -51,7 +51,7 @@ pub fn lex(item: &str) -> Result<Token, ParseErr> {
     }
 }
 
-pub fn distribute_lex(s: Vec<&str>) -> Result<Vec<Token>, ParseErr> {
+pub fn distribute_lex(s: &[&str]) -> Result<Vec<Token>, ParseErr> {
     let mut tokens = Vec::new();
     for item in s {
         tokens.push(lex(item)?);

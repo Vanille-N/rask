@@ -1,6 +1,6 @@
 use crate::parse::{Expr, ParseErr, Token};
 
-pub fn build(tokens: Vec<Token>) -> Vec<Result<Expr, ParseErr>> {
+pub fn build(tokens: &[Token]) -> Vec<Result<Expr, ParseErr>> {
     let mut exprs = Vec::new();
     let mut idx = 0;
     while idx < tokens.len() {
@@ -94,11 +94,11 @@ mod test {
             if let Err(e) = sp {
                 panic!("Failed to split: {:?}", e);
             }
-            let tokens = lex(sp.ok().unwrap());
+            let tokens = lex(&sp.ok().unwrap());
             if let Err(e) = tokens {
                 panic!("Failed to lex: {:?}", e);
             }
-            let lt = build(tokens.ok().unwrap());
+            let lt = build(&tokens.ok().unwrap());
             let target: Vec<Result<Expr, ParseErr>> = vec![ $( $e ),* ];
             if target.len() != lt.len() {
                 panic!("Not the right number of elements to compare: {} vs {} in \n {:?}", lt.len(), target.len(), &lt);

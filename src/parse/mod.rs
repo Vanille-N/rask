@@ -33,12 +33,12 @@ mod integrate {
                 panic!("Could not split {} properly: {:?}", file, e);
             }
             let symbols = symbols.ok().unwrap();
-            let tokens = lex(symbols);
+            let tokens = lex(&symbols);
             if let Err(e) = tokens {
                 panic!("Could not tokenize {} properly: {:?}", file, e);
             }
             let tokens = tokens.ok().unwrap();
-            let exprs = build(tokens.clone());
+            let exprs = build(&tokens);
             for expr in exprs.iter() {
                 if let Err(e) = expr {
                     match e {
