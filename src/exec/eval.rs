@@ -16,14 +16,14 @@ pub fn eval(expr: Rc<Expr>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
         Expr::Float(_) => Ok(expr.clone()),
         Expr::Char(_) => Ok(expr.clone()),
         Expr::String(_) => Ok(expr.clone()),
-        Expr::Ellipsis => Err(EvalErr::CannotEvalEllipsis),
         Expr::Nil => Ok(expr.clone()),
-        Expr::Func(_) => Err(EvalErr::CannotEvalFn(expr.clone())),
-        Expr::Lambda(_, _) => Err(EvalErr::CannotEvalFn(expr.clone())),
-        Expr::Dot => Err(EvalErr::CannotEvalDot),
         Expr::Bool(_) => Ok(expr.clone()),
         Expr::Cons(_, _) => Err(EvalErr::ProperListRequired),
-        Expr::List(items) => apply(&items),
+        Expr::List(items) => apply(&items, ctx),
+        Expr::Func(_) |
+        Expr::Ellipsis |
+        Expr::Lambda(_, _) |
+        Expr::Dot => Err(EvalErr::CannotEval(expr.clone())),
     }
 }
 
