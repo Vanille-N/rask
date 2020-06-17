@@ -1,5 +1,5 @@
 use core::time::Duration;
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion, Throughput};
 
 use rask::parse::{build, lex, split};
 use rask::source;
@@ -22,12 +22,16 @@ fn criterion_split(c: &mut Criterion) {
         .warm_up_time(Duration::new(1, 0));
     std::mem::replace(&mut *c, crit);
 
-    let mut group_split = c.benchmark_group("split");
+    let mut group = c.benchmark_group("Split");
     for file in ASSETS.iter() {
         let prog = source(&("assets/".to_owned() + *file)).unwrap();
-        group_split.bench_with_input(*file, *file, |b, _| b.iter(|| split(black_box(&prog[..]))));
+        let size = prog.len() as u64;
+        group.throughput(Throughput::Bytes(size));
+        group.bench_with_input(*file, &size, |b, _| {
+            b.iter(|| split(&prog[..]))
+        });
     }
-    group_split.finish();
+    group.finish();
 }
 
 fn criterion_lex(c: &mut Criterion) {
@@ -36,15 +40,17 @@ fn criterion_lex(c: &mut Criterion) {
         .warm_up_time(Duration::new(1, 0));
     std::mem::replace(&mut *c, crit);
 
-    let mut group_lex = c.benchmark_group("lex");
+    let mut group = c.benchmark_group("Lex");
     for file in ASSETS.iter() {
         let prog = source(&("assets/".to_owned() + *file)).unwrap();
         let symbols = split(&prog[..]).ok().unwrap();
-        group_lex.bench_with_input(*file, *file, |b, _| {
-            b.iter(|| lex(black_box(symbols.clone())))
+        let size = symbols.len() as u64;
+        group.throughput(Throughput::Bytes(size));
+        group.bench_with_input(*file, &size, |b, _| {
+            b.iter(|| lex(&symbols))
         });
     }
-    group_lex.finish();
+    group.finish();
 }
 
 fn criterion_build(c: &mut Criterion) {
@@ -53,17 +59,19 @@ fn criterion_build(c: &mut Criterion) {
         .warm_up_time(Duration::new(1, 0));
     std::mem::replace(&mut *c, crit);
 
-    let mut group_build = c.benchmark_group("build");
+    let mut group = c.benchmark_group("Build");
     for file in ASSETS.iter() {
         let prog = source(&("assets/".to_owned() + *file)).unwrap();
         let symbols = split(&prog[..]).ok().unwrap();
-        let tokens = lex(symbols).ok().unwrap();
-        group_build.bench_with_input(*file, *file, |b, _| {
-            b.iter(|| build(black_box(tokens.clone())))
+        let tokens = lex(&symbols).ok().unwrap();
+        let size = tokens.len() as u64;
+        group.throughput(Throughput::Bytes(size));
+        group.bench_with_input(*file, &size, |b, _| {
+            b.iter(|| build(&tokens))
         });
     }
-    group_build.finish();
+    group.finish();
 }
 
-criterion_group!(benches, criterion_build);
+criterion_group!(benches, criterion_split, criterion_lex, criterion_build);
 criterion_main!(benches);

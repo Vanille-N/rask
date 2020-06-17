@@ -11,7 +11,7 @@ keywords = ["scheme", "interpreter"]
 include = ["src/**/*", "README.md"]
 
 [dependencies]
-chainmap = "0.1.1"
+chainmap = "0.1.*"
 
 [dev-dependencies]
 criterion = "0.3"
