@@ -79,7 +79,6 @@ fn build_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr> {
         Token::Integer(i) => Ok(Expr::Integer(*i)),
         Token::Float(f) => Ok(Expr::Float(*f)),
         Token::Bool(b) => Ok(Expr::Bool(*b)),
-        Token::Literal(l) => Ok(Expr::Literal(*l)),
         Token::String(s) => Ok(Expr::String(Rc::new(s.clone()))),
     }
 }

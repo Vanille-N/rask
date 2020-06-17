@@ -63,14 +63,6 @@ impl cmp::PartialEq for ParseErr {
 
 impl cmp::Eq for ParseErr {}
 
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Literal {
-    LoadSource,
-    Exit,
-    Show,
-}
-
 #[derive(Debug, Clone)]
 pub enum Token {
     OpenParen,
@@ -88,7 +80,6 @@ pub enum Token {
     Float(f64),
     Bool(bool),
     String(String),
-    Literal(Literal),
 }
 
 impl cmp::PartialEq for Token {
@@ -121,7 +112,6 @@ impl cmp::PartialEq for Token {
             Token::Integer(i) => identical!(Integer(i)),
             Token::Bool(b) => identical!(Bool(b)),
             Token::String(s) => identical!(String(s)),
-            Token::Literal(lit) => identical!(Literal(lit)),
             Token::Ellipsis => identical!(Ellipsis),
             Token::Float(f) => match other {
                 Token::Float(g) => (g - f).abs() < 0.00000001,
@@ -147,7 +137,6 @@ pub enum Expr {
     Ellipsis,
     Dot,
     Bool(bool),
-    Literal(Literal),
     Cons(Rc<Vec<Expr>>, Rc<Expr>),
 }
 
@@ -189,7 +178,6 @@ impl fmt::Debug for Expr {
                     write!(f, "#f")
                 }
             }
-            Expr::Literal(_) => write!(f, "<lit>"),
             Expr::Cons(v, e) => {
                 if v.len() == 0 {
                     write!(f, "(. {:?})", e)
@@ -273,7 +261,6 @@ pub fn corresponds(lt: &Expr, rt: &Expr) -> bool {
         Ellipsis => identical!(Ellipsis),
         Dot => identical!(Dot),
         Bool(b) => identical!(Bool(b)),
-        Literal(_) => false,
         Cons(v, e) => {
             if let Cons(w, f) = rt {
                 if v.len() == w.len() {

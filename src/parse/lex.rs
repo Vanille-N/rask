@@ -1,4 +1,4 @@
-use crate::parse::{Literal, ParseErr, Token};
+use crate::parse::{ParseErr, Token};
 
 pub fn lex(item: &str) -> Result<Token, ParseErr> {
     match item {
@@ -27,11 +27,7 @@ pub fn lex(item: &str) -> Result<Token, ParseErr> {
                 } else if item == "#f" {
                     Ok(Token::Bool(false))
                 } else {
-                    let l = chars[1..].iter().collect::<String>();
-                    match verify_literal(&l[..]) {
-                        None => Err(ParseErr::InvalidLiteral(l)),
-                        Some(lit) => Ok(Token::Literal(lit)),
-                    }
+                    Err(ParseErr::InvalidLiteral(String::from(s)))
                 }
             } else if chars[0] == '"' {
                 // Correct string ending already verified
@@ -78,15 +74,6 @@ fn verify_char(s: &str) -> Option<char> {
             "delete" => Some('\x7F'),
             _ => None,
         }
-    }
-}
-
-fn verify_literal(s: &str) -> Option<Literal> {
-    match s {
-        "load" => Some(Literal::LoadSource),
-        "exit" => Some(Literal::Exit),
-        "show" => Some(Literal::Show),
-        _ => None,
     }
 }
 
@@ -143,11 +130,9 @@ mod test {
         test!("#\\abc" -> -InvalidChar(String::from("abc")));
         test!("#\\tab" -> +Char('\t'));
         test!("#\\newline" -> +Char('\n'));
-        test!("#newline" -> -InvalidLiteral(String::from("newline")));
+        test!("#newline" -> -InvalidLiteral(String::from("#newline")));
         test!("#t" -> +Bool(true));
         test!("#f" -> +Bool(false));
-        test!("#load" -> +Literal(Literal::LoadSource));
-        test!("#exit" -> +Literal(Literal::Exit));
         test!("#\\xy" -> -InvalidChar(String::from("xy")));
     }
 
