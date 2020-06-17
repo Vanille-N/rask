@@ -44,7 +44,7 @@ fn build_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr> {
                         break;
                     }
                 } else {
-                    v.push(expr);
+                    v.push(Rc::new(expr));
                 }
                 if *idx == tokens.len() {
                     return Err(match op {
@@ -140,7 +140,7 @@ mod test {
 
     macro_rules! list {
         ( $( $elem:expr ),* ) => {
-            Expr::List(Rc::new(vec![$( $elem ),*]))
+            Expr::List(Rc::new(vec![$( Rc::new($elem) ),*]))
         }
     }
 
@@ -180,7 +180,7 @@ mod test {
     }
 
     macro_rules! cons {
-        ( $( $elem:expr ),* ; $end:expr ) => {Expr::Cons(Rc::new(vec![$( $elem ),*]), Rc::new($end))}
+        ( $( $elem:expr ),* ; $end:expr ) => {Expr::Cons(Rc::new(vec![$( Rc::new($elem) ),*]), Rc::new($end))}
     }
     macro_rules! string {
         ( $e:expr ) => {

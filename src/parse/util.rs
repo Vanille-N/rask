@@ -123,7 +123,7 @@ impl cmp::PartialEq for Token {
 
 pub enum Expr {
     Atom(Rc<String>),
-    List(Rc<Vec<Expr>>),
+    List(Rc<Vec<Rc<Expr>>>),
     Quote(Rc<Expr>),
     Quasiquote(Rc<Expr>),
     Antiquote(Rc<Expr>),
@@ -137,10 +137,10 @@ pub enum Expr {
     Ellipsis,
     Dot,
     Bool(bool),
-    Cons(Rc<Vec<Expr>>, Rc<Expr>),
+    Cons(Rc<Vec<Rc<Expr>>>, Rc<Expr>),
 }
 
-pub type Func = Rc<dyn Fn(Vec<Expr>) -> Result<Expr, crate::exec::EvalErr>>;
+pub type Func = Rc<dyn Fn(&[Rc<Expr>]) -> Result<Rc<Expr>, crate::exec::EvalErr>>;
 
 pub type Envt = ChainMap<String, Rc<Expr>>;
 
