@@ -136,8 +136,8 @@ mod test {
         check!("'lst" [envt]-> Ok(atom!(lst)));
         check!("'(a b)" [envt]-> Ok(list!(atom!(a), atom!(b))));
         check!("'(1 2 \"c\" #\\')" [envt]-> Ok(list!(int!(1), int!(2), string!("c"), chr!('\''))));
-        check!("lst" [envt]-> Ok(list!(int!(12), float!(0.5), string!("xyz"))));
-        check!("`,lst" [envt]-> Ok(list!(int!(12), float!(0.5), string!("xyz"))));
+        check!("lst" [envt]-> Ok(list!(atom!(a), atom!(b), atom!(c))));
+        check!("`,lst" [envt]-> Ok(list!(atom!(a), atom!(b), atom!(c))));
         check!("`(,a b)" [envt]-> Ok(list!(int!(12), atom!(b))));
     }
 }
