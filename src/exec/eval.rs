@@ -110,3 +110,17 @@ mod test {
             }
         };
     }
+
+    #[test]
+    pub fn evals() {
+        let mut envt = ChainMap::new();
+        envt.insert(String::from("a"), Rc::new(int!(12)));
+        envt.insert(String::from("b"), Rc::new(float!(0.5)));
+        envt.insert(String::from("c"), Rc::new(string!("xyz")));
+        envt.insert(String::from("lst"), Rc::new(list!(atom!(a), atom!(b), atom!(c))));
+        check!("a" [envt]-> Ok(int!(12)));
+        check!("'b" [envt]-> Ok(atom!(b)));
+        check!("`,b" [envt]-> Ok(float!(0.5)));
+        check!("'lst" [envt]-> Ok(atom!(lst)));
+    }
+}
