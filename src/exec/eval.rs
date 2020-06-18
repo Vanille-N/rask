@@ -32,6 +32,13 @@ pub fn quasi_eval(expr: Rc<Expr>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     match &*expr {
         Expr::Antiquote(a) => eval(a.clone(), ctx),
         Expr::Quasiquote(a) => quasi_eval(a.clone(), ctx),
+        Expr::List(items) => {
+            let mut v = Vec::new();
+            for i in items.iter() {
+                v.push(quasi_eval(i.clone(), ctx)?);
+            }
+            Ok(Rc::new(Expr::List(Rc::new(v))))
+        }
         _ => Ok(expr.clone()),
     }
 }
@@ -76,6 +83,9 @@ mod test {
     macro_rules! float {
         ( $elem:expr ) => { Expr::Float($elem) };
     }
+    macro_rules! chr {
+        ( $elem:expr ) => { Expr::Char($elem) };
+    }
     macro_rules! string {
         ( $e:expr ) => {
             Expr::String(Rc::new(String::from($e)))
@@ -100,7 +110,7 @@ mod test {
                                 if !corresponds(&result, &target) {
                                     panic!(
                                         "Parsing mistake:\n    {:?} is not the same as \n    {:?}",
-                                        lt, target
+                                        &result, target
                                     );
                                 }
                             }
