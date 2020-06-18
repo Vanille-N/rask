@@ -7,6 +7,19 @@ pub use build::build;
 pub use lex::distribute_lex as lex;
 pub use split::split;
 pub use util::*;
+use std::rc::Rc;
+
+pub fn parse(src: &str) -> Vec<Result<Rc<Expr>, ParseErr>> {
+    let symbols = split(src);
+    if let Err(e) = symbols {
+        return vec![Err(e)];
+    }
+    let tokens = lex(&symbols.unwrap());
+    if let Err(e) = tokens {
+        return vec![Err(e)];
+    }
+    build(&tokens.unwrap())
+}
 
 #[cfg(test)]
 mod integrate {
