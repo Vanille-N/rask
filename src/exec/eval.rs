@@ -95,25 +95,20 @@ mod test {
     macro_rules! check {
         ( $s:tt [$envt:ident]-> $( $e:expr ),* ) => {
             let lt = parse(&$s);
-            let target: Vec<Result<Expr, EvalErr>> = vec![ $( $e ),* ];
+            let target: Vec<Rc<Expr>> = vec![ $( parse(&$e)[0].as_ref().ok().unwrap().clone() ),* ];
             if target.len() != lt.len() {
                 panic!("Not the right number of elements to compare: {} vs {} in \n {:?}", lt.len(), target.len(), &lt);
             }
             for i in 0..lt.len() {
-                match &target[i] {
-                    Err(_) => unimplemented!(),
-                    Ok(target) => {
-                        match &lt[i] {
-                            Err(lt) => panic!("Expected {:?} but obtained {:?}", target, lt),
-                            Ok(lt) => {
-                                let result = eval(lt.clone(), &mut $envt).ok().unwrap();
-                                if !corresponds(&result, &target) {
-                                    panic!(
-                                        "Parsing mistake:\n    {:?} is not the same as \n    {:?}",
-                                        &result, target
-                                    );
-                                }
-                            }
+                match &lt[i] {
+                    Err(lt) => panic!("Expected {:?} but obtained {:?}", target, lt),
+                    Ok(lt) => {
+                        let result = eval(lt.clone(), &mut $envt).ok().unwrap();
+                        if !corresponds(&result, &target[i]) {
+                            panic!(
+                                "Parsing mistake:\n    {:?} is not the same as \n    {:?}",
+                                &result, target
+                            );
                         }
                     }
                 }
