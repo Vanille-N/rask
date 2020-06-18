@@ -130,7 +130,14 @@ mod test {
         envt.insert(String::from("lst"), Rc::new(list!(atom!(a), atom!(b), atom!(c))));
         check!("a" [envt]-> Ok(int!(12)));
         check!("'b" [envt]-> Ok(atom!(b)));
+        check!("`a" [envt]-> Ok(atom!(a)));
+        check!("`lst" [envt]-> Ok(atom!(lst)));
         check!("`,b" [envt]-> Ok(float!(0.5)));
         check!("'lst" [envt]-> Ok(atom!(lst)));
+        check!("'(a b)" [envt]-> Ok(list!(atom!(a), atom!(b))));
+        check!("'(1 2 \"c\" #\\')" [envt]-> Ok(list!(int!(1), int!(2), string!("c"), chr!('\''))));
+        check!("lst" [envt]-> Ok(list!(int!(12), float!(0.5), string!("xyz"))));
+        check!("`,lst" [envt]-> Ok(list!(int!(12), float!(0.5), string!("xyz"))));
+        check!("`(,a b)" [envt]-> Ok(list!(int!(12), atom!(b))));
     }
 }
