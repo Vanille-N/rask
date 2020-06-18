@@ -6,5 +6,6 @@ pub enum EvalErr {
     UselessAntiquote(Rc<Expr>),
     CannotEval(Rc<Expr>),
     CannotApply(Rc<Expr>),
-    ProperListRequired,
+    ProperListRequired(Rc<Expr>),
+    UnknownIdent(Rc<Expr>),
 }
