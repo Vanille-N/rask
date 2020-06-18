@@ -139,5 +139,6 @@ mod test {
         check!("lst" [envt]-> Ok(list!(atom!(a), atom!(b), atom!(c))));
         check!("`,lst" [envt]-> Ok(list!(atom!(a), atom!(b), atom!(c))));
         check!("`(,a b)" [envt]-> Ok(list!(int!(12), atom!(b))));
+        check!("`(a ,b ,lst)" [envt]-> Ok(list!(atom!(a), float!(0.5), list!(atom!(a), atom!(b), atom!(c)))));
     }
 }
