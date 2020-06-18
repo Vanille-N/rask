@@ -12,15 +12,23 @@ pub fn apply(lst: &Vec<Rc<Expr>>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
             match &*result {
                 Expr::Func(f) => f(&lst[1..]),
                 Expr::Lambda(f, _) => f(&lst[1..]),
-                Expr::Atom(a) => apply_atom(&a[..], &lst[1..], ctx),
+                Expr::Atom(a) => apply_atom(&a, &lst[1..], ctx),
                 _ => Err(EvalErr::CannotApply(result.clone())),
             }
         }
-        Expr::Atom(a) => apply_atom(&a[..], &lst[1..], ctx),
+        Expr::Atom(a) => apply_atom(&a, &lst[1..], ctx),
         _ => unreachable!(),
     }
 }
 
-pub fn apply_atom(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
-    unimplemented!()
+pub fn apply_atom(a: &String, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
+    if let Some(f) = ctx.get(a) {
+        match &*f {
+            Expr::Func(f) => f(parameters, ),
+            Expr::Lambda(_, _) => unimplemented!(),
+            _ => Err(EvalErr::CannotApply(f.clone())),
+        }
+    } else {
+        Err(EvalErr::UnknownIdent(Rc::new(Expr::Atom(Rc::new(a.clone())))))
+    }
 }
