@@ -123,17 +123,17 @@ mod test {
         envt.insert(String::from("b"), Rc::new(float!(0.5)));
         envt.insert(String::from("c"), Rc::new(string!("xyz")));
         envt.insert(String::from("lst"), Rc::new(list!(atom!(a), atom!(b), atom!(c))));
-        check!("a" [envt]-> Ok(int!(12)));
-        check!("'b" [envt]-> Ok(atom!(b)));
-        check!("`a" [envt]-> Ok(atom!(a)));
-        check!("`lst" [envt]-> Ok(atom!(lst)));
-        check!("`,b" [envt]-> Ok(float!(0.5)));
-        check!("'lst" [envt]-> Ok(atom!(lst)));
-        check!("'(a b)" [envt]-> Ok(list!(atom!(a), atom!(b))));
-        check!("'(1 2 \"c\" #\\')" [envt]-> Ok(list!(int!(1), int!(2), string!("c"), chr!('\''))));
-        check!("lst" [envt]-> Ok(list!(atom!(a), atom!(b), atom!(c))));
-        check!("`,lst" [envt]-> Ok(list!(atom!(a), atom!(b), atom!(c))));
-        check!("`(,a b)" [envt]-> Ok(list!(int!(12), atom!(b))));
-        check!("`(a ,b ,lst)" [envt]-> Ok(list!(atom!(a), float!(0.5), list!(atom!(a), atom!(b), atom!(c)))));
+        check!("a" [envt]-> "12");
+        check!("'b" [envt]-> "b");
+        check!("`a" [envt]-> "a");
+        check!("`lst" [envt]-> "lst");
+        check!("`,b" [envt]-> "0.5");
+        check!("'lst" [envt]-> "lst");
+        check!("'(a b)" [envt]-> "(a b)");
+        check!("'(1 2 \"c\" #\\')" [envt]-> "(1 2 \"c\" #\\')");
+        check!("lst" [envt]-> "(a b c)");
+        check!("`,lst" [envt]-> "(a b c)");
+        check!("`(,a b)" [envt]-> "(12 b)");
+        check!("`(a ,b ,lst)" [envt]-> "(a 0.5 (a b c))");
     }
 }
