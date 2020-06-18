@@ -1,16 +1,17 @@
 use crate::parse::{Expr, ParseErr, Token};
 use std::rc::Rc;
 
-pub fn build(tokens: &[Token]) -> Vec<Result<Expr, ParseErr>> {
+pub fn build(tokens: &[Token]) -> Vec<Result<Rc<Expr>, ParseErr>> {
     let mut exprs = Vec::new();
     let mut idx = 0;
     while idx < tokens.len() {
         let expr = build_helper(&tokens, &mut idx);
-        if expr.is_err() {
-            exprs.push(expr);
+        if let Err(e) = expr {
+            exprs.push(Err(e));
             return exprs;
+        } else {
+            exprs.push(Ok(Rc::new(expr.unwrap())));
         }
-        exprs.push(expr);
     }
     exprs
 }
