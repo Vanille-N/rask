@@ -152,6 +152,54 @@ mod test {
                 }
             }))),
         );
+        envt.insert(
+            String::from("-"),
+            Rc::new(Expr::Func(Rc::new(|args, _| {
+                if args.len() != 2 {
+                    Err(EvalErr::WrongArgList)
+                } else if let Expr::Integer(i) = &*args[0] {
+                    if let Expr::Integer(j) = &*args[1] {
+                        Ok(Rc::new(Expr::Integer(i - j)))
+                    } else {
+                        Err(EvalErr::TypeError)
+                    }
+                } else {
+                    Err(EvalErr::TypeError)
+                }
+            }))),
+        );
+        envt.insert(
+            String::from("+"),
+            Rc::new(Expr::Func(Rc::new(|args, _| {
+                if args.len() != 2 {
+                    Err(EvalErr::WrongArgList)
+                } else if let Expr::Integer(i) = &*args[0] {
+                    if let Expr::Integer(j) = &*args[1] {
+                        Ok(Rc::new(Expr::Integer(i + j)))
+                    } else {
+                        Err(EvalErr::TypeError)
+                    }
+                } else {
+                    Err(EvalErr::TypeError)
+                }
+            }))),
+        );
+        envt.insert(
+            String::from("*"),
+            Rc::new(Expr::Func(Rc::new(|args, _| {
+                if args.len() != 2 {
+                    Err(EvalErr::WrongArgList)
+                } else if let Expr::Integer(i) = &*args[0] {
+                    if let Expr::Integer(j) = &*args[1] {
+                        Ok(Rc::new(Expr::Integer(i * j)))
+                    } else {
+                        Err(EvalErr::TypeError)
+                    }
+                } else {
+                    Err(EvalErr::TypeError)
+                }
+            }))),
+        );
         check!("a" [envt]-> "12");
         check!("'b" [envt]-> "b");
         check!("`a" [envt]-> "a");
@@ -166,5 +214,7 @@ mod test {
         check!("`(a ,b ,lst)" [envt]-> "(a 0.5 (a b c))");
         check!("(fn 1 2)" [envt]-> "3");
         check!("(fn a -1)" [envt]-> "11");
+        check!("(+ 1 4)" [envt]-> "5");
+        check!("(- 1 4)" [envt]-> "-3");
     }
 }
