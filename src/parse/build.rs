@@ -207,6 +207,8 @@ mod test {
         check!("'()" -> Ok(quote!(list!())));
         check!("(let [(a 1) (b 2)] (+ (* a 2) (/ b -3)))" -> Ok(list!(atom!(let), list!(list!(atom!(a), int!(1)), list!(atom!(b), int!(2))), list!(atom!(+), list!(atom!(*), atom!(a), int!(2)), list!(atom!(/), atom!(b), int!(-3))))));
         check!("(a b . c)" -> Ok(cons!(atom!(a), atom!(b) ; atom!(c))));
+        check!("()" -> Ok(list!()));
+        check!("'()" -> Ok(quote!(list!())));
     }
 
     #[test]
