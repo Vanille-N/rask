@@ -1,4 +1,4 @@
-use crate::exec::{EvalErr, Expr, eval, Envt};
+use crate::exec::{eval, Envt, EvalErr, Expr};
 use std::rc::Rc;
 
 pub fn apply(lst: &Vec<Rc<Expr>>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
@@ -6,7 +6,15 @@ pub fn apply(lst: &Vec<Rc<Expr>>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
         return Ok(Rc::new(Expr::Nil));
     }
     match &*lst[0] {
-        Expr::Nil | Expr::Char(_) | Expr::Integer(_) | Expr::Float(_) | Expr::String(_) | Expr::Cons(_, _) | Expr::Quote(_) | Expr::Quasiquote(_) | Expr::Antiquote(_) => Err(EvalErr::CannotApply(lst[0].clone())),
+        Expr::Nil
+        | Expr::Char(_)
+        | Expr::Integer(_)
+        | Expr::Float(_)
+        | Expr::String(_)
+        | Expr::Cons(_, _)
+        | Expr::Quote(_)
+        | Expr::Quasiquote(_)
+        | Expr::Antiquote(_) => Err(EvalErr::CannotApply(lst[0].clone())),
         Expr::List(_) => {
             let result = eval(lst[0].clone(), ctx)?;
             match &*result {
@@ -20,7 +28,11 @@ pub fn apply(lst: &Vec<Rc<Expr>>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     }
 }
 
-pub fn apply_atom(a: &String, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
+pub fn apply_atom(
+    a: &String,
+    parameters: &[Rc<Expr>],
+    ctx: &mut Envt,
+) -> Result<Rc<Expr>, EvalErr> {
     if let Some(f) = ctx.get(a) {
         match &*f {
             Expr::Func(f) => {
@@ -33,6 +45,8 @@ pub fn apply_atom(a: &String, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Result
             _ => Err(EvalErr::CannotApply(f.clone())),
         }
     } else {
-        Err(EvalErr::UnknownIdent(Rc::new(Expr::Atom(Rc::new(a.clone())))))
+        Err(EvalErr::UnknownIdent(Rc::new(Expr::Atom(Rc::new(
+            a.clone(),
+        )))))
     }
 }

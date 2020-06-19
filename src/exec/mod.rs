@@ -1,8 +1,8 @@
-mod util;
-mod eval;
 mod apply;
+mod eval;
+mod util;
 
-pub use util::*;
-pub use eval::eval;
+pub use crate::parse::{Envt, Expr, Func};
 pub use apply::apply;
-pub use crate::parse::{Expr, Func, Envt};
+pub use eval::eval;
+pub use util::*;

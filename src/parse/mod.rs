@@ -6,8 +6,8 @@ mod util;
 pub use build::build;
 pub use lex::distribute_lex as lex;
 pub use split::split;
-pub use util::*;
 use std::rc::Rc;
+pub use util::*;
 
 pub fn parse(src: &str) -> Vec<Result<Rc<Expr>, ParseErr>> {
     let symbols = split(src);

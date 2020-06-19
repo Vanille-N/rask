@@ -27,9 +27,7 @@ fn criterion_split(c: &mut Criterion) {
         let prog = source(&("assets/".to_owned() + *file)).unwrap();
         let size = prog.len() as u64;
         group.throughput(Throughput::Bytes(size));
-        group.bench_with_input(*file, &size, |b, _| {
-            b.iter(|| split(&prog[..]))
-        });
+        group.bench_with_input(*file, &size, |b, _| b.iter(|| split(&prog[..])));
     }
     group.finish();
 }
@@ -46,9 +44,7 @@ fn criterion_lex(c: &mut Criterion) {
         let symbols = split(&prog[..]).ok().unwrap();
         let size = symbols.len() as u64;
         group.throughput(Throughput::Bytes(size));
-        group.bench_with_input(*file, &size, |b, _| {
-            b.iter(|| lex(&symbols))
-        });
+        group.bench_with_input(*file, &size, |b, _| b.iter(|| lex(&symbols)));
     }
     group.finish();
 }
@@ -66,9 +62,7 @@ fn criterion_build(c: &mut Criterion) {
         let tokens = lex(&symbols).ok().unwrap();
         let size = tokens.len() as u64;
         group.throughput(Throughput::Bytes(size));
-        group.bench_with_input(*file, &size, |b, _| {
-            b.iter(|| build(&tokens))
-        });
+        group.bench_with_input(*file, &size, |b, _| b.iter(|| build(&tokens)));
     }
     group.finish();
 }

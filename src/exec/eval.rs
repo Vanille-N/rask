@@ -1,15 +1,13 @@
-use crate::exec::{apply, EvalErr, Expr, Envt};
+use crate::exec::{apply, Envt, EvalErr, Expr};
 use std::rc::Rc;
 
 pub fn eval(expr: Rc<Expr>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     match &*expr {
         Expr::Quote(a) => Ok(a.clone()),
-        Expr::Atom(a) => {
-            match ctx.get(&a) {
-                None => Err(EvalErr::UnknownIdentifier(a.to_string())),
-                Some(x) => Ok(x.clone()),
-            }
-        }
+        Expr::Atom(a) => match ctx.get(&a) {
+            None => Err(EvalErr::UnknownIdentifier(a.to_string())),
+            Some(x) => Ok(x.clone()),
+        },
         Expr::Antiquote(a) => Err(EvalErr::UselessAntiquote(a.clone())),
         Expr::Quasiquote(a) => quasi_eval(a.clone(), ctx),
         Expr::Integer(_) => Ok(expr.clone()),
@@ -20,12 +18,9 @@ pub fn eval(expr: Rc<Expr>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
         Expr::Bool(_) => Ok(expr.clone()),
         Expr::Cons(_, _) => Err(EvalErr::ProperListRequired(expr.clone())),
         Expr::List(items) => apply(&items, ctx),
-        Expr::Func(_) |
-        Expr::Ellipsis |
-        Expr::Dot => Err(EvalErr::CannotEval(expr.clone())),
+        Expr::Func(_) | Expr::Ellipsis | Expr::Dot => Err(EvalErr::CannotEval(expr.clone())),
     }
 }
-
 
 pub fn quasi_eval(expr: Rc<Expr>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     match &*expr {
@@ -46,7 +41,7 @@ pub fn quasi_eval(expr: Rc<Expr>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
 mod test {
     use super::*;
     use crate::exec::EvalErr;
-    use crate::parse::{parse, corresponds};
+    use crate::parse::{corresponds, parse};
     use chainmap::ChainMap;
 
     macro_rules! err {
@@ -65,25 +60,37 @@ mod test {
         ( $( $elem:tt )* ) => { Expr::Atom(Rc::new(String::from(concat!($( stringify!($elem) ),*)))) };
     }
     macro_rules! quote {
-        ( $elem:expr ) => { Expr::Quote(Rc::new($elem)) };
+        ( $elem:expr ) => {
+            Expr::Quote(Rc::new($elem))
+        };
     }
     macro_rules! quasiquote {
-        ( $elem:expr ) => { Expr::Quasiquote(Rc::new($elem)) };
+        ( $elem:expr ) => {
+            Expr::Quasiquote(Rc::new($elem))
+        };
     }
     macro_rules! antiquote {
-        ( $elem:expr ) => { Expr::Antiquote(Rc::new($elem)) };
+        ( $elem:expr ) => {
+            Expr::Antiquote(Rc::new($elem))
+        };
     }
     macro_rules! int {
-        ( $elem:expr ) => { Expr::Integer($elem) };
+        ( $elem:expr ) => {
+            Expr::Integer($elem)
+        };
     }
     macro_rules! cons {
         ( $( $elem:expr ),* ; $end:expr ) => {Expr::Cons(Rc::new(vec![$( Rc::new($elem) ),*]), Rc::new($end))}
     }
     macro_rules! float {
-        ( $elem:expr ) => { Expr::Float($elem) };
+        ( $elem:expr ) => {
+            Expr::Float($elem)
+        };
     }
     macro_rules! chr {
-        ( $elem:expr ) => { Expr::Char($elem) };
+        ( $elem:expr ) => {
+            Expr::Char($elem)
+        };
     }
     macro_rules! string {
         ( $e:expr ) => {
@@ -125,20 +132,26 @@ mod test {
         envt.insert(String::from("a"), Rc::new(int!(12)));
         envt.insert(String::from("b"), Rc::new(float!(0.5)));
         envt.insert(String::from("c"), Rc::new(string!("xyz")));
-        envt.insert(String::from("lst"), Rc::new(list!(atom!(a), atom!(b), atom!(c))));
-        envt.insert(String::from("fn"), Rc::new(Expr::Func(Rc::new(|args| {
-            if args.len() != 2 {
-                Err(EvalErr::WrongArgList)
-            } else if let Expr::Integer(i) = &*args[0] {
-                if let Expr::Integer(j) = &*args[1] {
-                    Ok(Rc::new(Expr::Integer(i + j)))
+        envt.insert(
+            String::from("lst"),
+            Rc::new(list!(atom!(a), atom!(b), atom!(c))),
+        );
+        envt.insert(
+            String::from("fn"),
+            Rc::new(Expr::Func(Rc::new(|args| {
+                if args.len() != 2 {
+                    Err(EvalErr::WrongArgList)
+                } else if let Expr::Integer(i) = &*args[0] {
+                    if let Expr::Integer(j) = &*args[1] {
+                        Ok(Rc::new(Expr::Integer(i + j)))
+                    } else {
+                        Err(EvalErr::TypeError)
+                    }
                 } else {
                     Err(EvalErr::TypeError)
                 }
-            } else {
-                Err(EvalErr::TypeError)
-            }
-        }))));
+            }))),
+        );
         check!("a" [envt]-> "12");
         check!("'b" [envt]-> "b");
         check!("`a" [envt]-> "a");
