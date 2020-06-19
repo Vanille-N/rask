@@ -1,6 +1,7 @@
 use crate::exec::Expr;
 use std::rc::Rc;
 
+#[derive(Debug)]
 pub enum EvalErr {
     UnknownIdentifier(String),
     UselessAntiquote(Rc<Expr>),
@@ -8,4 +9,6 @@ pub enum EvalErr {
     CannotApply(Rc<Expr>),
     ProperListRequired(Rc<Expr>),
     UnknownIdent(Rc<Expr>),
+    TypeError,
+    WrongArgList,
 }
