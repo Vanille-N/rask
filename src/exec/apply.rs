@@ -24,7 +24,13 @@ pub fn apply(lst: &Vec<Rc<Expr>>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
 pub fn apply_atom(a: &String, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     if let Some(f) = ctx.get(a) {
         match &*f {
-            Expr::Func(f) => f(parameters, ),
+            Expr::Func(f) => {
+                let mut par = Vec::new();
+                for p in parameters {
+                    par.push(eval(p.clone(), ctx)?)
+                }
+                f(&par[..])
+            }
             Expr::Lambda(_, _) => unimplemented!(),
             _ => Err(EvalErr::CannotApply(f.clone())),
         }
