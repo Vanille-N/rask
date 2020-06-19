@@ -217,6 +217,19 @@ mod test {
                 }
             }))),
         );
+        envt.insert(
+            String::from("set!"),
+            Rc::new(Expr::Func(Rc::new(|args, envt| {
+                if args.len() != 2 {
+                    Err(EvalErr::WrongArgList)
+                } else if let Expr::Atom(a) = &*args[0] {
+                    envt.update(&*a, args[1].clone());
+                    Ok(Rc::new(Expr::List(Rc::new(vec![]))))
+                } else {
+                    Err(EvalErr::TypeError)
+                }
+            }))),
+        );
         check!("a" [envt]-> "12");
         check!("'b" [envt]-> "b");
         check!("`a" [envt]-> "a");
@@ -235,6 +248,8 @@ mod test {
         check!("(- 1 4)" [envt]-> "-3");
         check!("(fact 0)" [envt]-> "1");
         check!("(fact 3)" [envt]-> "6");
-        check!("(+ 1 [fact (fact (+ -1 4))])" [envt]-> "721");
+        check!("(set! 'a 4)" [envt]-> "()");
+        check!("a" [envt]-> "4");
+        check!("(+ 1 [fact (fact (+ -1 a))])" [envt]-> "721");
     }
 }
