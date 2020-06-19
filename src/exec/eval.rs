@@ -200,6 +200,23 @@ mod test {
                 }
             }))),
         );
+        envt.insert(
+            String::from("fact"),
+            Rc::new(Expr::Func(Rc::new(|args, envt| {
+                if args.len() != 1 {
+                    Err(EvalErr::WrongArgList)
+                } else if let Expr::Integer(i) = &*args[0] {
+                    let mut envt = envt.extend();
+                    envt.insert(String::from("i"), Rc::new(Expr::Integer(*i)));
+                    match *i {
+                        0 => Ok(Rc::new(Expr::Integer(1))),
+                        i => eval(parse("(* i (fact (- i 1)))")[0].as_ref().ok().unwrap().clone(), &mut envt),
+                    }
+                } else {
+                    Err(EvalErr::TypeError)
+                }
+            }))),
+        );
         check!("a" [envt]-> "12");
         check!("'b" [envt]-> "b");
         check!("`a" [envt]-> "a");
@@ -216,5 +233,8 @@ mod test {
         check!("(fn a -1)" [envt]-> "11");
         check!("(+ 1 4)" [envt]-> "5");
         check!("(- 1 4)" [envt]-> "-3");
+        check!("(fact 0)" [envt]-> "1");
+        check!("(fact 3)" [envt]-> "6");
+        check!("(+ 1 [fact (fact (+ -1 4))])" [envt]-> "721");
     }
 }
