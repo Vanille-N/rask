@@ -103,7 +103,11 @@ mod test {
                 match &lt[i] {
                     Err(lt) => panic!("Expected {:?} but obtained {:?}", target, lt),
                     Ok(lt) => {
-                        let result = eval(lt.clone(), &mut $envt).ok().unwrap();
+                        let result = eval(lt.clone(), &mut $envt);
+                        if let Err(e) = result {
+                            panic!("Failed to evaluate: {:?}", e);
+                        }
+                        let result = result.ok().unwrap();
                         if !corresponds(&result, &target[i]) {
                             panic!(
                                 "Parsing mistake:\n    {:?} is not the same as \n    {:?}",
