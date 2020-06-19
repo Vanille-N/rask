@@ -1,8 +1,8 @@
 use crate::exec::{eval, Envt, EvalErr, Expr};
 use std::rc::Rc;
 
-pub fn apply(lst: &Vec<Rc<Expr>>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
-    if lst.len() == 0 {
+pub fn apply(lst: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
+    if lst.is_empty() {
         return Ok(Rc::new(Expr::Nil));
     }
     match &*lst[0] {

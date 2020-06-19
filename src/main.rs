@@ -28,24 +28,13 @@ fn errmsg_parse(arg: &str, e: ParseErr) {
     match e {
         ParseErr::UnterminatedString(pos) => {
             eprintln!("Unterminated string literal");
-            eprintln!(
-                "  Found in expression {}...",
-                &arg[0..10.min(n)]
-            );
-            eprintln!(
-                "  At position {}: {}...",
-                pos,
-                &arg[pos..(pos + 10).min(n)]
-            );
+            eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
+            eprintln!("  At position {}: {}...", pos, &arg[pos..(pos + 10).min(n)]);
         }
         ParseErr::IncorrectSpacing(pos) => {
             eprintln!("Incorrect spacing between disctinct elements");
             eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
-            eprintln!(
-                "  At position {}: {}...",
-                pos,
-                &arg[pos..(pos + 10).min(n)]
-            );
+            eprintln!("  At position {}: {}...", pos, &arg[pos..(pos + 10).min(n)]);
         }
         ParseErr::LoneNumbersign => {
             eprintln!("Number sign not followed by an interpreter directive nor a character");
@@ -71,9 +60,7 @@ fn errmsg_parse(arg: &str, e: ParseErr) {
             eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
         }
         ParseErr::NoCommentStart => {
-            eprintln!(
-                "Found an inline-comment terminator, but no matching beginning"
-            );
+            eprintln!("Found an inline-comment terminator, but no matching beginning");
             eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
         }
         ParseErr::MismatchedOpenBrace(idx) => {
@@ -82,23 +69,17 @@ fn errmsg_parse(arg: &str, e: ParseErr) {
             eprintln!("  Token identifier: {}", idx);
         }
         ParseErr::MismatchedCloseBrace(idx) => {
-            eprintln!(
-                "Did not expect closing bracket `]` without matching `[` first"
-            );
+            eprintln!("Did not expect closing bracket `]` without matching `[` first");
             eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
             eprintln!("  Token identifier: {}", idx);
         }
         ParseErr::MismatchedOpenParen(idx) => {
-            eprintln!(
-                "Found an opening parenthesis `(` with no corresponding `)`"
-            );
+            eprintln!("Found an opening parenthesis `(` with no corresponding `)`");
             eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
             eprintln!("  Token identifier: {}", idx);
         }
         ParseErr::MismatchedCloseParen(idx) => {
-            eprintln!(
-                "Did not expect closing parenthesis `)` without matching `(` first"
-            );
+            eprintln!("Did not expect closing parenthesis `)` without matching `(` first");
             eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
             eprintln!("  Token identifier: {}", idx);
         }

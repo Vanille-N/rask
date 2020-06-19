@@ -6,7 +6,7 @@ pub fn eval(expr: Rc<Expr>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
         Expr::Quote(a) => Ok(a.clone()),
         Expr::Atom(a) => match ctx.get(&a) {
             None => Err(EvalErr::UnknownIdentifier(a.to_string())),
-            Some(x) => Ok(x.clone()),
+            Some(x) => Ok(x),
         },
         Expr::Antiquote(a) => Err(EvalErr::UselessAntiquote(a.clone())),
         Expr::Quasiquote(a) => quasi_eval(a.clone(), ctx),
@@ -210,7 +210,14 @@ mod test {
                     envt.insert(String::from("i"), Rc::new(Expr::Integer(*i)));
                     match *i {
                         0 => Ok(Rc::new(Expr::Integer(1))),
-                        i => eval(parse("(* i (fact (- i 1)))")[0].as_ref().ok().unwrap().clone(), &mut envt),
+                        i => eval(
+                            parse("(* i (fact (- i 1)))")[0]
+                                .as_ref()
+                                .ok()
+                                .unwrap()
+                                .clone(),
+                            &mut envt,
+                        ),
                     }
                 } else {
                     Err(EvalErr::TypeError)
