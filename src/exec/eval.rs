@@ -127,6 +127,19 @@ mod test {
         envt.insert(String::from("b"), Rc::new(float!(0.5)));
         envt.insert(String::from("c"), Rc::new(string!("xyz")));
         envt.insert(String::from("lst"), Rc::new(list!(atom!(a), atom!(b), atom!(c))));
+        envt.insert(String::from("fn"), Rc::new(Expr::Func(Rc::new(|args| {
+            if args.len() != 2 {
+                Err(EvalErr::WrongArgList)
+            } else if let Expr::Integer(i) = &*args[0] {
+                if let Expr::Integer(j) = &*args[1] {
+                    Ok(Rc::new(Expr::Integer(i + j)))
+                } else {
+                    Err(EvalErr::TypeError)
+                }
+            } else {
+                Err(EvalErr::TypeError)
+            }
+        }))));
         check!("a" [envt]-> "12");
         check!("'b" [envt]-> "b");
         check!("`a" [envt]-> "a");
@@ -139,5 +152,7 @@ mod test {
         check!("`,lst" [envt]-> "(a b c)");
         check!("`(,a b)" [envt]-> "(12 b)");
         check!("`(a ,b ,lst)" [envt]-> "(a 0.5 (a b c))");
+        check!("(fn 1 2)" [envt]-> "3");
+        check!("(fn a -1)" [envt]-> "11");
     }
 }
