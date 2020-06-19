@@ -9,6 +9,7 @@ fn main() {
         eprintln!("Not enough arguments");
         process::exit(1);
     }
+    #[allow(clippy::single_match)]
     match &args[1][..] {
         "split" => {
             for arg in args.iter().skip(2) {
