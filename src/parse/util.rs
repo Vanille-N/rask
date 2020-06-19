@@ -139,7 +139,7 @@ pub enum Expr {
     Cons(Rc<Vec<Rc<Expr>>>, Rc<Expr>),
 }
 
-pub type Func = Rc<dyn Fn(&[Rc<Expr>]) -> Result<Rc<Expr>, crate::exec::EvalErr>>;
+pub type Func = Rc<dyn Fn(&[Rc<Expr>], &mut Envt) -> Result<Rc<Expr>, crate::exec::EvalErr>>;
 
 pub type Envt = ChainMap<String, Rc<Expr>>;
 

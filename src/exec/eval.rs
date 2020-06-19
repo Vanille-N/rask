@@ -138,7 +138,7 @@ mod test {
         );
         envt.insert(
             String::from("fn"),
-            Rc::new(Expr::Func(Rc::new(|args| {
+            Rc::new(Expr::Func(Rc::new(|args, _| {
                 if args.len() != 2 {
                     Err(EvalErr::WrongArgList)
                 } else if let Expr::Integer(i) = &*args[0] {

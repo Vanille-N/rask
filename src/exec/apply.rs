@@ -18,7 +18,7 @@ pub fn apply(lst: &Vec<Rc<Expr>>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
         Expr::List(_) => {
             let result = eval(lst[0].clone(), ctx)?;
             match &*result {
-                Expr::Func(f) => f(&lst[1..]),
+                Expr::Func(f) => f(&lst[1..], ctx),
                 Expr::Atom(a) => apply_atom(&a, &lst[1..], ctx),
                 _ => Err(EvalErr::CannotApply(result.clone())),
             }
@@ -40,7 +40,7 @@ pub fn apply_atom(
                 for p in parameters {
                     par.push(eval(p.clone(), ctx)?)
                 }
-                f(&par[..])
+                f(&par[..], ctx)
             }
             _ => Err(EvalErr::CannotApply(f.clone())),
         }
