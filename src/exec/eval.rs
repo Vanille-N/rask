@@ -126,6 +126,34 @@ mod test {
         };
     }
 
+    macro_rules! err {
+        ( $s:tt [$envt:ident]-> $( $e:expr ),* ) => {
+            let lt = parse(&$s);
+            let target: Vec<EvalErr> = vec![ $( $e ),* ];
+            if target.len() != lt.len() {
+                panic!("Not the right number of elements to compare: {} vs {} in \n {:?}", lt.len(), target.len(), &lt);
+            }
+            for i in 0..lt.len() {
+                match &lt[i] {
+                    Err(lt) => panic!("Expected {:?} but obtained {:?}", target, lt),
+                    Ok(lt) => {
+                        let result = eval(lt.clone(), &mut $envt);
+                        if let Ok(e) = result {
+                            panic!("Expected an error to occur: {:?}", e);
+                        }
+                        let result = result.err().unwrap();
+                        if result != target[i] {
+                            panic!(
+                                "Parsing mistake:\n    {:?} is not the same as \n    {:?}",
+                                &result, target
+                            );
+                        }
+                    }
+                }
+            }
+        };
+    }
+
     #[test]
     pub fn evals() {
         let mut envt = ChainMap::new();
@@ -210,7 +238,7 @@ mod test {
                     envt.insert(String::from("i"), Rc::new(Expr::Integer(*i)));
                     match *i {
                         0 => Ok(Rc::new(Expr::Integer(1))),
-                        i => eval(
+                        _i => eval(
                             parse("(* i (fact (- i 1)))")[0]
                                 .as_ref()
                                 .ok()
