@@ -29,6 +29,8 @@ Rask is under development.
 - [X] **Eval** (expression tree → expression)
 - [X] **Cov** (decent test coverage)
 
+Test coverage is now considered sufficient, 0.1 has had its last commit. Development will resume with 0.2, shortly after the 11th of July.
+
 #### 0.2 roadmap:
 - [ ] **Def** (defines and variable bindings)
 - [ ] **Boot** (basic constructs: if, let, letrec, let*, ...)
