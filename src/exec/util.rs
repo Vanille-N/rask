@@ -3,12 +3,11 @@ use std::rc::Rc;
 
 #[derive(Debug)]
 pub enum EvalErr {
-    UnknownIdentifier(String),
+    UnknownIdent(Rc<Expr>),
     UselessAntiquote(Rc<Expr>),
     CannotEval(Rc<Expr>),
     CannotApply(Rc<Expr>),
     ProperListRequired(Rc<Expr>),
-    UnknownIdent(Rc<Expr>),
     TypeError,
     WrongArgList,
 }

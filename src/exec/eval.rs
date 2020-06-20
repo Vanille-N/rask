@@ -5,7 +5,7 @@ pub fn eval(expr: Rc<Expr>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     match &*expr {
         Expr::Quote(a) => Ok(a.clone()),
         Expr::Atom(a) => match ctx.get(&a) {
-            None => Err(EvalErr::UnknownIdentifier(a.to_string())),
+            None => Err(EvalErr::UnknownIdent(expr.clone())),
             Some(x) => Ok(x),
         },
         Expr::Antiquote(a) => Err(EvalErr::UselessAntiquote(a.clone())),
