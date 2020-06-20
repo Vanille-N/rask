@@ -295,5 +295,18 @@ mod test {
         check!("\"abc\"" [envt]-> "\"abc\"");
         check!("#t" [envt]-> "#t");
         check!("`(`a)" [envt]-> "(a)");
+        // Note that Rc::new(Expr::Dot) is merely a placeholder.
+        // We check that an error of the correct type occured and assume that the
+        // contents are correct as well.
+        macro_rules! placeholder {
+            () => { Rc::new(Expr::Dot) }
+        }
+        err!("('a b)" [envt]-> EvalErr::CannotApply(placeholder!()));
+        err!("(#\\a a)" [envt]-> EvalErr::CannotApply(placeholder!()));
+        err!("(() a)" [envt]-> EvalErr::CannotApply(placeholder!()));
+        err!("(funct a)" [envt]-> EvalErr::UnknownIdent(placeholder!()));
+        err!("(a a)" [envt]-> EvalErr::CannotApply(placeholder!()));
+        err!(",a" [envt]-> EvalErr::UselessAntiquote(placeholder!()));
+        err!("(a . b)" [envt]-> EvalErr::ProperListRequired(placeholder!()));
     }
 }
