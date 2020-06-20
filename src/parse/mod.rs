@@ -70,4 +70,10 @@ mod integrate {
             }
         }
     }
+
+    #[test]
+    fn failures() {
+        assert_eq!(*parse("(")[0].as_ref().err().unwrap(), ParseErr::MismatchedOpenParen(0));
+        assert_eq!(source("nofile"), None);
+    }
 }

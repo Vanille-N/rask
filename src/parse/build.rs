@@ -34,6 +34,13 @@ fn build_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr> {
             let cl = close_separator(&op);
             let mut v = Vec::new();
             let mut dot_seen = false;
+            if *idx == tokens.len() {
+                return Err(match op {
+                    Token::OpenParen => ParseErr::MismatchedOpenParen(*idx-1),
+                    Token::OpenBrace => ParseErr::MismatchedOpenBrace(*idx-1),
+                    _ => unreachable!(),
+                });
+            }
             while tokens[*idx] != cl {
                 let expr = build_helper(tokens, idx)?;
                 if let Expr::Dot = expr {
