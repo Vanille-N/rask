@@ -20,6 +20,7 @@ pub enum ParseErr {
     InvalidCons(usize),
 }
 
+#[cfg_attr(tarpaulin, skip)]
 impl cmp::PartialEq for ParseErr {
     fn eq(&self, other: &Self) -> bool {
         macro_rules! identical {
@@ -82,6 +83,7 @@ pub enum Token {
     String(String),
 }
 
+#[cfg_attr(tarpaulin, skip)]
 impl cmp::PartialEq for Token {
     fn eq(&self, other: &Self) -> bool {
         macro_rules! identical {
@@ -142,6 +144,7 @@ pub type Func = Rc<dyn Fn(&[Rc<Expr>], &mut Envt) -> Result<Rc<Expr>, crate::exe
 
 pub type Envt = ChainMap<String, Rc<Expr>>;
 
+#[cfg_attr(tarpaulin, skip)]
 impl fmt::Debug for Expr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match &self {
