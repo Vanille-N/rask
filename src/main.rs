@@ -3,6 +3,7 @@ use std::process;
 
 use rask::parse::{split, ParseErr};
 
+#[cfg_attr(tarpaulin, skip)]
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
@@ -23,6 +24,7 @@ fn main() {
     }
 }
 
+#[cfg_attr(tarpaulin, skip)]
 fn errmsg_parse(arg: &str, e: ParseErr) {
     let n = arg.len();
     match e {

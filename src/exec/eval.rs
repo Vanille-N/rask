@@ -37,6 +37,7 @@ pub fn quasi_eval(expr: Rc<Expr>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
 }
 
 #[cfg(test)]
+#[cfg_attr(tarpaulin, skip)]
 mod test {
     use super::*;
     use crate::exec::EvalErr;
