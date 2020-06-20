@@ -27,7 +27,7 @@ Rask is under development.
 - [X] **Lex** (symbols → tokens)
 - [X] **Parse** (tokens → expression tree)
 - [X] **Eval** (expression tree → expression)
-- [ ] **Cov** (decent test coverage)
+- [X] **Cov** (decent test coverage)
 
 #### 0.2 roadmap:
 - [ ] **Def** (defines and variable bindings)
