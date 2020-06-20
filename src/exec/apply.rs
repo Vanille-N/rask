@@ -3,11 +3,10 @@ use std::rc::Rc;
 
 pub fn apply(lst: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     if lst.is_empty() {
-        return Ok(Rc::new(Expr::Nil));
+        return Ok(Rc::new(Expr::List(Rc::new(Vec::new()))));
     }
     match &*lst[0] {
-        Expr::Nil
-        | Expr::Char(_)
+        Expr::Char(_)
         | Expr::Integer(_)
         | Expr::Float(_)
         | Expr::String(_)

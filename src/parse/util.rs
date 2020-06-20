@@ -132,7 +132,6 @@ pub enum Expr {
     String(Rc<String>),
     Char(char),
     Func(Func),
-    Nil,
     Ellipsis,
     Dot,
     Bool(bool),
@@ -166,7 +165,6 @@ impl fmt::Debug for Expr {
             Expr::String(s) => write!(f, "\"{}\"", &s),
             Expr::Char(c) => write!(f, "#\\{:?}", c),
             Expr::Func(_) => write!(f, "<fun>"),
-            Expr::Nil => write!(f, "()"),
             Expr::Ellipsis => write!(f, "..."),
             Expr::Dot => write!(f, "."),
             Expr::Bool(b) => {
@@ -254,7 +252,6 @@ pub fn corresponds(lt: &Expr, rt: &Expr) -> bool {
         String(s) => identical!(String(s)),
         Char(c) => identical!(Char(c)),
         Func(_) => false,
-        Nil => identical!(Nil),
         Ellipsis => identical!(Ellipsis),
         Dot => identical!(Dot),
         Bool(b) => identical!(Bool(b)),

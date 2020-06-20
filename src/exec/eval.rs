@@ -14,7 +14,6 @@ pub fn eval(expr: Rc<Expr>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
         Expr::Float(_) => Ok(expr.clone()),
         Expr::Char(_) => Ok(expr.clone()),
         Expr::String(_) => Ok(expr.clone()),
-        Expr::Nil => Ok(expr.clone()),
         Expr::Bool(_) => Ok(expr.clone()),
         Expr::Cons(_, _) => Err(EvalErr::ProperListRequired(expr.clone())),
         Expr::List(items) => apply(&items, ctx),
