@@ -260,5 +260,11 @@ mod test {
         check!("(+ 1 [fact (fact (+ -1 a))])" [envt]-> "721");
         check!("(set! 'fn fact)" [envt]-> "()");
         check!("(fn a)" [envt]-> "24");
+        check!("()" [envt]-> "()");
+        check!("1.1" [envt]-> "1.1");
+        check!("#\\a" [envt]-> "#\\a");
+        check!("\"abc\"" [envt]-> "\"abc\"");
+        check!("#t" [envt]-> "#t");
+        check!("`(`a)" [envt]-> "(a)");
     }
 }
