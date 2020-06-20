@@ -4,7 +4,6 @@ use std::io::Read;
 pub mod exec;
 pub mod parse;
 
-#[cfg_attr(tarpaulin, skip)]
 pub fn source(fname: &str) -> Option<String> {
     if let Ok(mut file) = File::open(fname.to_owned() + ".scm") {
         let mut contents = String::new();

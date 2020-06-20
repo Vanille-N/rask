@@ -130,7 +130,7 @@ mod test {
     macro_rules! err {
         ( $s:tt [$envt:ident]-> $( $e:expr ),* ) => {
             let lt = parse(&$s);
-            let target: Vec<EvalErr> = vec![ $( $e ),* ];
+            let target = vec![ $( $e ),* ];
             if target.len() != lt.len() {
                 panic!("Not the right number of elements to compare: {} vs {} in \n {:?}", lt.len(), target.len(), &lt);
             }

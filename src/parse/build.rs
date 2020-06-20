@@ -20,7 +20,7 @@ fn close_separator(op: &Token) -> Token {
     match op {
         Token::OpenParen => Token::CloseParen,
         Token::OpenBrace => Token::CloseBrace,
-        _ => panic!("{:?} is not closable", op),
+        _ => unreachable!(),
     }
 }
 

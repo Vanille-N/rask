@@ -13,6 +13,8 @@ pub enum EvalErr {
     WrongArgList,
 }
 
+// No need to test this, it will be correct in practice
+#[cfg_attr(tarpaulin, skip)]
 impl cmp::PartialEq for EvalErr {
     fn eq(&self, other: &Self) -> bool {
         macro_rules! identical {
