@@ -38,7 +38,6 @@ pub fn apply_atom(
 ) -> Result<Rc<Expr>, EvalErr> {
     match &a[..] {
         "define" => {
-            println!("Yes");
             if parameters.is_empty() {
                 return Err(EvalErr::EmptyDefine);
             }
@@ -72,7 +71,6 @@ pub fn apply_atom(
                     }
                     let mut actions = Vec::new();
                     for act in &parameters[1..] {
-                        print!("{:?} ", act);
                         actions.push(act.clone());
                     }
                     if actions.is_empty() {
