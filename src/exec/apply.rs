@@ -15,11 +15,17 @@ pub fn apply(lst: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
         | Expr::Quasiquote(_)
         | Expr::Antiquote(_) => Err(EvalErr::CannotApply(lst[0].clone())),
         Expr::List(_) => {
-            let result = eval(lst[0].clone(), ctx)?;
-            match &*result {
-                Expr::Func(f) => f(&lst[1..], ctx),
+            match &*lst[0] {
                 Expr::Atom(a) => apply_atom(&a, &lst[1..], ctx),
-                _ => Err(EvalErr::CannotApply(result.clone())),
+                Expr::List(_) => {
+                    let result = eval(lst[0].clone(), ctx)?;
+                    match &*result {
+                        Expr::Func(f) => f(&lst[1..], ctx),
+                        Expr::Atom(a) => apply_atom(&a, &lst[1..], ctx),
+                        _ => Err(EvalErr::CannotApply(result.clone())),
+                    }
+                },
+                _ => Err(EvalErr::CannotApply(lst[0].clone())),
             }
         }
         Expr::Atom(a) => apply_atom(&a, &lst[1..], ctx),
