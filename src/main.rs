@@ -1,7 +1,7 @@
 use std::env;
 use std::process;
 
-use rask::parse::{split, ParseErr};
+use rask::parse::{split, lex, parse, ParseErr};
 
 #[cfg_attr(tarpaulin, skip)]
 fn main() {
@@ -15,6 +15,21 @@ fn main() {
         "split" => {
             for arg in args.iter().skip(2) {
                 match split(&arg) {
+                    Ok(v) => println!("{:?}", &v),
+                    Err(e) => errmsg_parse(&arg, e),
+                }
+            }
+        }
+        "lex" => {
+            for arg in args.iter().skip(2) {
+                let tokens = match split(&arg) {
+                    Ok(v) => v,
+                    Err(e) => {
+                        errmsg_parse(&arg, e);
+                        continue;
+                    }
+                };
+                match lex(&tokens) {
                     Ok(v) => println!("{:?}", &v),
                     Err(e) => errmsg_parse(&arg, e),
                 }
