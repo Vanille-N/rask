@@ -39,6 +39,28 @@ pub fn apply_atom(
     parameters: &[Rc<Expr>],
     ctx: &mut Envt,
 ) -> Result<Rc<Expr>, EvalErr> {
+    match &a[..] {
+        "define" => {
+            println!("Yes");
+            if parameters.is_empty() {
+                return Err(EvalErr::EmptyDefine);
+            }
+            match &*parameters[0] {
+                Expr::Atom(x) => {
+                    if parameters.len() == 1 {
+                        ctx.insert(x.to_string(), Rc::new(Expr::List(Rc::new(vec![])))); // Nil
+                    } else if parameters.len() == 2 {
+                        match eval(parameters[1].clone(), &mut ctx.extend()) {
+                            Ok(res) => {
+                                ctx.insert(x.to_string(), res.clone());
+                                return Ok(Rc::new(Expr::List(Rc::new(vec![]))));
+                            },
+                            Err(err) => return Err(err),
+                        }
+                    } else {
+                        return Err(EvalErr::InvalidDefine);
+                    }
+                },
     if let Some(f) = ctx.get(a) {
         match &*f {
             Expr::Func(f) => {
