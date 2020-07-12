@@ -35,6 +35,16 @@ fn main() {
                 }
             }
         }
+        "parse" => {
+            for arg in args.iter().skip(2) {
+                for elem in parse(&arg) {
+                    match elem {
+                        Ok(v) => println!("{:?}", &v),
+                        Err(e) => errmsg_parse(&arg, e),
+                    }
+                }
+            }
+        }
         _ => (),
     }
 }
