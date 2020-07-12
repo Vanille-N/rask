@@ -304,7 +304,9 @@ mod test {
         // We check that an error of the correct type occured and assume that the
         // contents are correct as well.
         macro_rules! placeholder {
-            () => { Rc::new(Expr::Dot) }
+            () => {
+                Rc::new(Expr::Dot)
+            };
         }
         err!("('a b)" [envt]-> EvalErr::CannotApply(placeholder!()));
         err!("(#\\a a)" [envt]-> EvalErr::CannotApply(placeholder!()));

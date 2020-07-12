@@ -1,6 +1,6 @@
 use crate::exec::Expr;
-use std::rc::Rc;
 use std::cmp;
+use std::rc::Rc;
 
 #[derive(Debug)]
 pub enum EvalErr {

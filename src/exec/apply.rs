@@ -14,20 +14,18 @@ pub fn apply(lst: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
         | Expr::Quote(_)
         | Expr::Quasiquote(_)
         | Expr::Antiquote(_) => Err(EvalErr::CannotApply(lst[0].clone())),
-        Expr::List(_) => {
-            match &*lst[0] {
-                Expr::Atom(a) => apply_atom(&a, &lst[1..], ctx),
-                Expr::List(_) => {
-                    let result = eval(lst[0].clone(), ctx)?;
-                    match &*result {
-                        Expr::Func(f) => f(&lst[1..], ctx),
-                        Expr::Atom(a) => apply_atom(&a, &lst[1..], ctx),
-                        _ => Err(EvalErr::CannotApply(result.clone())),
-                    }
-                },
-                _ => Err(EvalErr::CannotApply(lst[0].clone())),
+        Expr::List(_) => match &*lst[0] {
+            Expr::Atom(a) => apply_atom(&a, &lst[1..], ctx),
+            Expr::List(_) => {
+                let result = eval(lst[0].clone(), ctx)?;
+                match &*result {
+                    Expr::Func(f) => f(&lst[1..], ctx),
+                    Expr::Atom(a) => apply_atom(&a, &lst[1..], ctx),
+                    _ => Err(EvalErr::CannotApply(result.clone())),
+                }
             }
-        }
+            _ => Err(EvalErr::CannotApply(lst[0].clone())),
+        },
         Expr::Atom(a) => apply_atom(&a, &lst[1..], ctx),
         _ => unreachable!(),
     }
@@ -47,19 +45,20 @@ pub fn apply_atom(
             match &*parameters[0] {
                 Expr::Atom(x) => {
                     if parameters.len() == 1 {
-                        ctx.insert(x.to_string(), Rc::new(Expr::List(Rc::new(vec![])))); // Nil
+                        ctx.insert(x.to_string(), Rc::new(Expr::List(Rc::new(vec![]))));
+                    // Nil
                     } else if parameters.len() == 2 {
                         match eval(parameters[1].clone(), &mut ctx.extend()) {
                             Ok(res) => {
                                 ctx.insert(x.to_string(), res.clone());
                                 return Ok(Rc::new(Expr::List(Rc::new(vec![]))));
-                            },
+                            }
                             Err(err) => return Err(err),
                         }
                     } else {
                         return Err(EvalErr::InvalidDefine);
                     }
-                },
+                }
                 Expr::List(fndef) => {
                     let mut ident = Vec::new();
                     for x in fndef.iter() {
@@ -79,31 +78,34 @@ pub fn apply_atom(
                     if actions.is_empty() {
                         return Err(EvalErr::InvalidDefine);
                     }
-                    ctx.insert(ident[0].to_string(), Rc::new(Expr::Func(Rc::new(move |args, mut envt| {
-                        if args.len() != ident.len() - 1 {
-                            return Err(EvalErr::WrongArgList);
-                        }
-                        let mut ctx = envt.extend();
-                        for i in 0..args.len() {
-                            match eval(args[i].clone(), &mut envt) {
-                                Ok(val) => ctx.insert(ident[i+1].clone(), val.clone()),
-                                Err(err) => return Err(err),
+                    ctx.insert(
+                        ident[0].to_string(),
+                        Rc::new(Expr::Func(Rc::new(move |args, mut envt| {
+                            if args.len() != ident.len() - 1 {
+                                return Err(EvalErr::WrongArgList);
                             }
-                        }
-                        let mut res = Rc::new(Expr::List(Rc::new(vec![])));
-                        for act in &actions {
-                            match eval(act.clone(), &mut ctx) {
-                                Ok(val) => res = val,
-                                Err(err) => return Err(err),
+                            let mut ctx = envt.extend();
+                            for i in 0..args.len() {
+                                match eval(args[i].clone(), &mut envt) {
+                                    Ok(val) => ctx.insert(ident[i + 1].clone(), val.clone()),
+                                    Err(err) => return Err(err),
+                                }
                             }
-                        }
-                        Ok(res)
-                    }))));
+                            let mut res = Rc::new(Expr::List(Rc::new(vec![])));
+                            for act in &actions {
+                                match eval(act.clone(), &mut ctx) {
+                                    Ok(val) => res = val,
+                                    Err(err) => return Err(err),
+                                }
+                            }
+                            Ok(res)
+                        }))),
+                    );
                     return Ok(Rc::new(Expr::List(Rc::new(vec![]))));
                 }
                 _ => return Err(EvalErr::InvalidDefine),
             }
-        },
+        }
         _ => (),
     }
     if let Some(f) = ctx.get(a) {

@@ -36,8 +36,8 @@ fn build_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr> {
             let mut dot_seen = false;
             if *idx == tokens.len() {
                 return Err(match op {
-                    Token::OpenParen => ParseErr::MismatchedOpenParen(*idx-1),
-                    Token::OpenBrace => ParseErr::MismatchedOpenBrace(*idx-1),
+                    Token::OpenParen => ParseErr::MismatchedOpenParen(*idx - 1),
+                    Token::OpenBrace => ParseErr::MismatchedOpenBrace(*idx - 1),
                     _ => unreachable!(),
                 });
             }

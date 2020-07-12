@@ -74,11 +74,26 @@ mod integrate {
 
     #[test]
     fn failures() {
-        assert_eq!(*parse("(")[0].as_ref().err().unwrap(), ParseErr::MismatchedOpenParen(0));
-        assert_eq!(*parse("#")[0].as_ref().err().unwrap(), ParseErr::LoneNumbersign);
+        assert_eq!(
+            *parse("(")[0].as_ref().err().unwrap(),
+            ParseErr::MismatchedOpenParen(0)
+        );
+        assert_eq!(
+            *parse("#")[0].as_ref().err().unwrap(),
+            ParseErr::LoneNumbersign
+        );
         assert_eq!(source("nofile"), None);
-        assert_eq!(*parse("abc |# x")[0].as_ref().err().unwrap(), ParseErr::NoCommentStart);
-        assert_eq!(*parse("x #| abc")[0].as_ref().err().unwrap(), ParseErr::UnterminatedComment);
-        assert_eq!(*parse("\"abc")[0].as_ref().err().unwrap(), ParseErr::UnterminatedString(1));
+        assert_eq!(
+            *parse("abc |# x")[0].as_ref().err().unwrap(),
+            ParseErr::NoCommentStart
+        );
+        assert_eq!(
+            *parse("x #| abc")[0].as_ref().err().unwrap(),
+            ParseErr::UnterminatedComment
+        );
+        assert_eq!(
+            *parse("\"abc")[0].as_ref().err().unwrap(),
+            ParseErr::UnterminatedString(1)
+        );
     }
 }

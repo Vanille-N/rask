@@ -1,7 +1,7 @@
 use std::env;
 use std::process;
 
-use rask::parse::{split, lex, parse, ParseErr};
+use rask::parse::{lex, parse, split, ParseErr};
 
 #[cfg_attr(tarpaulin, skip)]
 fn main() {
