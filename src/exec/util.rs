@@ -1,4 +1,4 @@
-use crate::exec::Expr;
+use crate::exec::{Expr, Envt};
 use std::rc::Rc;
 use std::cmp;
 
@@ -11,6 +11,8 @@ pub enum EvalErr {
     ProperListRequired(Rc<Expr>),
     TypeError,
     WrongArgList,
+    EmptyDefine,
+    InvalidDefine,
 }
 
 // No need to test this, it will be correct in practice
@@ -45,6 +47,8 @@ impl cmp::PartialEq for EvalErr {
             EvalErr::ProperListRequired(_) => identical!(ProperListRequired(_)),
             EvalErr::TypeError => identical!(TypeError),
             EvalErr::WrongArgList => identical!(WrongArgList),
+            EvalErr::EmptyDefine => identical!(EmptyDefine),
+            EvalErr::InvalidDefine => identical!(InvalidDefine),
         }
     }
 }
