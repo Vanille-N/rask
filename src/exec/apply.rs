@@ -33,7 +33,6 @@ pub fn apply(lst: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     }
 }
 
-#[allow(clippy::ptr_arg)]
 pub fn apply_atom(
     a: &String,
     parameters: &[Rc<Expr>],

@@ -1,4 +1,4 @@
-use crate::exec::{Expr, Envt};
+use crate::exec::Expr;
 use std::rc::Rc;
 use std::cmp;
 
