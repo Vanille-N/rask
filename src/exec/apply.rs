@@ -61,6 +61,52 @@ pub fn apply_atom(
                         return Err(EvalErr::InvalidDefine);
                     }
                 },
+                Expr::List(fndef) => {
+                    let mut ident = Vec::new();
+                    for x in fndef.iter() {
+                        match &**x {
+                            Expr::Atom(name) => ident.push(name.to_string()),
+                            _ => return Err(EvalErr::InvalidDefine),
+                        }
+                    }
+                    if ident.is_empty() {
+                        return Err(EvalErr::InvalidDefine);
+                    }
+                    let mut actions = Vec::new();
+                    for act in &parameters[1..] {
+                        print!("{:?} ", act);
+                        actions.push(act.clone());
+                    }
+                    if actions.is_empty() {
+                        return Err(EvalErr::InvalidDefine);
+                    }
+                    ctx.insert(ident[0].to_string(), Rc::new(Expr::Func(Rc::new(move |args, mut envt| {
+                        if args.len() != ident.len() - 1 {
+                            return Err(EvalErr::WrongArgList);
+                        }
+                        let mut ctx = envt.extend();
+                        for i in 0..args.len() {
+                            match eval(args[i].clone(), &mut envt) {
+                                Ok(val) => ctx.insert(ident[i+1].clone(), val.clone()),
+                                Err(err) => return Err(err),
+                            }
+                        }
+                        let mut res = Rc::new(Expr::List(Rc::new(vec![])));
+                        for act in &actions {
+                            match eval(act.clone(), &mut ctx) {
+                                Ok(val) => res = val,
+                                Err(err) => return Err(err),
+                            }
+                        }
+                        Ok(res)
+                    }))));
+                    return Ok(Rc::new(Expr::List(Rc::new(vec![]))));
+                }
+                _ => return Err(EvalErr::InvalidDefine),
+            }
+        },
+        _ => (),
+    }
     if let Some(f) = ctx.get(a) {
         match &*f {
             Expr::Func(f) => {
