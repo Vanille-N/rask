@@ -313,5 +313,14 @@ mod test {
         err!("(a a)" [envt]-> EvalErr::CannotApply(placeholder!()));
         err!(",a" [envt]-> EvalErr::UselessAntiquote(placeholder!()));
         err!("(a . b)" [envt]-> EvalErr::ProperListRequired(placeholder!()));
+
+        // Define check
+        check!("a" [envt]-> "4");
+        check!("(define a 1)" [envt]-> "()");
+        check!("a" [envt]-> "1");
+        check!("(define (fun a b) (+ (+ a b) 1))" [envt]-> "()");
+        check!("(fun (fun a 1) 2)" [envt]-> "6");
+        check!("(define (sum a b c d e f g h) (+ (+ (+ a b) (+ c d)) (+ (+ e f) (+ g h))))" [envt]-> "()");
+        check!("(sum 1 3 4 -1 2 -5 -5 1)" [envt]-> "0");
     }
 }
