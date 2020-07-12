@@ -349,5 +349,8 @@ mod test {
         check!("(sum 1 3 4 -1 2 -5 -5 1)" [envt]-> "0");
         check!("(define sum +)" [envt]-> "()");
         check!("(sum 1 2)" [envt]-> "3");
+        check!("(define (f x) (g x x))" [envt]-> "()");
+        check!("(define (g x y) (+ x y))" [envt]-> "()");
+        check!("(f 3)" [envt]-> "6");
     }
 }
