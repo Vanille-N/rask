@@ -347,5 +347,7 @@ mod test {
         check!("(fun (fun a 1) 2)" [envt]-> "6");
         check!("(define (sum a b c d e f g h) (+ (+ (+ a b) (+ c d)) (+ (+ e f) (+ g h))))" [envt]-> "()");
         check!("(sum 1 3 4 -1 2 -5 -5 1)" [envt]-> "0");
+        check!("(define sum +)" [envt]-> "()");
+        check!("(sum 1 2)" [envt]-> "3");
     }
 }
