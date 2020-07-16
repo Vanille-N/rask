@@ -13,6 +13,7 @@ pub enum EvalErr {
     WrongArgList,
     EmptyDefine,
     InvalidDefine,
+    CannotBind(Rc<Expr>),
 }
 
 // No need to test this, it will be correct in practice
