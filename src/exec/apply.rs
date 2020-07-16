@@ -141,6 +141,41 @@ pub fn apply_atom(
             }
             return eval(parameters[1].clone(), &mut new_envt);
         },
+        "let*" => {
+            let mut new_envt = ctx.extend();
+            if parameters.len() != 2 {
+                return Err(EvalErr::WrongArgList);
+            }
+            if let Expr::List(bindings) = &*parameters[0] {
+                for bind in bindings.iter() {
+                    if let Expr::List(lst) = &**bind {
+                        if lst.len() == 2 {
+                            if let Expr::Atom(x) = &*lst[0] {
+                                if is_bindable(&x) {
+                                    match eval(lst[1].clone(), &mut new_envt) {
+                                        Ok(val) => {
+                                            new_envt.insert(x.to_string(), val.clone());
+                                        },
+                                        Err(e) => return Err(e),
+                                    }
+                                } else {
+                                    return Err(EvalErr::CannotBind(x.to_string()));
+                                }
+                            } else {
+                                return Err(EvalErr::InvalidDefine);
+                            }
+                        } else {
+                            return Err(EvalErr::WrongArgList);
+                        }
+                    } else {
+                        return Err(EvalErr::InvalidDefine);
+                    }
+                }
+            } else {
+                return Err(EvalErr::TypeError);
+            }
+            return eval(parameters[1].clone(), &mut new_envt);
+        },
         _ => (),
     }
     if let Some(f) = ctx.get(a) {
