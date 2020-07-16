@@ -36,6 +36,27 @@ pub fn apply_atom(
     parameters: &[Rc<Expr>],
     ctx: &mut Envt,
 ) -> Result<Rc<Expr>, EvalErr> {
+    if let Some(res) = apply_construct(a, parameters, ctx) {
+        res
+    } else if let Some(f) = ctx.get(a) {
+        match &*f {
+            Expr::Func(f) => {
+                let mut par = Vec::new();
+                for p in parameters {
+                    par.push(eval(p.clone(), ctx)?)
+                }
+                f(&par[..], ctx)
+            }
+            _ => Err(EvalErr::CannotApply(f.clone())),
+        }
+    } else {
+        Err(EvalErr::UnknownIdent(Rc::new(Expr::Atom(Rc::new(
+            a.clone(),
+        )))))
+    }
+}
+
+
 fn is_bindable(name: &str) -> bool {
     match name {
         "define" | "let" | "letrec" => false,
@@ -183,31 +204,6 @@ fn is_bindable(name: &str) -> bool {
             }
             return eval(parameters[1].clone(), &mut new_envt);
         },
-        _ => (),
-    }
-    if let Some(f) = ctx.get(a) {
-        match &*f {
-            Expr::Func(f) => {
-                let mut par = Vec::new();
-                for p in parameters {
-                    par.push(eval(p.clone(), ctx)?)
-                }
-                f(&par[..], ctx)
-            }
-            _ => Err(EvalErr::CannotApply(f.clone())),
-        }
-    } else {
-        Err(EvalErr::UnknownIdent(Rc::new(Expr::Atom(Rc::new(
-            a.clone(),
-        )))))
-    }
-}
-
-
-fn is_bindable(name: &str) -> bool {
-    match name {
-        "define" | "let" | "letrec" => false,
-        x if x.len() >= 2 && &x[..3] == "~~~" => false,
-        _ => true,
+        _ => None,
     }
 }
