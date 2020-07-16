@@ -50,6 +50,7 @@ impl cmp::PartialEq for EvalErr {
             EvalErr::WrongArgList => identical!(WrongArgList),
             EvalErr::EmptyDefine => identical!(EmptyDefine),
             EvalErr::InvalidDefine => identical!(InvalidDefine),
+            EvalErr::CannotBind(_) => identical!(CannotBind(_)),
         }
     }
 }
