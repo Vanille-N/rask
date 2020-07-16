@@ -64,47 +64,50 @@ fn is_bindable(name: &str) -> bool {
         _ => true,
     }
 }
+
+
+fn apply_construct(a: &String, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Option<Result<Rc<Expr>, EvalErr>> {
     match &a[..] {
         "define" => {
             if parameters.is_empty() {
-                return Err(EvalErr::EmptyDefine);
+                return Some(Err(EvalErr::EmptyDefine));
             }
             match &*parameters[0] {
                 Expr::Atom(x) if is_bindable(x) => {
                     if parameters.len() == 1 {
                         ctx.insert(x.to_string(), Rc::new(Expr::List(Rc::new(vec![]))));
-                    // Nil
+                        Some(Ok(Rc::new(Expr::List(Rc::new(vec![])))))
                     } else if parameters.len() == 2 {
                         match eval(parameters[1].clone(), &mut ctx.extend()) {
                             Ok(res) => {
                                 ctx.insert(x.to_string(), res.clone());
-                                return Ok(Rc::new(Expr::List(Rc::new(vec![]))));
+                                return Some(Ok(Rc::new(Expr::List(Rc::new(vec![])))));
                             }
-                            Err(err) => return Err(err),
+                            Err(err) => return Some(Err(err)),
                         }
                     } else {
-                        return Err(EvalErr::InvalidDefine);
+                        return Some(Err(EvalErr::InvalidDefine));
                     }
                 }
-                Expr::Atom(x) => return Err(EvalErr::CannotBind(x.to_string())),
+                Expr::Atom(x) => return Some(Err(EvalErr::CannotBind(x.to_string()))),
                 Expr::List(fndef) => {
                     let mut ident = Vec::new();
                     for x in fndef.iter() {
                         match &**x {
                             Expr::Atom(name) if is_bindable(name) => ident.push(name.to_string()),
-                            Expr::Atom(name) => return Err(EvalErr::CannotBind(name.to_string())),
-                            _ => return Err(EvalErr::InvalidDefine),
+                            Expr::Atom(name) => return Some(Err(EvalErr::CannotBind(name.to_string()))),
+                            _ => return Some(Err(EvalErr::InvalidDefine)),
                         }
                     }
                     if ident.is_empty() {
-                        return Err(EvalErr::InvalidDefine);
+                        return Some(Err(EvalErr::InvalidDefine));
                     }
                     let mut actions = Vec::new();
                     for act in &parameters[1..] {
                         actions.push(act.clone());
                     }
                     if actions.is_empty() {
-                        return Err(EvalErr::InvalidDefine);
+                        return Some(Err(EvalErr::InvalidDefine));
                     }
                     ctx.insert(
                         ident[0].to_string(),
@@ -129,15 +132,15 @@ fn is_bindable(name: &str) -> bool {
                             Ok(res)
                         }))),
                     );
-                    return Ok(Rc::new(Expr::List(Rc::new(vec![]))));
+                    return Some(Ok(Rc::new(Expr::List(Rc::new(vec![])))));
                 }
-                _ => return Err(EvalErr::InvalidDefine),
+                _ => return Some(Err(EvalErr::InvalidDefine)),
             }
         }
         "let" => {
             let mut new_envt = ctx.extend();
             if parameters.len() != 2 {
-                return Err(EvalErr::WrongArgList);
+                return Some(Err(EvalErr::WrongArgList));
             }
             if let Expr::List(bindings) = &*parameters[0] {
                 for bind in bindings.iter() {
@@ -149,30 +152,30 @@ fn is_bindable(name: &str) -> bool {
                                         Ok(val) => {
                                             new_envt.insert(x.to_string(), val.clone());
                                         },
-                                        Err(e) => return Err(e),
+                                        Err(e) => return Some(Err(e)),
                                     }
                                 } else {
-                                    return Err(EvalErr::CannotBind(x.to_string()));
+                                    return Some(Err(EvalErr::CannotBind(x.to_string())));
                                 }
                             } else {
-                                return Err(EvalErr::InvalidDefine);
+                                return Some(Err(EvalErr::InvalidDefine));
                             }
                         } else {
-                            return Err(EvalErr::WrongArgList);
+                            return Some(Err(EvalErr::WrongArgList));
                         }
                     } else {
-                        return Err(EvalErr::InvalidDefine);
+                        return Some(Err(EvalErr::InvalidDefine));
                     }
                 }
             } else {
-                return Err(EvalErr::TypeError);
+                return Some(Err(EvalErr::TypeError));
             }
-            return eval(parameters[1].clone(), &mut new_envt);
+            return Some(eval(parameters[1].clone(), &mut new_envt));
         },
         "let*" => {
             let mut new_envt = ctx.extend();
             if parameters.len() != 2 {
-                return Err(EvalErr::WrongArgList);
+                return Some(Err(EvalErr::WrongArgList));
             }
             if let Expr::List(bindings) = &*parameters[0] {
                 for bind in bindings.iter() {
@@ -184,25 +187,25 @@ fn is_bindable(name: &str) -> bool {
                                         Ok(val) => {
                                             new_envt.insert(x.to_string(), val.clone());
                                         },
-                                        Err(e) => return Err(e),
+                                        Err(e) => return Some(Err(e)),
                                     }
                                 } else {
-                                    return Err(EvalErr::CannotBind(x.to_string()));
+                                    return Some(Err(EvalErr::CannotBind(x.to_string())));
                                 }
                             } else {
-                                return Err(EvalErr::InvalidDefine);
+                                return Some(Err(EvalErr::InvalidDefine));
                             }
                         } else {
-                            return Err(EvalErr::WrongArgList);
+                            return Some(Err(EvalErr::WrongArgList));
                         }
                     } else {
-                        return Err(EvalErr::InvalidDefine);
+                        return Some(Err(EvalErr::InvalidDefine));
                     }
                 }
             } else {
-                return Err(EvalErr::TypeError);
+                return Some(Err(EvalErr::TypeError));
             }
-            return eval(parameters[1].clone(), &mut new_envt);
+            return Some(eval(parameters[1].clone(), &mut new_envt));
         },
         _ => None,
     }
