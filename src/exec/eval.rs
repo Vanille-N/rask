@@ -362,5 +362,10 @@ mod test {
         check!("y" [envt]-> "1");
         check!("(define x 2)" [envt]-> "()");
         check!("y" [envt]-> "1");
+
+        check!("(define (f) x)" [envt]-> "()");
+        check!("(define x 3)" [envt]-> "()");
+        check!("(f)" [envt]-> "3");
+    }
     }
 }
