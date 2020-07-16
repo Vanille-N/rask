@@ -391,5 +391,12 @@ mod test {
         check!("(define x (let [(y 1) (z 2)] (+ y z)))" [envt]-> "()");
         check!("x" [envt]-> "3");
         check!("(let [(add +)] (add 1 2))" [envt]-> "3");
+        check!("
+(define (f x)
+    (let [(plus1 (+ x 1))
+          (plus2 (+ x 2))]
+         (+ plus1 plus2)))" [envt]-> "()");
+        check!("(f 2)" [envt]-> "7");
+
     }
 }
