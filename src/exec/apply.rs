@@ -36,6 +36,13 @@ pub fn apply_atom(
     parameters: &[Rc<Expr>],
     ctx: &mut Envt,
 ) -> Result<Rc<Expr>, EvalErr> {
+fn is_bindable(name: &str) -> bool {
+    match name {
+        "define" | "let" | "letrec" => false,
+        x if x.len() >= 2 && &x[..3] == "~~~" => false,
+        _ => true,
+    }
+}
     match &a[..] {
         "define" => {
             if parameters.is_empty() {
