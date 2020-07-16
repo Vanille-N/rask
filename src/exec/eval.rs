@@ -397,6 +397,13 @@ mod test {
           (plus2 (+ x 2))]
          (+ plus1 plus2)))" [envt]-> "()");
         check!("(f 2)" [envt]-> "7");
+        check!("
+(let [(x 1)
+      (y 2)
+      (z 3)]
+     (let [(x (+ x 1))
+           (y (+ x 2))]
+          (+ (+ x y) z)))" [envt]-> "8");
 
     }
 }
