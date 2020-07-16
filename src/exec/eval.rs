@@ -367,5 +367,29 @@ mod test {
         check!("(define x 3)" [envt]-> "()");
         check!("(f)" [envt]-> "3");
     }
+
+    #[test]
+    fn let_bindings() {
+        let mut envt = ChainMap::new();
+        envt.insert(
+            String::from("+"),
+            Rc::new(Expr::Func(Rc::new(|args, _| {
+                if args.len() != 2 {
+                    Err(EvalErr::WrongArgList)
+                } else if let Expr::Integer(i) = &*args[0] {
+                    if let Expr::Integer(j) = &*args[1] {
+                        Ok(Rc::new(Expr::Integer(i + j)))
+                    } else {
+                        Err(EvalErr::TypeError)
+                    }
+                } else {
+                    Err(EvalErr::TypeError)
+                }
+            }))),
+        );
+        check!("(let [(x 2)] x)" [envt]-> "2");
+        check!("(define x (let [(y 1) (z 2)] (+ y z)))" [envt]-> "()");
+        check!("x" [envt]-> "3");
+        check!("(let [(add +)] (add 1 2))" [envt]-> "3");
     }
 }
