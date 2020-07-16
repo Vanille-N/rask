@@ -353,4 +353,14 @@ mod test {
         check!("(define (g x y) (+ x y))" [envt]-> "()");
         check!("(f 3)" [envt]-> "6");
     }
+
+    #[test]
+    fn scoping() {
+        let mut envt = ChainMap::new();
+        check!("(define x 1)" [envt]-> "()");
+        check!("(define y x)" [envt]-> "()");
+        check!("y" [envt]-> "1");
+        check!("(define x 2)" [envt]-> "()");
+        check!("y" [envt]-> "1");
+    }
 }
