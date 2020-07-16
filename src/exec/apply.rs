@@ -130,7 +130,7 @@ pub fn apply_atom(
 fn is_bindable(name: &str) -> bool {
     match name {
         "define" | "let" | "letrec" => false,
-        x if &x[..3] == "~~~" => true,
-        _ => false,
+        x if x.len() >= 2 && &x[..3] == "~~~" => false,
+        _ => true,
     }
 }
