@@ -58,13 +58,13 @@ pub fn apply_atom(
                         return Err(EvalErr::InvalidDefine);
                     }
                 }
-                Expr::Atom(x) => return Err(EvalErr::CannotBind(parameters[0].clone())),
+                Expr::Atom(x) => return Err(EvalErr::CannotBind(x.to_string())),
                 Expr::List(fndef) => {
                     let mut ident = Vec::new();
                     for x in fndef.iter() {
                         match &**x {
                             Expr::Atom(name) if is_bindable(name) => ident.push(name.to_string()),
-                            Expr::Atom(name) => return Err(EvalErr::CannotBind(x.clone())),
+                            Expr::Atom(name) => return Err(EvalErr::CannotBind(name.to_string())),
                             _ => return Err(EvalErr::InvalidDefine),
                         }
                     }
