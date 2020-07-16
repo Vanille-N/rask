@@ -32,7 +32,7 @@ Rask is under development.
 Test coverage is now considered sufficient, 0.1 has had its last commit. Development will resume with 0.2, shortly after the 11th of July.
 
 #### 0.2 roadmap:
-- [ ] **Def** (defines and variable bindings)
+- [X] **Def** (defines and variable bindings)
 - [ ] **Boot** (basic constructs: if, let, letrec, let*, ...)
 - [ ] **REPL** (interactive [text → expression] loop)
 - [ ] **Disp** (pretty-print expressions)
