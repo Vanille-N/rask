@@ -34,6 +34,8 @@ pub fn apply(lst: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
 pub fn apply_atom(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     if let Some(res) = apply_construct(a, parameters, ctx) {
         res
+    } else if let Some(res) = apply_builtin(a, parameters, ctx) {
+        res
     } else if let Some(f) = ctx.get(&a.to_string()) {
         match &*f {
             Expr::Func(f) => {
