@@ -354,6 +354,8 @@ mod test {
         check!("(define (f x) (g x x))" [envt]-> "()");
         check!("(define (g x y) (+ x y))" [envt]-> "()");
         check!("(f 3)" [envt]-> "6");
+        check!("(define e)" [envt]-> "()");
+        check!("e" [envt]-> "()");
     }
 
     #[test]
