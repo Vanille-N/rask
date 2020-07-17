@@ -205,7 +205,7 @@ fn apply_construct(a: &String, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Optio
             } else {
                 return Some(Err(EvalErr::TypeError));
             }
-            return Some(eval(parameters[1].clone(), &mut new_envt));
+            Some(eval(parameters[1].clone(), &mut new_envt))
         },
         _ => None,
     }
