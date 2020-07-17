@@ -422,6 +422,9 @@ mod test {
        (x (+ z 1))]
        `(,x ,y ,z))" [envt]-> "(4 2 3)") ;
 
+       check!("(let [(undef 1)] ())" [envt]-> "()");
+       err!("undef" [envt]-> EvalErr::UnknownIdent(placeholder!()));
+       err!("(let [(undef 1) (y undef)] ())" [envt]-> EvalErr::UnknownIdent(placeholder!()));
     }
 
     #[test]
