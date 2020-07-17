@@ -356,6 +356,13 @@ mod test {
         check!("(f 3)" [envt]-> "6");
         check!("(define e)" [envt]-> "()");
         check!("e" [envt]-> "()");
+
+        err!("(h 55)" [envt]-> EvalErr::UnknownIdent(placeholder!()));
+        err!("(g 55)" [envt]-> EvalErr::WrongArgList);
+        err!("(define 4)" [envt]-> EvalErr::InvalidDefine);
+        err!("(define (f x))" [envt]-> EvalErr::InvalidDefine);
+        err!("(define (f 5))" [envt]-> EvalErr::InvalidDefine);
+        err!("(define f g h)" [envt]-> EvalErr::InvalidDefine);
     }
 
     #[test]
