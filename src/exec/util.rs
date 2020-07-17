@@ -56,3 +56,11 @@ impl cmp::PartialEq for EvalErr {
 }
 
 impl cmp::Eq for EvalErr {}
+
+pub fn is_bindable(name: &str) -> bool {
+    match name {
+        "define" | "let" | "letrec" => false,
+        x if x.len() >= 2 && &x[..2] == "__" => false,
+        _ => true,
+    }
+}

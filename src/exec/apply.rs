@@ -1,4 +1,4 @@
-use crate::exec::{eval, Envt, EvalErr, Expr};
+use crate::exec::{eval, Envt, EvalErr, Expr, is_bindable};
 use std::rc::Rc;
 
 pub fn apply(lst: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
@@ -49,14 +49,6 @@ pub fn apply_atom(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc
         Err(EvalErr::UnknownIdent(Rc::new(Expr::Atom(Rc::new(
             a.to_string(),
         )))))
-    }
-}
-
-fn is_bindable(name: &str) -> bool {
-    match name {
-        "define" | "let" | "letrec" => false,
-        x if x.len() >= 2 && &x[..2] == "__" => false,
-        _ => true,
     }
 }
 
