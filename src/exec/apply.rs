@@ -32,13 +32,13 @@ pub fn apply(lst: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
 }
 
 pub fn apply_atom(
-    a: &String,
+    a: &str,
     parameters: &[Rc<Expr>],
     ctx: &mut Envt,
 ) -> Result<Rc<Expr>, EvalErr> {
     if let Some(res) = apply_construct(a, parameters, ctx) {
         res
-    } else if let Some(f) = ctx.get(a) {
+    } else if let Some(f) = ctx.get(&a.to_string()) {
         match &*f {
             Expr::Func(f) => {
                 let mut par = Vec::new();
@@ -51,7 +51,7 @@ pub fn apply_atom(
         }
     } else {
         Err(EvalErr::UnknownIdent(Rc::new(Expr::Atom(Rc::new(
-            a.clone(),
+            a.to_string(),
         )))))
     }
 }
@@ -66,7 +66,7 @@ fn is_bindable(name: &str) -> bool {
 }
 
 
-fn apply_construct(a: &String, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Option<Result<Rc<Expr>, EvalErr>> {
+fn apply_construct(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Option<Result<Rc<Expr>, EvalErr>> {
     match &a[..] {
         "define" => {
             if parameters.is_empty() {
@@ -80,16 +80,16 @@ fn apply_construct(a: &String, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Optio
                     } else if parameters.len() == 2 {
                         match eval(parameters[1].clone(), &mut ctx.extend()) {
                             Ok(res) => {
-                                ctx.insert(x.to_string(), res.clone());
-                                return Some(Ok(Rc::new(Expr::List(Rc::new(vec![])))));
+                                ctx.insert(x.to_string(), res);
+                                Some(Ok(Rc::new(Expr::List(Rc::new(vec![])))))
                             }
-                            Err(err) => return Some(Err(err)),
+                            Err(err) => Some(Err(err)),
                         }
                     } else {
-                        return Some(Err(EvalErr::InvalidDefine));
+                        Some(Err(EvalErr::InvalidDefine))
                     }
                 }
-                Expr::Atom(x) => return Some(Err(EvalErr::CannotBind(x.to_string()))),
+                Expr::Atom(x) => Some(Err(EvalErr::CannotBind(x.to_string()))),
                 Expr::List(fndef) => {
                     let mut ident = Vec::new();
                     for x in fndef.iter() {
@@ -132,9 +132,9 @@ fn apply_construct(a: &String, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Optio
                             Ok(res)
                         }))),
                     );
-                    return Some(Ok(Rc::new(Expr::List(Rc::new(vec![])))));
+                    Some(Ok(Rc::new(Expr::List(Rc::new(vec![])))))
                 }
-                _ => return Some(Err(EvalErr::InvalidDefine)),
+                _ => Some(Err(EvalErr::InvalidDefine)),
             }
         }
         "let" => {
@@ -170,7 +170,7 @@ fn apply_construct(a: &String, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Optio
             } else {
                 return Some(Err(EvalErr::TypeError));
             }
-            return Some(eval(parameters[1].clone(), &mut new_envt));
+            Some(eval(parameters[1].clone(), &mut new_envt))
         },
         "let*" => {
             let mut new_envt = ctx.extend();
