@@ -412,4 +412,13 @@ mod test {
        `(,x ,y ,z))" [envt]-> "(4 2 3)") ;
 
     }
+
+    #[test]
+    fn if_expr() {
+        let mut envt = ChainMap::new();
+        check!("(if #t 1 2)" [envt]-> "1");
+        check!("(if #f 1 2)" [envt]-> "2");
+        check!("(let [(x #t)] (if x 1 2))" [envt]-> "1");
+        check!("(let [(x #f)] (if x 1 x))" [envt]-> "#f");
+    }
 }
