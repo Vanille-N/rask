@@ -207,6 +207,25 @@ fn apply_construct(a: &String, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Optio
             }
             Some(eval(parameters[1].clone(), &mut new_envt))
         },
+        "if" => {
+            if parameters.len() != 3 {
+                return Some(Err(EvalErr::WrongArgList));
+            }
+            match eval(parameters[0].clone(), &mut ctx.extend()) {
+                Ok(val) => {
+                    if let Expr::Bool(b) = &*val {
+                        if *b {
+                            Some(eval(parameters[1].clone(), &mut ctx.extend()))
+                        } else {
+                            Some(eval(parameters[2].clone(), &mut ctx.extend()))
+                        }
+                    } else {
+                        Some(Err(EvalErr::TypeError))
+                    }
+                }
+                Err(e) => Some(Err(e)),
+            }
+        }
         _ => None,
     }
 }
