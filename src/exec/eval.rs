@@ -441,4 +441,27 @@ mod test {
         err!("(if #f () () ())" [envt]-> EvalErr::WrongArgList);
         err!("(if #f)" [envt]-> EvalErr::WrongArgList);
     }
+
+    // #[test]
+    // Will have to wait for the basic functions to be implemented
+    fn builtins() {
+        let mut envt = ChainMap::new();
+        check!("(__+ 1 2)" [envt]-> "3");
+        check!("(__+ 1 2 3 4 5)" [envt]-> "15");
+        check!("(__+ 1.0 2 3 4 5)" [envt]-> "15.0");
+        check!("(__+)" [envt]-> "0");
+        check!("(__+ 1 -1)" [envt]-> "0");
+        check!("(let [(+ __+)] (+ 1 2))" [envt]-> "3");
+        check!("(__* 2 5)" [envt]-> "10");
+        check!("(__* 1.5 2" [envt]-> "3.0");
+        check!("(__* 3.0 3.0)" [envt]-> "9.0");
+        check!("(__- 0 1)" [envt]-> "-1");
+        check!("(__- 1 1 1 1)" [envt]-> "-3");
+        check!("(__- -3 -6" [envt]-> "3");
+        check!("(__- -1.0 1.0)" [envt]-> "-2.0");
+        check!("(__/ 6 3)" [envt]-> "2");
+        check!("(__/ 6 3.0)" [envt]-> "2.0");
+        check!("(__/ 6 4)" [envt]-> "1.5");
+        check!("(__/ 6 3.0 2)" [envt]-> "1.0");
+    }
 }
