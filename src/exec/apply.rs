@@ -34,8 +34,6 @@ pub fn apply(lst: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
 pub fn apply_atom(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     if let Some(res) = apply_construct(a, parameters, ctx) {
         res
-    } else if let Some(res) = apply_builtin(a, parameters, ctx) {
-        res
     } else if let Some(f) = ctx.get(&a.to_string()) {
         match &*f {
             Expr::Func(f) => {
@@ -229,40 +227,6 @@ fn apply_construct(
                 }
                 Err(e) => Some(Err(e)),
             }
-        }
-        _ => None,
-    }
-}
-
-fn apply_builtin(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Option<Result<Rc<Expr>, EvalErr>> {
-    match a {
-        "__+" => {
-            let mut sum = Expr::Integer(0);
-            for x in parameters {
-                match eval(x.clone(), ctx) {
-                    Ok(val) => {
-                        match *val {
-                            Expr::Integer(n) => {
-                                match sum {
-                                    Expr::Integer(s) => sum = Expr::Integer(s + n),
-                                    Expr::Float(f) => sum = Expr::Float(f + n as f64),
-                                    _ => unreachable!(),
-                                }
-                            }
-                            Expr::Float(y) => {
-                                match sum {
-                                    Expr::Integer(s) => sum = Expr::Float(s as f64 + y),
-                                    Expr::Float(f) => sum = Expr::Float(f + y),
-                                    _ => unreachable!(),
-                                }
-                            }
-                            _ => return Some(Err(EvalErr::TypeError)),
-                        }
-                    }
-                    Err(e) => return Some(Err(e)),
-                }
-            }
-            Some(Ok(Rc::new(sum)))
         }
         _ => None,
     }
