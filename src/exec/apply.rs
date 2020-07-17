@@ -31,11 +31,7 @@ pub fn apply(lst: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     }
 }
 
-pub fn apply_atom(
-    a: &str,
-    parameters: &[Rc<Expr>],
-    ctx: &mut Envt,
-) -> Result<Rc<Expr>, EvalErr> {
+pub fn apply_atom(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     if let Some(res) = apply_construct(a, parameters, ctx) {
         res
     } else if let Some(f) = ctx.get(&a.to_string()) {
@@ -56,7 +52,6 @@ pub fn apply_atom(
     }
 }
 
-
 fn is_bindable(name: &str) -> bool {
     match name {
         "define" | "let" | "letrec" => false,
@@ -65,8 +60,11 @@ fn is_bindable(name: &str) -> bool {
     }
 }
 
-
-fn apply_construct(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Option<Result<Rc<Expr>, EvalErr>> {
+fn apply_construct(
+    a: &str,
+    parameters: &[Rc<Expr>],
+    ctx: &mut Envt,
+) -> Option<Result<Rc<Expr>, EvalErr>> {
     match &a[..] {
         "define" => {
             if parameters.is_empty() {
@@ -95,7 +93,9 @@ fn apply_construct(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Option<R
                     for x in fndef.iter() {
                         match &**x {
                             Expr::Atom(name) if is_bindable(name) => ident.push(name.to_string()),
-                            Expr::Atom(name) => return Some(Err(EvalErr::CannotBind(name.to_string()))),
+                            Expr::Atom(name) => {
+                                return Some(Err(EvalErr::CannotBind(name.to_string())))
+                            }
                             _ => return Some(Err(EvalErr::InvalidDefine)),
                         }
                     }
@@ -151,7 +151,7 @@ fn apply_construct(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Option<R
                                     match eval(lst[1].clone(), &mut ctx.extend()) {
                                         Ok(val) => {
                                             new_envt.insert(x.to_string(), val.clone());
-                                        },
+                                        }
                                         Err(e) => return Some(Err(e)),
                                     }
                                 } else {
@@ -171,7 +171,7 @@ fn apply_construct(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Option<R
                 return Some(Err(EvalErr::TypeError));
             }
             Some(eval(parameters[1].clone(), &mut new_envt))
-        },
+        }
         "let*" => {
             let mut new_envt = ctx.extend();
             if parameters.len() != 2 {
@@ -186,7 +186,7 @@ fn apply_construct(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Option<R
                                     match eval(lst[1].clone(), &mut new_envt) {
                                         Ok(val) => {
                                             new_envt.insert(x.to_string(), val.clone());
-                                        },
+                                        }
                                         Err(e) => return Some(Err(e)),
                                     }
                                 } else {
@@ -206,7 +206,7 @@ fn apply_construct(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Option<R
                 return Some(Err(EvalErr::TypeError));
             }
             Some(eval(parameters[1].clone(), &mut new_envt))
-        },
+        }
         "if" => {
             if parameters.len() != 2 && parameters.len() != 3 {
                 return Some(Err(EvalErr::WrongArgList));
