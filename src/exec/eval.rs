@@ -434,6 +434,9 @@ mod test {
         check!("(if #f 1 2)" [envt]-> "2");
         check!("(let [(x #t)] (if x 1 2))" [envt]-> "1");
         check!("(let [(x #f)] (if x 1 x))" [envt]-> "#f");
+        check!("(if #t 1)" [envt]-> "1");
+        check!("(if #f 1)" [envt]-> "()");
+
         err!("(if 1 () ())" [envt]-> EvalErr::TypeError);
         err!("(if #f () () ())" [envt]-> EvalErr::WrongArgList);
         err!("(if #f)" [envt]-> EvalErr::WrongArgList);
