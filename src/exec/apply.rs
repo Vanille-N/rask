@@ -208,7 +208,7 @@ fn apply_construct(a: &String, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Optio
             Some(eval(parameters[1].clone(), &mut new_envt))
         },
         "if" => {
-            if parameters.len() != 3 {
+            if parameters.len() != 2 && parameters.len() != 3 {
                 return Some(Err(EvalErr::WrongArgList));
             }
             match eval(parameters[0].clone(), &mut ctx.extend()) {
@@ -216,8 +216,10 @@ fn apply_construct(a: &String, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Optio
                     if let Expr::Bool(b) = &*val {
                         if *b {
                             Some(eval(parameters[1].clone(), &mut ctx.extend()))
+                        } else if let Some(p) = parameters.get(2) {
+                            Some(eval(p.clone(), &mut ctx.extend()))
                         } else {
-                            Some(eval(parameters[2].clone(), &mut ctx.extend()))
+                            Some(Ok(Rc::new(Expr::List(Rc::new(vec![])))))
                         }
                     } else {
                         Some(Err(EvalErr::TypeError))
