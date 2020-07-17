@@ -156,6 +156,15 @@ mod test {
         };
     }
 
+    // Note that Rc::new(Expr::Dot) is merely a placeholder.
+    // We check that an error of the correct type occured and assume that the
+    // contents are correct as well.
+    macro_rules! placeholder {
+        () => {
+            Rc::new(Expr::Dot)
+        };
+    }
+
     #[test]
     pub fn evals() {
         let mut envt = ChainMap::new();
@@ -300,14 +309,7 @@ mod test {
         check!("''a" [envt]-> "'a");
         check!("'`a" [envt]-> "`a");
         check!("',a" [envt]-> ",a");
-        // Note that Rc::new(Expr::Dot) is merely a placeholder.
-        // We check that an error of the correct type occured and assume that the
-        // contents are correct as well.
-        macro_rules! placeholder {
-            () => {
-                Rc::new(Expr::Dot)
-            };
-        }
+
         err!("('a b)" [envt]-> EvalErr::CannotApply(placeholder!()));
         err!("(#\\a a)" [envt]-> EvalErr::CannotApply(placeholder!()));
         err!("(() a)" [envt]-> EvalErr::CannotApply(placeholder!()));
