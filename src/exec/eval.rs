@@ -353,7 +353,7 @@ mod test {
 
     #[test]
     fn if_expr() {
-        let mut envt = ChainMap::new();
+        let mut envt = crate::init::initialize_environment();
         check!("(if #t 1 2)" [envt]-> "1");
         check!("(if #f 1 2)" [envt]-> "2");
         check!("(let [(x #t)] (if x 1 2))" [envt]-> "1");
@@ -364,6 +364,13 @@ mod test {
         err!("(if 1 () ())" [envt]-> EvalErr::TypeError);
         err!("(if #f () () ())" [envt]-> EvalErr::WrongArgList);
         err!("(if #f)" [envt]-> EvalErr::WrongArgList);
+
+        check!("
+(define (fact n)
+    (if (__= n 0)
+        1
+        (__* n (fact (__- n 1)))))" [envt]-> "()");
+        check!("`(,(fact 0) ,(fact 1) ,(fact 2) ,(fact 3))" [envt]-> "(1 1 2 6)");
     }
 
     #[test]
