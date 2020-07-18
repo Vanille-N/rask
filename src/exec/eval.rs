@@ -349,6 +349,22 @@ mod test {
         check!("(let [(undef 1)] ())" [envt]-> "()");
         err!("undef" [envt]-> EvalErr::UnknownIdent(placeholder!()));
         err!("(let [(undef 1) (y undef)] ())" [envt]-> EvalErr::UnknownIdent(placeholder!()));
+        check!("
+(define (f x)
+    (define (g y)
+        (+ y 1))
+    (define (h y)
+        (__* y 2))
+    `(,(g x) ,(h x)))" [envt]-> "()");
+        check!("(f 2)" [envt]-> "(3 4)");
+        check!("
+(let [(x 1) (y 2)]
+    (define (add a b) (+ a b))
+    (add x y))" [envt]-> "3");
+    check!("
+(let* [(x 1) (y (+ x 2))]
+    (define (add a b) (+ a b))
+    (add x y))" [envt]-> "4");
     }
 
     #[test]
@@ -460,5 +476,20 @@ mod test {
         check!("(__>= 2 3.0)" [envt]-> "#f");
         check!("(__>= 3.0 2)" [envt]-> "#t");
         check!("(__>= 3 2.0)" [envt]-> "#t");
+    }
+
+    #[test]
+    fn lambda() {
+        let mut envt = crate::init::initialize_environment();
+        check!("
+((lambda x x) 1)" [envt]-> "1");
+        check!("
+((lambda (x y) x) 1 2)" [envt]-> "1");
+        check!("
+((lambda (x y z)
+    (define add (lambda (a b) (__+ a b)))
+    (define w (add x y))
+    (add w z))
+ 2 4 5)" [envt]-> "11");
     }
 }
