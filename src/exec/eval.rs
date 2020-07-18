@@ -374,7 +374,7 @@ mod test {
     }
 
     #[test]
-    fn builtins() {
+    fn operators() {
         let mut envt = crate::init::initialize_environment();
         check!("(__+ 1 2)" [envt]-> "3");
         check!("(__+ 1 2 3 4 5)" [envt]-> "15");
@@ -398,5 +398,67 @@ mod test {
         err!("(__+ \"abc\" 5)" [envt]-> EvalErr::TypeError);
         err!("(__/ 1 0)" [envt]-> EvalErr::MathError);
         err!("(__/ 1 0.0)" [envt]-> EvalErr::MathError);
+    }
+
+    #[test]
+    fn comparisons() {
+        let mut envt = crate::init::initialize_environment();
+        check!("(__< 1 2 3)" [envt]-> "#t");
+        check!("(__< 1 2 2)" [envt]-> "#f");
+        check!("(__<= 1 2 2)" [envt]-> "#t");
+        check!("(__= 2 2 2 2)" [envt]-> "#t");
+        check!("(__= 2 20e-1)" [envt]-> "#t");
+        // Exhaustive tests
+        check!("(__< 2 2)" [envt]-> "#f");
+        check!("(__< 2 3)" [envt]-> "#t");
+        check!("(__< 3 2)" [envt]-> "#f");
+        check!("(__< 2.5 2.5)" [envt]-> "#f");
+        check!("(__< 2.5 3.5)" [envt]-> "#t");
+        check!("(__< 3.5 2.5)" [envt]-> "#f");
+        check!("(__< 2 2.0)" [envt]-> "#f");
+        check!("(__< 2.0 2)" [envt]-> "#f");
+        check!("(__< 2.0 3)" [envt]-> "#t");
+        check!("(__< 2 3.0)" [envt]-> "#t");
+        check!("(__< 3.0 2)" [envt]-> "#f");
+        check!("(__< 3 2.0)" [envt]-> "#f");
+
+        check!("(__<= 2 2)" [envt]-> "#t");
+        check!("(__<= 2 3)" [envt]-> "#t");
+        check!("(__<= 3 2)" [envt]-> "#f");
+        check!("(__<= 2.5 2.5)" [envt]-> "#t");
+        check!("(__<= 2.5 3.5)" [envt]-> "#t");
+        check!("(__<= 3.5 2.5)" [envt]-> "#f");
+        check!("(__<= 2 2.0)" [envt]-> "#t");
+        check!("(__<= 2.0 2)" [envt]-> "#t");
+        check!("(__<= 2.0 3)" [envt]-> "#t");
+        check!("(__<= 2 3.0)" [envt]-> "#t");
+        check!("(__<= 3.0 2)" [envt]-> "#f");
+        check!("(__<= 3 2.0)" [envt]-> "#f");
+
+        check!("(__> 2 2)" [envt]-> "#f");
+        check!("(__> 2 3)" [envt]-> "#f");
+        check!("(__> 3 2)" [envt]-> "#t");
+        check!("(__> 2.5 2.5)" [envt]-> "#f");
+        check!("(__> 2.5 3.5)" [envt]-> "#f");
+        check!("(__> 3.5 2.5)" [envt]-> "#t");
+        check!("(__> 2 2.0)" [envt]-> "#f");
+        check!("(__> 2.0 2)" [envt]-> "#f");
+        check!("(__> 2.0 3)" [envt]-> "#f");
+        check!("(__> 2 3.0)" [envt]-> "#f");
+        check!("(__> 3.0 2)" [envt]-> "#t");
+        check!("(__> 3 2.0)" [envt]-> "#t");
+
+        check!("(__>= 2 2)" [envt]-> "#t");
+        check!("(__>= 2 3)" [envt]-> "#f");
+        check!("(__>= 3 2)" [envt]-> "#t");
+        check!("(__>= 2.5 2.5)" [envt]-> "#t");
+        check!("(__>= 2.5 3.5)" [envt]-> "#f");
+        check!("(__>= 3.5 2.5)" [envt]-> "#t");
+        check!("(__>= 2 2.0)" [envt]-> "#t");
+        check!("(__>= 2.0 2)" [envt]-> "#t");
+        check!("(__>= 2.0 3)" [envt]-> "#f");
+        check!("(__>= 2 3.0)" [envt]-> "#f");
+        check!("(__>= 3.0 2)" [envt]-> "#t");
+        check!("(__>= 3 2.0)" [envt]-> "#t");
     }
 }
