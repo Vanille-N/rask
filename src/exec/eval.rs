@@ -392,90 +392,90 @@ mod test {
     #[test]
     fn operators() {
         let mut envt = crate::init::initialize_environment();
-        check!("(__+ 1 2)" [envt]-> "3");
-        check!("(__+ 1 2 3 4 5)" [envt]-> "15");
-        check!("(__+ 1.0 2 3 4 5)" [envt]-> "15.0");
-        check!("(__+)" [envt]-> "0");
-        check!("(__+ 1 -1)" [envt]-> "0");
+        check!("(+ 1 2)" [envt]-> "3");
+        check!("(+ 1 2 3 4 5)" [envt]-> "15");
+        check!("(+ 1.0 2 3 4 5)" [envt]-> "15.0");
+        check!("(+)" [envt]-> "0");
+        check!("(+ 1 -1)" [envt]-> "0");
         check!("(let [(+ __+)] (+ 1 2))" [envt]-> "3");
-        check!("(__* 2 5)" [envt]-> "10");
-        check!("(__* 1.5 2)" [envt]-> "3.0");
-        check!("(__* 3.0 3.0)" [envt]-> "9.0");
-        check!("(__* 0 0 undef)" [envt]-> "0");
-        check!("(__* 1 0 undef)" [envt]-> "0");
-        check!("(__- 0 1)" [envt]-> "-1");
-        check!("(__- 1 1 1 1)" [envt]-> "-2");
-        check!("(__- -3 -6)" [envt]-> "3");
-        check!("(__- -1.0 1.0)" [envt]-> "-2.0");
-        check!("(__/ 6 3)" [envt]-> "2");
-        check!("(__/ 6 3.0)" [envt]-> "2.0");
-        check!("(__/ 6 4)" [envt]-> "1.5");
-        check!("(__/ 6 3.0 2)" [envt]-> "1.0");
-        err!("(__+ \"abc\" 5)" [envt]-> EvalErr::TypeError);
-        err!("(__/ 1 0)" [envt]-> EvalErr::MathError);
-        err!("(__/ 1 0.0)" [envt]-> EvalErr::MathError);
+        check!("(* 2 5)" [envt]-> "10");
+        check!("(* 1.5 2)" [envt]-> "3.0");
+        check!("(* 3.0 3.0)" [envt]-> "9.0");
+        check!("(* 0 0 undef)" [envt]-> "0");
+        check!("(* 1 0 undef)" [envt]-> "0");
+        check!("(- 0 1)" [envt]-> "-1");
+        check!("(- 1 1 1 1)" [envt]-> "-2");
+        check!("(- -3 -6)" [envt]-> "3");
+        check!("(- -1.0 1.0)" [envt]-> "-2.0");
+        check!("(/ 6 3)" [envt]-> "2");
+        check!("(/ 6 3.0)" [envt]-> "2.0");
+        check!("(/ 6 4)" [envt]-> "1.5");
+        check!("(/ 6 3.0 2)" [envt]-> "1.0");
+        err!("(+ \"abc\" 5)" [envt]-> EvalErr::TypeError);
+        err!("(/ 1 0)" [envt]-> EvalErr::MathError);
+        err!("(/ 1 0.0)" [envt]-> EvalErr::MathError);
     }
 
     #[test]
     fn comparisons() {
         let mut envt = crate::init::initialize_environment();
-        check!("(__< 1 2 3)" [envt]-> "#t");
-        check!("(__< 1 2 2)" [envt]-> "#f");
-        check!("(__<= 1 2 2)" [envt]-> "#t");
-        check!("(__= 2 2 2 2)" [envt]-> "#t");
-        check!("(__= 2 20e-1)" [envt]-> "#t");
+        check!("(< 1 2 3)" [envt]-> "#t");
+        check!("(< 1 2 2)" [envt]-> "#f");
+        check!("(<= 1 2 2)" [envt]-> "#t");
+        check!("(= 2 2 2 2)" [envt]-> "#t");
+        check!("(= 2 20e-1)" [envt]-> "#t");
         // Exhaustive tests
-        check!("(__< 2 2)" [envt]-> "#f");
-        check!("(__< 2 3)" [envt]-> "#t");
-        check!("(__< 3 2)" [envt]-> "#f");
-        check!("(__< 2.5 2.5)" [envt]-> "#f");
-        check!("(__< 2.5 3.5)" [envt]-> "#t");
-        check!("(__< 3.5 2.5)" [envt]-> "#f");
-        check!("(__< 2 2.0)" [envt]-> "#f");
-        check!("(__< 2.0 2)" [envt]-> "#f");
-        check!("(__< 2.0 3)" [envt]-> "#t");
-        check!("(__< 2 3.0)" [envt]-> "#t");
-        check!("(__< 3.0 2)" [envt]-> "#f");
-        check!("(__< 3 2.0)" [envt]-> "#f");
+        check!("(< 2 2)" [envt]-> "#f");
+        check!("(< 2 3)" [envt]-> "#t");
+        check!("(< 3 2)" [envt]-> "#f");
+        check!("(< 2.5 2.5)" [envt]-> "#f");
+        check!("(< 2.5 3.5)" [envt]-> "#t");
+        check!("(< 3.5 2.5)" [envt]-> "#f");
+        check!("(< 2 2.0)" [envt]-> "#f");
+        check!("(< 2.0 2)" [envt]-> "#f");
+        check!("(< 2.0 3)" [envt]-> "#t");
+        check!("(< 2 3.0)" [envt]-> "#t");
+        check!("(< 3.0 2)" [envt]-> "#f");
+        check!("(< 3 2.0)" [envt]-> "#f");
 
-        check!("(__<= 2 2)" [envt]-> "#t");
-        check!("(__<= 2 3)" [envt]-> "#t");
-        check!("(__<= 3 2)" [envt]-> "#f");
-        check!("(__<= 2.5 2.5)" [envt]-> "#t");
-        check!("(__<= 2.5 3.5)" [envt]-> "#t");
-        check!("(__<= 3.5 2.5)" [envt]-> "#f");
-        check!("(__<= 2 2.0)" [envt]-> "#t");
-        check!("(__<= 2.0 2)" [envt]-> "#t");
-        check!("(__<= 2.0 3)" [envt]-> "#t");
-        check!("(__<= 2 3.0)" [envt]-> "#t");
-        check!("(__<= 3.0 2)" [envt]-> "#f");
-        check!("(__<= 3 2.0)" [envt]-> "#f");
+        check!("(<= 2 2)" [envt]-> "#t");
+        check!("(<= 2 3)" [envt]-> "#t");
+        check!("(<= 3 2)" [envt]-> "#f");
+        check!("(<= 2.5 2.5)" [envt]-> "#t");
+        check!("(<= 2.5 3.5)" [envt]-> "#t");
+        check!("(<= 3.5 2.5)" [envt]-> "#f");
+        check!("(<= 2 2.0)" [envt]-> "#t");
+        check!("(<= 2.0 2)" [envt]-> "#t");
+        check!("(<= 2.0 3)" [envt]-> "#t");
+        check!("(<= 2 3.0)" [envt]-> "#t");
+        check!("(<= 3.0 2)" [envt]-> "#f");
+        check!("(<= 3 2.0)" [envt]-> "#f");
 
-        check!("(__> 2 2)" [envt]-> "#f");
-        check!("(__> 2 3)" [envt]-> "#f");
-        check!("(__> 3 2)" [envt]-> "#t");
-        check!("(__> 2.5 2.5)" [envt]-> "#f");
-        check!("(__> 2.5 3.5)" [envt]-> "#f");
-        check!("(__> 3.5 2.5)" [envt]-> "#t");
-        check!("(__> 2 2.0)" [envt]-> "#f");
-        check!("(__> 2.0 2)" [envt]-> "#f");
-        check!("(__> 2.0 3)" [envt]-> "#f");
-        check!("(__> 2 3.0)" [envt]-> "#f");
-        check!("(__> 3.0 2)" [envt]-> "#t");
-        check!("(__> 3 2.0)" [envt]-> "#t");
+        check!("(> 2 2)" [envt]-> "#f");
+        check!("(> 2 3)" [envt]-> "#f");
+        check!("(> 3 2)" [envt]-> "#t");
+        check!("(> 2.5 2.5)" [envt]-> "#f");
+        check!("(> 2.5 3.5)" [envt]-> "#f");
+        check!("(> 3.5 2.5)" [envt]-> "#t");
+        check!("(> 2 2.0)" [envt]-> "#f");
+        check!("(> 2.0 2)" [envt]-> "#f");
+        check!("(> 2.0 3)" [envt]-> "#f");
+        check!("(> 2 3.0)" [envt]-> "#f");
+        check!("(> 3.0 2)" [envt]-> "#t");
+        check!("(> 3 2.0)" [envt]-> "#t");
 
-        check!("(__>= 2 2)" [envt]-> "#t");
-        check!("(__>= 2 3)" [envt]-> "#f");
-        check!("(__>= 3 2)" [envt]-> "#t");
-        check!("(__>= 2.5 2.5)" [envt]-> "#t");
-        check!("(__>= 2.5 3.5)" [envt]-> "#f");
-        check!("(__>= 3.5 2.5)" [envt]-> "#t");
-        check!("(__>= 2 2.0)" [envt]-> "#t");
-        check!("(__>= 2.0 2)" [envt]-> "#t");
-        check!("(__>= 2.0 3)" [envt]-> "#f");
-        check!("(__>= 2 3.0)" [envt]-> "#f");
-        check!("(__>= 3.0 2)" [envt]-> "#t");
-        check!("(__>= 3 2.0)" [envt]-> "#t");
+        check!("(>= 2 2)" [envt]-> "#t");
+        check!("(>= 2 3)" [envt]-> "#f");
+        check!("(>= 3 2)" [envt]-> "#t");
+        check!("(>= 2.5 2.5)" [envt]-> "#t");
+        check!("(>= 2.5 3.5)" [envt]-> "#f");
+        check!("(>= 3.5 2.5)" [envt]-> "#t");
+        check!("(>= 2 2.0)" [envt]-> "#t");
+        check!("(>= 2.0 2)" [envt]-> "#t");
+        check!("(>= 2.0 3)" [envt]-> "#f");
+        check!("(>= 2 3.0)" [envt]-> "#f");
+        check!("(>= 3.0 2)" [envt]-> "#t");
+        check!("(>= 3 2.0)" [envt]-> "#t");
     }
 
     #[test]
@@ -487,7 +487,7 @@ mod test {
 ((lambda (x y) x) 1 2)" [envt]-> "1");
         check!("
 ((lambda (x y z)
-    (define add (lambda (a b) (__+ a b)))
+    (define add (lambda (a b) (+ a b)))
     (define w (add x y))
     (add w z))
  2 4 5)" [envt]-> "11");
