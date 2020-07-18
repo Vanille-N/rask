@@ -217,16 +217,16 @@ pub fn init(envt: &mut Envt) {
                         match *val {
                             Expr::Integer(n) => {
                                 match pred {
-                                    Expr::Integer(s) => if s < n {return Ok(Rc::new(Expr::Bool(false)));}
-                                    Expr::Float(f) => if f < n as f64 {return Ok(Rc::new(Expr::Bool(false)));}
+                                    Expr::Integer(s) => if s >= n {return Ok(Rc::new(Expr::Bool(false)));}
+                                    Expr::Float(f) => if f >= n as f64 {return Ok(Rc::new(Expr::Bool(false)));}
                                     _ => unreachable!(),
                                 }
                                 pred = Expr::Integer(n);
                             }
                             Expr::Float(y) => {
                                 match pred {
-                                    Expr::Integer(s) => if (s as f64) < y {return Ok(Rc::new(Expr::Bool(false)));}
-                                    Expr::Float(f) => if f < y {return Ok(Rc::new(Expr::Bool(false)));}
+                                    Expr::Integer(s) => if (s as f64) >= y {return Ok(Rc::new(Expr::Bool(false)));}
+                                    Expr::Float(f) => if f >= y {return Ok(Rc::new(Expr::Bool(false)));}
                                     _ => unreachable!(),
                                 }
                                 pred = Expr::Float(y);
@@ -260,6 +260,49 @@ pub fn init(envt: &mut Envt) {
                         match *val {
                             Expr::Integer(n) => {
                                 match pred {
+                                    Expr::Integer(s) => if s > n {return Ok(Rc::new(Expr::Bool(false)));}
+                                    Expr::Float(f) => if f > n as f64 {return Ok(Rc::new(Expr::Bool(false)));}
+                                    _ => unreachable!(),
+                                }
+                                pred = Expr::Integer(n);
+                            }
+                            Expr::Float(y) => {
+                                match pred {
+                                    Expr::Integer(s) => if (s as f64) > y {return Ok(Rc::new(Expr::Bool(false)));}
+                                    Expr::Float(f) => if f > y {return Ok(Rc::new(Expr::Bool(false)));}
+                                    _ => unreachable!(),
+                                }
+                                pred = Expr::Float(y);
+                            }
+                            _ => return Err(EvalErr::TypeError),
+                        }
+                    }
+                    Err(e) => return Err(e),
+                }
+            }
+            Ok(Rc::new(Expr::Bool(true)))
+        })))
+    );
+    envt.insert(
+        String::from("__>"),
+        Rc::new(Expr::Func(Rc::new(|args, ctx| {
+            let mut pred = match args.get(0) {
+                None => return Err(EvalErr::WrongArgList),
+                Some(val) => match eval(val.clone(), ctx) {
+                    Ok(val) => match *val {
+                        Expr::Integer(n) => Expr::Integer(n),
+                        Expr::Float(f) => Expr::Float(f),
+                        _ => return Err(EvalErr::TypeError),
+                    }
+                    Err(e) => return Err(e),
+                }
+            };
+            for x in args.iter().skip(1) {
+                match eval(x.clone(), ctx) {
+                    Ok(val) => {
+                        match *val {
+                            Expr::Integer(n) => {
+                                match pred {
                                     Expr::Integer(s) => if s <= n {return Ok(Rc::new(Expr::Bool(false)));}
                                     Expr::Float(f) => if f <= n as f64 {return Ok(Rc::new(Expr::Bool(false)));}
                                     _ => unreachable!(),
@@ -268,7 +311,7 @@ pub fn init(envt: &mut Envt) {
                             }
                             Expr::Float(y) => {
                                 match pred {
-                                    Expr::Integer(s) => if s as f64 <= y {return Ok(Rc::new(Expr::Bool(false)));}
+                                    Expr::Integer(s) => if (s as f64) <= y {return Ok(Rc::new(Expr::Bool(false)));}
                                     Expr::Float(f) => if f <= y {return Ok(Rc::new(Expr::Bool(false)));}
                                     _ => unreachable!(),
                                 }
@@ -284,7 +327,7 @@ pub fn init(envt: &mut Envt) {
         })))
     );
     envt.insert(
-        String::from("__>"),
+        String::from("__>="),
         Rc::new(Expr::Func(Rc::new(|args, ctx| {
             let mut pred = match args.get(0) {
                 None => return Err(EvalErr::WrongArgList),
@@ -303,59 +346,16 @@ pub fn init(envt: &mut Envt) {
                         match *val {
                             Expr::Integer(n) => {
                                 match pred {
-                                    Expr::Integer(s) => if s > n {return Ok(Rc::new(Expr::Bool(false)));}
-                                    Expr::Float(f) => if f > n as f64 {return Ok(Rc::new(Expr::Bool(false)));}
+                                    Expr::Integer(s) => if s < n {return Ok(Rc::new(Expr::Bool(false)));}
+                                    Expr::Float(f) => if f < n as f64 {return Ok(Rc::new(Expr::Bool(false)));}
                                     _ => unreachable!(),
                                 }
                                 pred = Expr::Integer(n);
                             }
                             Expr::Float(y) => {
                                 match pred {
-                                    Expr::Integer(s) => if s as f64 > y {return Ok(Rc::new(Expr::Bool(false)));}
-                                    Expr::Float(f) => if f > y {return Ok(Rc::new(Expr::Bool(false)));}
-                                    _ => unreachable!(),
-                                }
-                                pred = Expr::Float(y);
-                            }
-                            _ => return Err(EvalErr::TypeError),
-                        }
-                    }
-                    Err(e) => return Err(e),
-                }
-            }
-            Ok(Rc::new(Expr::Bool(true)))
-        })))
-    );
-    envt.insert(
-        String::from("__>"),
-        Rc::new(Expr::Func(Rc::new(|args, ctx| {
-            let mut pred = match args.get(0) {
-                None => return Err(EvalErr::WrongArgList),
-                Some(val) => match eval(val.clone(), ctx) {
-                    Ok(val) => match *val {
-                        Expr::Integer(n) => Expr::Integer(n),
-                        Expr::Float(f) => Expr::Float(f),
-                        _ => return Err(EvalErr::TypeError),
-                    }
-                    Err(e) => return Err(e),
-                }
-            };
-            for x in args.iter().skip(1) {
-                match eval(x.clone(), ctx) {
-                    Ok(val) => {
-                        match *val {
-                            Expr::Integer(n) => {
-                                match pred {
-                                    Expr::Integer(s) => if s > n {return Ok(Rc::new(Expr::Bool(false)));}
-                                    Expr::Float(f) => if f > n as f64 {return Ok(Rc::new(Expr::Bool(false)));}
-                                    _ => unreachable!(),
-                                }
-                                pred = Expr::Integer(n);
-                            }
-                            Expr::Float(y) => {
-                                match pred {
-                                    Expr::Integer(s) => if s as f64 > y {return Ok(Rc::new(Expr::Bool(false)));}
-                                    Expr::Float(f) => if f > y {return Ok(Rc::new(Expr::Bool(false)));}
+                                    Expr::Integer(s) => if (s as f64) < y {return Ok(Rc::new(Expr::Bool(false)));}
+                                    Expr::Float(f) => if f < y {return Ok(Rc::new(Expr::Bool(false)));}
                                     _ => unreachable!(),
                                 }
                                 pred = Expr::Float(y);
