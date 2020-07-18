@@ -52,6 +52,13 @@ pub fn split(expr: &str) -> Result<Vec<&str>, ParseErr> {
             comment = 1;
             begin += len + 2;
             len = 0;
+        } else if begin + len + 1 < expr.len() && &expr[begin + len..begin + len + 2] == "#(" {
+            if len > 0 {
+                items.push(&expr[begin..begin + len]);
+            }
+            items.push("#(");
+            begin += len + 2;
+            len = 0;
         } else if begin + len + 1 < expr.len() && &expr[begin + len..begin + len + 2] == "|#" {
             return Err(ParseErr::NoCommentStart);
         } else if "()[] \t\n".contains(c) {
@@ -111,6 +118,8 @@ mod test {
         test!("abc de (a cfg (b d)) )" -> "abc" "de" "(" "a" "cfg" "(" "b" "d" ")" ")" ")");
         test!("+-123 // <e> (%1 11>1) ?~" -> "+-123" "//" "<e>" "(" "%1" "11>1" ")" "?~");
         test!("(f args ...)" -> "(" "f" "args" "..." ")");
+        test!("(f 1e-1 2e3)" -> "(" "f" "1e-1" "2e3" ")");
+        test!("#(1 2 5)" -> "#(" "1" "2" "5" ")");
     }
 
     #[test]

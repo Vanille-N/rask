@@ -22,6 +22,8 @@ pub fn lex(item: &str) -> Result<Token, ParseErr> {
                         None => Err(ParseErr::InvalidChar(c)),
                         Some(chr) => Ok(Token::Char(chr)),
                     }
+                } else if item == "#(" {
+                    Ok(Token::VecParen)
                 } else if item == "#t" {
                     Ok(Token::Bool(true))
                 } else if item == "#f" {
@@ -142,6 +144,7 @@ mod test {
         test!("-125" -> +Integer(-125));
         test!("1253.7" -> +Float(1253.7));
         test!("12e-1" -> +Float(1.2));
+        test!("1e+2" -> +Float(100.));
         test!("0.5" -> +Float(0.5));
         test!(".5" -> +Float(0.5));
         test!("0." -> +Float(0.0));

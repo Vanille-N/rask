@@ -75,6 +75,25 @@ fn build_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr> {
                 Ok(Expr::List(Rc::new(v)))
             }
         }
+        Token::VecParen => {
+            let mut v = Vec::new();
+            if *idx == tokens.len() {
+                return Err(ParseErr::MismatchedOpenParen(*idx - 1));
+            }
+            while tokens[*idx] != Token::CloseParen {
+                let expr = build_helper(tokens, idx)?;
+                if let Expr::Dot = expr {
+                    return Err(ParseErr::InvalidVec(*idx));
+                } else {
+                    v.push(Rc::new(expr));
+                }
+                if *idx == tokens.len() {
+                    return Err(ParseErr::MismatchedOpenParen(*idx));
+                }
+            }
+            *idx += 1;
+            Ok(Expr::Vec(Rc::new(v)))
+        }
         Token::CloseParen => Err(ParseErr::MismatchedCloseParen(*idx)),
         Token::CloseBrace => Err(ParseErr::MismatchedCloseBrace(*idx)),
         Token::Quote => Ok(Expr::Quote(Rc::new(build_helper(tokens, idx)?))),
@@ -151,6 +170,11 @@ mod test {
             Expr::List(Rc::new(vec![$( Rc::new($elem) ),*]))
         }
     }
+    macro_rules! vector {
+        ( $( $elem:expr ),* ) => {
+            Expr::Vec(Rc::new(vec![$( Rc::new($elem) ),*]))
+        }
+    }
 
     macro_rules! atom {
         ( $( $elem:tt )* ) => {
@@ -216,6 +240,8 @@ mod test {
         check!("(a b . c)" -> Ok(cons!(atom!(a), atom!(b) ; atom!(c))));
         check!("()" -> Ok(list!()));
         check!("'()" -> Ok(quote!(list!())));
+        check!("#()" -> Ok(vector!()));
+        check!("#(1 2 53)" -> Ok(vector!(int!(1), int!(2), int!(53))));
     }
 
     #[test]

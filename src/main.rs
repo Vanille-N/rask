@@ -120,5 +120,10 @@ fn errmsg_parse(arg: &str, e: ParseErr) {
             eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
             eprintln!("  Token identifier: {}", idx);
         }
+        ParseErr::InvalidVec(idx) => {
+            eprintln!("Malformed vector literal");
+            eprintln!("  Found in expression {}...", &arg[0..10.min(n)]);
+            eprintln!("  Token identifier: {}", idx);
+        }
     }
 }

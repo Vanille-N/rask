@@ -18,6 +18,7 @@ pub enum ParseErr {
     MismatchedCloseBrace(usize),
     Unfinished,
     InvalidCons(usize),
+    InvalidVec(usize),
 }
 
 #[cfg_attr(tarpaulin, skip)]
@@ -58,6 +59,7 @@ impl cmp::PartialEq for ParseErr {
             ParseErr::MismatchedCloseBrace(_) => identical!(MismatchedCloseBrace(_)),
             ParseErr::Unfinished => identical!(Unfinished),
             ParseErr::InvalidCons(_) => identical!(InvalidCons(_)),
+            ParseErr::InvalidVec(_) => identical!(InvalidVec(_)),
         }
     }
 }
@@ -68,6 +70,7 @@ impl cmp::Eq for ParseErr {}
 pub enum Token {
     OpenParen,
     CloseParen,
+    VecParen,
     OpenBrace,
     CloseBrace,
     Quote,
@@ -103,6 +106,7 @@ impl cmp::PartialEq for Token {
         match self {
             Token::OpenBrace => identical!(OpenBrace),
             Token::CloseBrace => identical!(CloseBrace),
+            Token::VecParen => identical!(VecParen),
             Token::OpenParen => identical!(OpenParen),
             Token::CloseParen => identical!(CloseParen),
             Token::Quote => identical!(Quote),
@@ -126,6 +130,7 @@ impl cmp::PartialEq for Token {
 pub enum Expr {
     Atom(Rc<String>),
     List(Rc<Vec<Rc<Expr>>>),
+    Vec(Rc<Vec<Rc<Expr>>>),
     Quote(Rc<Expr>),
     Quasiquote(Rc<Expr>),
     Antiquote(Rc<Expr>),
@@ -186,6 +191,17 @@ impl fmt::Debug for Expr {
                         write!(f, "{:?} ", &item)?;
                     }
                     write!(f, ". {:?})", e)
+                }
+            }
+            Expr::Vec(v) => {
+                if v.len() == 0 {
+                    write!(f, "'()")
+                } else {
+                    write!(f, "({:?}", v[0])?;
+                    for item in v.iter().skip(1) {
+                        write!(f, " {:?}", &item)?;
+                    }
+                    write!(f, ")")
                 }
             }
         }
@@ -271,6 +287,19 @@ pub fn corresponds(lt: &Expr, rt: &Expr) -> bool {
             } else {
                 false
             }
+        }
+        Vec(v) => {
+            if let Vec(w) = rt {
+                if v.len() == w.len() {
+                    for i in 0..v.len() {
+                        if !corresponds(&v[i], &w[i]) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+            false
         }
     }
 }
