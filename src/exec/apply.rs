@@ -125,7 +125,7 @@ fn apply_construct(
         }
         "let" => {
             let mut new_envt = ctx.extend();
-            if parameters.len() != 2 {
+            if parameters.len() < 2 {
                 return Some(Err(EvalErr::WrongArgList));
             }
             if let Expr::List(bindings) = &*parameters[0] {
@@ -156,11 +156,18 @@ fn apply_construct(
             } else {
                 return Some(Err(EvalErr::TypeError));
             }
-            Some(eval(parameters[1].clone(), &mut new_envt))
+            let mut res = Rc::new(Expr::List(Rc::new(vec![])));
+            for act in parameters[1..].iter() {
+                match eval(act.clone(), &mut new_envt) {
+                    Ok(val) => res = val,
+                    Err(err) => return Some(Err(err)),
+                }
+            }
+            Some(Ok(res))
         }
         "let*" => {
             let mut new_envt = ctx.extend();
-            if parameters.len() != 2 {
+            if parameters.len() < 2 {
                 return Some(Err(EvalErr::WrongArgList));
             }
             if let Expr::List(bindings) = &*parameters[0] {
@@ -191,7 +198,14 @@ fn apply_construct(
             } else {
                 return Some(Err(EvalErr::TypeError));
             }
-            Some(eval(parameters[1].clone(), &mut new_envt))
+            let mut res = Rc::new(Expr::List(Rc::new(vec![])));
+            for act in parameters[1..].iter() {
+                match eval(act.clone(), &mut new_envt) {
+                    Ok(val) => res = val,
+                    Err(err) => return Some(Err(err)),
+                }
+            }
+            Some(Ok(res))
         }
         "if" => {
             if parameters.len() != 2 && parameters.len() != 3 {
@@ -213,6 +227,57 @@ fn apply_construct(
                 }
                 Err(e) => Some(Err(e)),
             }
+        }
+        "lambda" => {
+            if parameters.len() < 2 {
+                return Some(Err(EvalErr::EmptyDefine));
+            }
+            let mut ident = Vec::new();
+            match &*parameters[0] {
+                Expr::Atom(name) => ident.push(name.to_string()),
+                Expr::List(v) => {
+                    for x in v.iter() {
+                        match &**x {
+                            Expr::Atom(name) if is_bindable(name) => ident.push(name.to_string()),
+                            Expr::Atom(name) => {
+                                return Some(Err(EvalErr::CannotBind(name.to_string())))
+                            }
+                            _ => return Some(Err(EvalErr::InvalidDefine)),
+                        }
+                    }
+                }
+                _ => return Some(Err(EvalErr::TypeError)),
+            }
+            if ident.is_empty() {
+                return Some(Err(EvalErr::InvalidDefine));
+            }
+            let mut actions = Vec::new();
+            for act in &parameters[1..] {
+                actions.push(act.clone());
+            }
+            if actions.is_empty() {
+                return Some(Err(EvalErr::InvalidDefine));
+            }
+            Some(Ok(Rc::new(Expr::Func(Rc::new(move |args, mut envt| {
+                if args.len() != ident.len() {
+                    return Err(EvalErr::WrongArgList);
+                }
+                let mut ctx = envt.extend();
+                for i in 0..args.len() {
+                    match eval(args[i].clone(), &mut envt) {
+                        Ok(val) => ctx.insert(ident[i].clone(), val.clone()),
+                        Err(err) => return Err(err),
+                    }
+                }
+                let mut res = Rc::new(Expr::List(Rc::new(vec![])));
+                for act in &actions {
+                    match eval(act.clone(), &mut ctx) {
+                        Ok(val) => res = val,
+                        Err(err) => return Err(err),
+                    }
+                }
+                Ok(res)
+            })))))
         }
         _ => None,
     }
