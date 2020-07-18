@@ -1,5 +1,6 @@
 use crate::exec::{Envt, EvalErr, Expr, eval};
 use std::rc::Rc;
+use crate::init::Alias;
 
 pub fn init(envt: &mut Envt) {
     envt.insert(
@@ -369,4 +370,13 @@ pub fn init(envt: &mut Envt) {
             Ok(Rc::new(Expr::Bool(true)))
         })))
     );
+    envt.alias("+", "__+");
+    envt.alias("-", "__-");
+    envt.alias("*", "__*");
+    envt.alias("/", "__/");
+    envt.alias("=", "__=");
+    envt.alias("<", "__<");
+    envt.alias(">", "__>");
+    envt.alias("<=", "__<=");
+    envt.alias(">=", "__>=");
 }
