@@ -3,6 +3,7 @@ use std::io::Read;
 
 pub mod exec;
 pub mod parse;
+pub mod init;
 
 pub fn source(fname: &str) -> Option<String> {
     if let Ok(mut file) = File::open(fname.to_owned() + ".scm") {
