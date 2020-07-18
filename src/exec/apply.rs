@@ -36,13 +36,7 @@ pub fn apply_atom(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc
         res
     } else if let Some(f) = ctx.get(&a.to_string()) {
         match &*f {
-            Expr::Func(f) => {
-                let mut par = Vec::new();
-                for p in parameters {
-                    par.push(eval(p.clone(), ctx)?)
-                }
-                f(&par[..], ctx)
-            }
+            Expr::Func(f) => f(&parameters[..], ctx),
             _ => Err(EvalErr::CannotApply(f.clone())),
         }
     } else {

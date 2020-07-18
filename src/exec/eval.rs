@@ -45,6 +45,7 @@ mod test {
     use crate::exec::EvalErr;
     use crate::parse::{corresponds, parse};
     use chainmap::ChainMap;
+    use crate::init::initialize_environment;
 
     macro_rules! err {
         ( $e:ident *) => {
@@ -167,7 +168,7 @@ mod test {
 
     #[test]
     pub fn evals() {
-        let mut envt = ChainMap::new();
+        let mut envt = initialize_environment();
         envt.insert(String::from("a"), Rc::new(int!(12)));
         envt.insert(String::from("b"), Rc::new(float!(0.5)));
         envt.insert(String::from("c"), Rc::new(string!("xyz")));
@@ -175,91 +176,40 @@ mod test {
             String::from("lst"),
             Rc::new(list!(atom!(a), atom!(b), atom!(c))),
         );
-        envt.insert(
-            String::from("fn"),
-            Rc::new(Expr::Func(Rc::new(|args, _| {
-                if args.len() != 2 {
-                    Err(EvalErr::WrongArgList)
-                } else if let Expr::Integer(i) = &*args[0] {
-                    if let Expr::Integer(j) = &*args[1] {
-                        Ok(Rc::new(Expr::Integer(i + j)))
-                    } else {
-                        Err(EvalErr::TypeError)
-                    }
-                } else {
-                    Err(EvalErr::TypeError)
-                }
-            }))),
-        );
-        envt.insert(
-            String::from("-"),
-            Rc::new(Expr::Func(Rc::new(|args, _| {
-                if args.len() != 2 {
-                    Err(EvalErr::WrongArgList)
-                } else if let Expr::Integer(i) = &*args[0] {
-                    if let Expr::Integer(j) = &*args[1] {
-                        Ok(Rc::new(Expr::Integer(i - j)))
-                    } else {
-                        Err(EvalErr::TypeError)
-                    }
-                } else {
-                    Err(EvalErr::TypeError)
-                }
-            }))),
-        );
-        envt.insert(
-            String::from("+"),
-            Rc::new(Expr::Func(Rc::new(|args, _| {
-                if args.len() != 2 {
-                    Err(EvalErr::WrongArgList)
-                } else if let Expr::Integer(i) = &*args[0] {
-                    if let Expr::Integer(j) = &*args[1] {
-                        Ok(Rc::new(Expr::Integer(i + j)))
-                    } else {
-                        Err(EvalErr::TypeError)
-                    }
-                } else {
-                    Err(EvalErr::TypeError)
-                }
-            }))),
-        );
-        envt.insert(
-            String::from("*"),
-            Rc::new(Expr::Func(Rc::new(|args, _| {
-                if args.len() != 2 {
-                    Err(EvalErr::WrongArgList)
-                } else if let Expr::Integer(i) = &*args[0] {
-                    if let Expr::Integer(j) = &*args[1] {
-                        Ok(Rc::new(Expr::Integer(i * j)))
-                    } else {
-                        Err(EvalErr::TypeError)
-                    }
-                } else {
-                    Err(EvalErr::TypeError)
-                }
-            }))),
-        );
+        check!("(define + __+)" [envt]-> "()");
+        check!("(define - __-)" [envt]-> "()");
+        check!("(define fn +)" [envt]-> "()");
+        check!("(define * __*)" [envt]-> "()");
+
         envt.insert(
             String::from("fact"),
             Rc::new(Expr::Func(Rc::new(|args, envt| {
                 if args.len() != 1 {
                     Err(EvalErr::WrongArgList)
-                } else if let Expr::Integer(i) = &*args[0] {
-                    let mut envt = envt.extend();
-                    envt.insert(String::from("i"), Rc::new(Expr::Integer(*i)));
-                    match *i {
-                        0 => Ok(Rc::new(Expr::Integer(1))),
-                        _i => eval(
-                            parse("(* i (fact (- i 1)))")[0]
-                                .as_ref()
-                                .ok()
-                                .unwrap()
-                                .clone(),
-                            &mut envt,
-                        ),
-                    }
                 } else {
-                    Err(EvalErr::TypeError)
+                    match eval(args[0].clone(), envt) {
+                        Ok(val) => {
+                            println!("{:?}", val);
+                            match *val {
+                            Expr::Integer(i) => {
+                                let mut envt = envt.extend();
+                                envt.insert(String::from("i"), Rc::new(Expr::Integer(i)));
+                                match i {
+                                    0 => Ok(Rc::new(Expr::Integer(1))),
+                                    _i => eval(
+                                        parse("(* i (fact (- i 1)))")[0]
+                                            .as_ref()
+                                            .ok()
+                                            .unwrap()
+                                            .clone(),
+                                        &mut envt,
+                                    ),
+                                }
+                            }
+                            _ => Err(EvalErr::TypeError),
+                        }}
+                        Err(e) => Err(e),
+                    }
                 }
             }))),
         );
@@ -269,7 +219,8 @@ mod test {
                 if args.len() != 2 {
                     Err(EvalErr::WrongArgList)
                 } else if let Expr::Atom(a) = &*args[0] {
-                    envt.update(&*a, args[1].clone());
+                    let newval = eval(args[1].clone(), envt).unwrap();
+                    envt.update(&*a, newval);
                     Ok(Rc::new(Expr::List(Rc::new(vec![]))))
                 } else {
                     Err(EvalErr::TypeError)
@@ -293,11 +244,12 @@ mod test {
         check!("(+ 1 4)" [envt]-> "5");
         check!("(- 1 4)" [envt]-> "-3");
         check!("(fact 0)" [envt]-> "1");
+        check!("(fact 1)" [envt]-> "1");
         check!("(fact 3)" [envt]-> "6");
-        check!("(set! 'a 4)" [envt]-> "()");
+        check!("(set! a 4)" [envt]-> "()");
         check!("a" [envt]-> "4");
         check!("(+ 1 [fact (fact (+ -1 a))])" [envt]-> "721");
-        check!("(set! 'fn fact)" [envt]-> "()");
+        check!("(set! fn fact)" [envt]-> "()");
         check!("(fn a)" [envt]-> "24");
         check!("()" [envt]-> "()");
         check!("1.1" [envt]-> "1.1");
@@ -322,23 +274,9 @@ mod test {
     #[test]
     fn bindings() {
         // Define check
-        let mut envt = ChainMap::new();
-        envt.insert(
-            String::from("+"),
-            Rc::new(Expr::Func(Rc::new(|args, _| {
-                if args.len() != 2 {
-                    Err(EvalErr::WrongArgList)
-                } else if let Expr::Integer(i) = &*args[0] {
-                    if let Expr::Integer(j) = &*args[1] {
-                        Ok(Rc::new(Expr::Integer(i + j)))
-                    } else {
-                        Err(EvalErr::TypeError)
-                    }
-                } else {
-                    Err(EvalErr::TypeError)
-                }
-            }))),
-        );
+        let mut envt = initialize_environment();
+        check!("(define + __+)" [envt]-> "()");
+
         check!("(define a 4)" [envt]-> "()");
         check!("(define s \"abc\")" [envt]-> "()");
         check!("s" [envt]-> "\"abc\"");
@@ -381,23 +319,8 @@ mod test {
 
     #[test]
     fn let_bindings() {
-        let mut envt = ChainMap::new();
-        envt.insert(
-            String::from("+"),
-            Rc::new(Expr::Func(Rc::new(|args, _| {
-                if args.len() != 2 {
-                    Err(EvalErr::WrongArgList)
-                } else if let Expr::Integer(i) = &*args[0] {
-                    if let Expr::Integer(j) = &*args[1] {
-                        Ok(Rc::new(Expr::Integer(i + j)))
-                    } else {
-                        Err(EvalErr::TypeError)
-                    }
-                } else {
-                    Err(EvalErr::TypeError)
-                }
-            }))),
-        );
+        let mut envt = initialize_environment();
+        check!("(define + __+)" [envt]-> "()");
         check!("(let [(x 2)] x)" [envt]-> "2");
         check!("(define x (let [(y 1) (z 2)] (+ y z)))" [envt]-> "()");
         check!("x" [envt]-> "3");
@@ -442,10 +365,9 @@ mod test {
         err!("(if #f)" [envt]-> EvalErr::WrongArgList);
     }
 
-    // #[test]
-    // Will have to wait for the basic functions to be implemented
+    #[test]
     fn builtins() {
-        let mut envt = ChainMap::new();
+        let mut envt = crate::init::initialize_environment();
         check!("(__+ 1 2)" [envt]-> "3");
         check!("(__+ 1 2 3 4 5)" [envt]-> "15");
         check!("(__+ 1.0 2 3 4 5)" [envt]-> "15.0");
@@ -453,15 +375,20 @@ mod test {
         check!("(__+ 1 -1)" [envt]-> "0");
         check!("(let [(+ __+)] (+ 1 2))" [envt]-> "3");
         check!("(__* 2 5)" [envt]-> "10");
-        check!("(__* 1.5 2" [envt]-> "3.0");
+        check!("(__* 1.5 2)" [envt]-> "3.0");
         check!("(__* 3.0 3.0)" [envt]-> "9.0");
+        check!("(__* 0 0 undef)" [envt]-> "0");
+        check!("(__* 1 0 undef)" [envt]-> "0");
         check!("(__- 0 1)" [envt]-> "-1");
-        check!("(__- 1 1 1 1)" [envt]-> "-3");
-        check!("(__- -3 -6" [envt]-> "3");
+        check!("(__- 1 1 1 1)" [envt]-> "-2");
+        check!("(__- -3 -6)" [envt]-> "3");
         check!("(__- -1.0 1.0)" [envt]-> "-2.0");
         check!("(__/ 6 3)" [envt]-> "2");
         check!("(__/ 6 3.0)" [envt]-> "2.0");
         check!("(__/ 6 4)" [envt]-> "1.5");
         check!("(__/ 6 3.0 2)" [envt]-> "1.0");
+        err!("(__+ \"abc\" 5)" [envt]-> EvalErr::TypeError);
+        err!("(__/ 1 0)" [envt]-> EvalErr::MathError);
+        err!("(__/ 1 0.0)" [envt]-> EvalErr::MathError);
     }
 }
