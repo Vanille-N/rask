@@ -492,4 +492,24 @@ mod test {
     (add w z))
  2 4 5)" [envt]-> "11");
     }
+
+    #[test]
+    fn exhaustive_bool_check() {
+        let mut envt = crate::init::initialize_environment();
+        check!("(and)" [envt]-> "#t");
+        check!("(and #f)" [envt]-> "#f");
+        check!("(and #t #t)" [envt]-> "#t");
+        check!("(and (< 1 24) (= 2 2.0) #t)" [envt]-> "#t");
+        check!("(or)" [envt]-> "#f");
+        check!("(or #f)" [envt]-> "#f");
+        check!("(or #f #f #f (= 1 1))" [envt]-> "#t");
+        check!("(not #t)" [envt]-> "#f");
+        check!("
+(define xor
+    (lambda (a b)
+        (and (or a b) (not (and a b)))))" [envt]-> "()");
+        check!("(xor #t #f)" [envt]-> "#t");
+        check!("(xor #t #t)" [envt]-> "#f");
+        check!("(xor #f #f)" [envt]-> "#f");
+    }
 }
