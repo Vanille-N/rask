@@ -1,8 +1,9 @@
 use crate::exec::Envt;
 use chainmap::ChainMap;
 
-mod operators;
-mod type_identification;
+mod stdnum;
+mod stdtype;
+mod stdbool;
 
 pub trait Alias {
     fn alias(&mut self, s: &str, a: &str);
@@ -17,7 +18,8 @@ impl Alias for Envt {
 
 pub fn initialize_environment() -> Envt {
     let mut envt = ChainMap::new();
-    operators::init(&mut envt);
-    type_identification::init(&mut envt);
+    stdnum::init(&mut envt);
+    stdtype::init(&mut envt);
+    stdbool::init(&mut envt);
     envt
 }
