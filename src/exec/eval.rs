@@ -512,4 +512,12 @@ mod test {
         check!("(xor #t #t)" [envt]-> "#f");
         check!("(xor #f #f)" [envt]-> "#f");
     }
+
+    #[test]
+    fn type_identification() {
+        let mut envt = crate::init::initialize_environment();
+        check!("(and (integer? 1) (not (float? 1)) (real? 1))" [envt]-> "#t");
+        check!("(and (float? 1.) (not (integer? 1.)) (real? 1.))" [envt]-> "#t");
+        check!("(vector? #())" [envt]-> "#t");
+    }
 }
