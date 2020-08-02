@@ -526,5 +526,7 @@ mod test {
         let mut envt = crate::init::initialize_environment();
         check!("(exp 0)" [envt]-> "1.0");
         check!("(= (* (exp 1) (exp 2)) (exp (+ 1 2)))" [envt]-> "#t");
+        check!("(pow 2 3)" [envt]-> "8");
+        check!("(pow 3.0 2)" [envt]-> "9.0");
     }
 }
