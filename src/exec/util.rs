@@ -15,6 +15,7 @@ pub enum EvalErr {
     InvalidDefine,
     CannotBind(String),
     MathError,
+    InvalidNumber,
 }
 
 // No need to test this, it will be correct in practice
@@ -53,6 +54,7 @@ impl cmp::PartialEq for EvalErr {
             EvalErr::InvalidDefine => identical!(InvalidDefine),
             EvalErr::CannotBind(_) => identical!(CannotBind(_)),
             EvalErr::MathError => identical!(MathError),
+            EvalErr::InvalidNumber => identical!(InvalidNumber),
         }
     }
 }
