@@ -1,6 +1,7 @@
 use crate::exec::{Envt, EvalErr, Expr, eval};
 use std::rc::Rc;
 use crate::init::Alias;
+use std::convert::TryInto;
 
 pub fn init(envt: &mut Envt) {
     envt.insert(
@@ -38,8 +39,20 @@ pub fn init(envt: &mut Envt) {
                                 match eval(args[1].clone(), ctx) {
                                     Ok(val) => {
                                         match &*val {
-                                            Expr::Integer(m) => Ok(Rc::new(Expr::Integer(n.powi(m)))),
-                                            Expr::Float(g) => Ok(Rc::new(Expr::Float((n as f64).pow(g)))),
+                                            Expr::Integer(m) => {
+                                                if *m >= 0 {
+                                                    match (*m).try_into() {
+                                                        Ok(u) => Ok(Rc::new(Expr::Integer(n.pow(u)))),
+                                                        Err(e) => Err(EvalErr::InvalidNumber),
+                                                    }
+                                                } else {
+                                                    match (*m).try_into() {
+                                                        Ok(i) => Ok(Rc::new(Expr::Float((*n as f64).powi(i)))),
+                                                        Err(e) => Err(EvalErr::InvalidNumber),
+                                                    }
+                                                }
+                                            }
+                                            Expr::Float(g) => Ok(Rc::new(Expr::Float((*n as f64).powf(*g)))),
                                             _ => Err(EvalErr::TypeError),
                                         }
                                     }
@@ -49,8 +62,13 @@ pub fn init(envt: &mut Envt) {
                             Expr::Float(f) => match eval(args[1].clone(), ctx) {
                                 Ok(val) => {
                                     match &*val {
-                                        Expr::Integer(m) => Ok(Rc::new(Expr::Integer(n.powi(m)))),
-                                        Expr::Float(g) => Ok(Rc::new(Expr::Float(n.pow(g)))),
+                                        Expr::Integer(m) => {
+                                            match (*m).try_into() {
+                                                Ok(i) => Ok(Rc::new(Expr::Float(f.powi(i)))),
+                                                Err(e) => Err(EvalErr::InvalidNumber),
+                                            }
+                                        }
+                                        Expr::Float(g) => Ok(Rc::new(Expr::Float(f.powf(*g)))),
                                         _ => Err(EvalErr::TypeError),
                                     }
                                 }
