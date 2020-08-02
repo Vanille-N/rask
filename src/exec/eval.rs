@@ -520,4 +520,11 @@ mod test {
         check!("(and (float? 1.) (not (integer? 1.)) (real? 1.))" [envt]-> "#t");
         check!("(vector? #())" [envt]-> "#t");
     }
+
+    #[test]
+    fn math_primitives() {
+        let mut envt = crate::init::initialize_environment();
+        check!("(exp 0)" [envt]-> "1.0");
+        check!("(= (* (exp 1) (exp 2)) (exp (+ 1 2))" [envt]-> "#t");
+    }
 }
