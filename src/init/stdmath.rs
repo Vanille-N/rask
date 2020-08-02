@@ -89,11 +89,15 @@ pub fn init(envt: &mut Envt) {
         String::from("__pi"),
         Rc::new(Expr::Float(3.14159265359))
     );
+    envt.insert(
+        String::from("__e"),
+        Rc::new(Expr::Float(2.71828182845))
+    );
 
     envt.alias("exp", "__exp");
     envt.alias("pow", "__pow");
-    // envt.alias("math.e", "__e");
     envt.alias("math.pi", "__pi");
+    envt.alias("math.e", "__e");
     // envt.alias("cos", "__cos");
     // envt.alias("sin", "__sin");
     // envt.alias("tan", "__tan");
