@@ -525,6 +525,6 @@ mod test {
     fn math_primitives() {
         let mut envt = crate::init::initialize_environment();
         check!("(exp 0)" [envt]-> "1.0");
-        check!("(= (* (exp 1) (exp 2)) (exp (+ 1 2))" [envt]-> "#t");
+        check!("(= (* (exp 1) (exp 2)) (exp (+ 1 2)))" [envt]-> "#t");
     }
 }

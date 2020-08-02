@@ -9,10 +9,18 @@ pub fn init(envt: &mut Envt) {
             if args.len() != 1 {
                 Err(EvalErr::WrongArgList)
             } else {
-                match &*args[0] {
-                    Expr::Integer(n) => Ok(Rc::new(Expr::Float((n as f64).exp()))),
-                    Expr::Float(f) => Ok(Rc::new(Expr::Float(f.exp()))),
-                    _ => Err(EvalErr::TypeError),
+                match eval(args[0].clone(), ctx) {
+                    Ok(val) => {
+                        match &*val {
+                            Expr::Integer(n) => Ok(Rc::new(Expr::Float((*n as f64).exp()))),
+                            Expr::Float(f) => Ok(Rc::new(Expr::Float(f.exp()))),
+                            _ => {
+                                eprintln!("{:?}", args[0]);
+                                Err(EvalErr::TypeError)
+                            }
+                        }
+                    }
+                    Err(e) => Err(e),
                 }
             }
         })))
