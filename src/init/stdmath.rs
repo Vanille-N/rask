@@ -43,12 +43,12 @@ pub fn init(envt: &mut Envt) {
                                                 if *m >= 0 {
                                                     match (*m).try_into() {
                                                         Ok(u) => Ok(Rc::new(Expr::Integer(n.pow(u)))),
-                                                        Err(e) => Err(EvalErr::InvalidNumber),
+                                                        Err(_) => Err(EvalErr::InvalidNumber),
                                                     }
                                                 } else {
                                                     match (*m).try_into() {
                                                         Ok(i) => Ok(Rc::new(Expr::Float((*n as f64).powi(i)))),
-                                                        Err(e) => Err(EvalErr::InvalidNumber),
+                                                        Err(_) => Err(EvalErr::InvalidNumber),
                                                     }
                                                 }
                                             }
@@ -65,7 +65,7 @@ pub fn init(envt: &mut Envt) {
                                         Expr::Integer(m) => {
                                             match (*m).try_into() {
                                                 Ok(i) => Ok(Rc::new(Expr::Float(f.powi(i)))),
-                                                Err(e) => Err(EvalErr::InvalidNumber),
+                                                Err(_) => Err(EvalErr::InvalidNumber),
                                             }
                                         }
                                         Expr::Float(g) => Ok(Rc::new(Expr::Float(f.powf(*g)))),
