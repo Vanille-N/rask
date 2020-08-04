@@ -58,8 +58,8 @@ mod tests {
     fn cons_adds_new_value() {
         let a = List::new();
         let b = a.cons(1usize);
-        let c = a.cons(2usize);
-        let d = c.cons(3usize);
+        let c = a.cons(2);
+        let d = c.cons(3);
         assert!(a.head().is_none());
         assert_eq!(b.head(), Some(&1));
         assert_eq!(c.head(), Some(&2));
