@@ -109,4 +109,14 @@ mod tests {
         assert_eq!(lst.tail().tail().tail().tail().head(), Some(&1));
         assert_eq!(lst.tail().tail().tail().tail().tail().head(), None);
     }
+
+    #[test]
+    fn iterator_test() {
+        let lst = List::new().cons('c').cons('b').cons('a');
+        let mut it = lst.iter();
+        assert_eq!(it.next(), Some(&'a'));
+        assert_eq!(it.next(), Some(&'b'));
+        assert_eq!(it.next(), Some(&'c'));
+        assert_eq!(it.next(), None);
+    }
 }
