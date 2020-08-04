@@ -2,7 +2,7 @@
 use std::rc::Rc;
 
 pub struct List<T> {
-    head: Option<Elem<T>>,
+    head: Link<T>,
 }
 
 struct Elem<T> {
@@ -10,7 +10,7 @@ struct Elem<T> {
     next: Link<T>,
 }
 
-type Link<T> = Rc<Elem<T>>;
+type Link<T> = Option<Rc<Elem<T>>>;
 
 impl<T> List<T> {
     pub fn new() -> Self {
@@ -19,6 +19,12 @@ impl<T> List<T> {
 
     pub fn head(&self) -> Option<&T> {
         self.head.as_ref().map(|elem| &elem.item)
+    }
+
+    pub fn tail(&self) -> Self {
+        Self {
+            head: self.head.as_ref().unwrap().next.clone()
+        }
     }
 }
 
@@ -36,5 +42,12 @@ mod tests {
     fn new_list_is_empty() {
         let lst = List::<isize>::new();
         assert!(lst.head().is_none());
+    }
+
+    #[test]
+    #[should_panic]
+    fn new_list_has_no_tail() {
+        let lst = List::<isize>::new();
+        let _tl = lst.tail();
     }
 }
