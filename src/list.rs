@@ -59,4 +59,28 @@ mod tests {
         let lst = List::<isize>::new();
         let _tl = lst.tail();
     }
+
+    #[test]
+    fn cons_adds_new_value() {
+        let a = List::new();
+        let b = a.cons(1usize);
+        let c = a.cons(2usize);
+        let d = c.cons(3usize);
+        assert!(a.head().is_none());
+        assert_eq!(b.head(), Some(&1));
+        assert_eq!(c.head(), Some(&2));
+        assert_eq!(d.head(), Some(&3));
+    }
+
+    #[test]
+    fn can_access_deep_values() {
+        let lst = List::new().cons(1usize).cons(2).cons(3).cons(4).cons(5);
+        let bis = lst.tail().tail().tail().cons(6).cons(7);
+        assert_eq!(bis.head(), Some(&7));
+        assert_eq!(bis.tail().head(), Some(&6));
+        assert_eq!(bis.tail().tail().head(), Some(&2));
+        assert_eq!(lst.head(), Some(&5));
+        assert_eq!(lst.tail().tail().tail().tail().head(), Some(&1));
+        assert_eq!(lst.tail().tail().tail().tail().tail().head(), None);
+    }
 }
