@@ -21,3 +21,18 @@ impl List<T> {
     }
 }
 
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn create_new_list() {
+        let _lst = List::new::<isize>();
+    }
+
+    #[test]
+    #[should_panic]
+    fn new_list_is_empty() {
+        let lst = List::new::<isize>();
+        assert(lst.head().is_none());
+    }
+}
