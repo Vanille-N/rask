@@ -41,12 +41,6 @@ impl<T> List<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn create_new_list() {
-        let _lst = List::<isize>::new();
-    }
-
     #[test]
     fn new_list_is_empty() {
         let lst = List::<isize>::new();
