@@ -1,6 +1,6 @@
 // List struct
 
-struct List<T> {
+pub struct List<T> {
     head: Option<Elem<T>>,
 }
 
@@ -20,3 +20,4 @@ impl List<T> {
         self.head.as_ref()
     }
 }
+
