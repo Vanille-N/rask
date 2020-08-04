@@ -26,6 +26,15 @@ impl<T> List<T> {
             head: self.head.as_ref().unwrap().next.clone()
         }
     }
+
+    pub fn cons(&self, elem: T) -> Self {
+        Self {
+            head: Some(Rc::new(Elem {
+                item: elem,
+                next: self.head.clone(),
+            })),
+        }
+    }
 }
 
 
