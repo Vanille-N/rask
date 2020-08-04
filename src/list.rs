@@ -1,4 +1,5 @@
 // List struct
+use std::rc::Rc;
 
 pub struct List<T> {
     head: Option<Elem<T>>,
@@ -11,28 +12,29 @@ struct Elem<T> {
 
 type Link<T> = Rc<Elem<T>>;
 
-impl List<T> {
+impl<T> List<T> {
     pub fn new() -> Self {
         Self { head: None }
     }
 
-    pub fn head() -> Option<&T> {
-        self.head.as_ref()
+    pub fn head(&self) -> Option<&T> {
+        self.head.as_ref().map(|elem| &elem.item)
     }
 }
 
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn create_new_list() {
-        let _lst = List::new::<isize>();
+        let _lst = List::<isize>::new();
     }
 
     #[test]
-    #[should_panic]
     fn new_list_is_empty() {
-        let lst = List::new::<isize>();
-        assert(lst.head().is_none());
+        let lst = List::<isize>::new();
+        assert!(lst.head().is_none());
     }
 }
