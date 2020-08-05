@@ -1,5 +1,6 @@
 use chainmap::ChainMap;
 use std::rc::Rc;
+use crate::list::List;
 use std::{cmp, fmt};
 
 #[derive(Debug)]
@@ -129,7 +130,7 @@ impl cmp::PartialEq for Token {
 
 pub enum Expr {
     Atom(Rc<String>),
-    List(Rc<Vec<Rc<Expr>>>),
+    List(Rc<List<Rc<Expr>>>),
     Vec(Rc<Vec<Rc<Expr>>>),
     Quote(Rc<Expr>),
     Quasiquote(Rc<Expr>),
@@ -142,10 +143,10 @@ pub enum Expr {
     Ellipsis,
     Dot,
     Bool(bool),
-    Cons(Rc<Vec<Rc<Expr>>>, Rc<Expr>),
+    Cons(Rc<List<Rc<Expr>>>, Rc<Expr>),
 }
 
-pub type Func = Rc<dyn Fn(&[Rc<Expr>], &mut Envt) -> Result<Rc<Expr>, crate::exec::EvalErr>>;
+pub type Func = Rc<dyn Fn(impl Iterator<Item = Rc<Expr>>, &mut Envt) -> Result<Rc<Expr>, crate::exec::EvalErr>>;
 
 pub type Envt = ChainMap<String, Rc<Expr>>;
 
