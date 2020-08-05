@@ -1,10 +1,10 @@
 use crate::exec::Envt;
 use chainmap::ChainMap;
 
-mod stdnum;
-mod stdtype;
 mod stdbool;
 mod stdmath;
+mod stdnum;
+mod stdtype;
 
 pub trait Alias {
     fn alias(&mut self, s: &str, a: &str);

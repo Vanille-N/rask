@@ -44,9 +44,9 @@ pub fn quasi_eval(expr: Rc<Expr>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
 mod test {
     use super::*;
     use crate::exec::EvalErr;
+    use crate::init::initialize_environment;
     use crate::parse::{corresponds, parse};
     use chainmap::ChainMap;
-    use crate::init::initialize_environment;
 
     macro_rules! err {
         ( $e:ident *) => {
@@ -192,23 +192,24 @@ mod test {
                         Ok(val) => {
                             println!("{:?}", val);
                             match *val {
-                            Expr::Integer(i) => {
-                                let mut envt = envt.extend();
-                                envt.insert(String::from("i"), Rc::new(Expr::Integer(i)));
-                                match i {
-                                    0 => Ok(Rc::new(Expr::Integer(1))),
-                                    _i => eval(
-                                        parse("(* i (fact (- i 1)))")[0]
-                                            .as_ref()
-                                            .ok()
-                                            .unwrap()
-                                            .clone(),
-                                        &mut envt,
-                                    ),
+                                Expr::Integer(i) => {
+                                    let mut envt = envt.extend();
+                                    envt.insert(String::from("i"), Rc::new(Expr::Integer(i)));
+                                    match i {
+                                        0 => Ok(Rc::new(Expr::Integer(1))),
+                                        _i => eval(
+                                            parse("(* i (fact (- i 1)))")[0]
+                                                .as_ref()
+                                                .ok()
+                                                .unwrap()
+                                                .clone(),
+                                            &mut envt,
+                                        ),
+                                    }
                                 }
+                                _ => Err(EvalErr::TypeError),
                             }
-                            _ => Err(EvalErr::TypeError),
-                        }}
+                        }
                         Err(e) => Err(e),
                     }
                 }
@@ -361,7 +362,7 @@ mod test {
 (let [(x 1) (y 2)]
     (define (add a b) (+ a b))
     (add x y))" [envt]-> "3");
-    check!("
+        check!("
 (let* [(x 1) (y (+ x 2))]
     (define (add a b) (+ a b))
     (add x y))" [envt]-> "4");

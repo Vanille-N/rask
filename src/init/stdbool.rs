@@ -1,6 +1,6 @@
-use crate::exec::{Envt, EvalErr, Expr, eval};
-use std::rc::Rc;
+use crate::exec::{eval, Envt, EvalErr, Expr};
 use crate::init::Alias;
+use std::rc::Rc;
 
 pub fn init(envt: &mut Envt) {
     envt.insert(
@@ -14,9 +14,9 @@ pub fn init(envt: &mut Envt) {
                 Ok(val) => match &*val {
                     Expr::Bool(b) => Ok(Rc::new(Expr::Bool(!b))),
                     _ => Err(EvalErr::TypeError),
-                }
+                },
             }
-        })))
+        }))),
     );
     envt.insert(
         String::from("__and"),
@@ -28,11 +28,11 @@ pub fn init(envt: &mut Envt) {
                         Expr::Bool(false) => return Ok(Rc::new(Expr::Bool(false))),
                         Expr::Bool(_) => (),
                         _ => return Err(EvalErr::TypeError),
-                    }
+                    },
                 }
             }
             Ok(Rc::new(Expr::Bool(true)))
-        })))
+        }))),
     );
     envt.insert(
         String::from("__or"),
@@ -44,11 +44,11 @@ pub fn init(envt: &mut Envt) {
                         Expr::Bool(true) => return Ok(Rc::new(Expr::Bool(true))),
                         Expr::Bool(_) => (),
                         _ => return Err(EvalErr::TypeError),
-                    }
+                    },
                 }
             }
             Ok(Rc::new(Expr::Bool(false)))
-        })))
+        }))),
     );
     envt.alias("not", "__not");
     envt.alias("and", "__and");

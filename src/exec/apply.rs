@@ -1,4 +1,4 @@
-use crate::exec::{eval, Envt, EvalErr, Expr, is_bindable};
+use crate::exec::{eval, is_bindable, Envt, EvalErr, Expr};
 use std::rc::Rc;
 
 pub fn apply(lst: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
