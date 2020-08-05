@@ -139,5 +139,6 @@ mod tests {
         assert_eq!(it.next(), Some(&'b'));
         assert_eq!(it.next(), Some(&'c'));
         assert_eq!(it.next(), None);
+        assert_eq!(lst.head(), Some(&'a'));
     }
 }
