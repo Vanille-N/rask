@@ -12,7 +12,7 @@ pub trait Alias {
 
 impl Alias for Envt {
     fn alias(&mut self, s: &str, a: &str) {
-        let cpy = self.get(&a.to_string()).unwrap().clone();
+        let cpy = self.get(&a.to_string()).unwrap();
         self.insert(s.to_string(), cpy);
     }
 }
