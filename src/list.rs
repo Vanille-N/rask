@@ -35,6 +35,14 @@ impl<T> List<T> {
             })),
         }
     }
+
+    pub fn from(v: Vec<T>) -> Self {
+        let mut lst = Self::new();
+        for x in v.into_iter().rev() {
+            lst = lst.cons(x);
+        }
+        lst
+    }
 }
 
 impl<T> Drop for List<T> {
