@@ -56,13 +56,13 @@ fn apply_construct(
             match &*parameters.head().unwrap().clone() {
                 Expr::Atom(x) if is_bindable(x) => {
                     if parameters.tail().head().is_none() {
-                        ctx.insert(x.to_string(), Rc::new(Expr::List(Rc::new(vec![]))));
-                        Some(Ok(Rc::new(Expr::List(Rc::new(vec![])))))
+                        ctx.insert(x.to_string(), Rc::new(Expr::List(Rc::new(List::new()))));
+                        Some(Ok(Rc::new(Expr::List(Rc::new(List::new())))))
                     } else if parameters.tail().tail().head().is_none() {
-                        match eval(parameters[1].clone(), &mut ctx.extend()) {
+                        match eval(parameters.tail().head().unwrap().clone(), &mut ctx.extend()) {
                             Ok(res) => {
                                 ctx.insert(x.to_string(), res);
-                                Some(Ok(Rc::new(Expr::List(Rc::new(vec![])))))
+                                Some(Ok(Rc::new(Expr::List(Rc::new(List::new())))))
                             }
                             Err(err) => Some(Err(err)),
                         }
@@ -86,7 +86,7 @@ fn apply_construct(
                         return Some(Err(EvalErr::InvalidDefine));
                     }
                     let mut actions = Vec::new();
-                    for act in &parameters[1..] {
+                    for act in parameters.tail().iter() {
                         actions.push(act.clone());
                     }
                     if actions.is_empty() {
@@ -99,13 +99,13 @@ fn apply_construct(
                                 return Err(EvalErr::WrongArgList);
                             }
                             let mut ctx = envt.extend();
-                            for i in 0..args.len() {
-                                match eval(args[i].clone(), &mut envt) {
-                                    Ok(val) => ctx.insert(ident[i + 1].clone(), val.clone()),
+                            for (arg, id) in args.iter().zip(ident.iter().skip(1)) {
+                                match eval(arg.clone(), &mut envt) {
+                                    Ok(val) => ctx.insert(id.clone(), val.clone()),
                                     Err(err) => return Err(err),
                                 }
                             }
-                            let mut res = Rc::new(Expr::List(Rc::new(vec![])));
+                            let mut res = Rc::new(Expr::List(Rc::new(List::new())));
                             for act in &actions {
                                 match eval(act.clone(), &mut ctx) {
                                     Ok(val) => res = val,

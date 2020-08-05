@@ -48,6 +48,10 @@ impl<T> List<T> {
         }
         lst
     }
+
+    pub fn len(&self) -> usize {
+        self.iter().count()
+    }
 }
 
 impl<T> Drop for List<T> {
