@@ -178,13 +178,16 @@ pub fn init(envt: &mut Envt) {
                             Expr::Integer(n) => {
                                 match fst {
                                     Expr::Integer(s) => if s != n {return Ok(Rc::new(Expr::Bool(false)));}
+                                    #[allow(clippy::float_cmp)]
                                     Expr::Float(f) => if f != n as f64 {return Ok(Rc::new(Expr::Bool(false)));}
                                     _ => unreachable!(),
                                 }
                             }
                             Expr::Float(y) => {
                                 match fst {
+                                    #[allow(clippy::float_cmp)]
                                     Expr::Integer(s) => if s as f64 != y {return Ok(Rc::new(Expr::Bool(false)));}
+                                    #[allow(clippy::float_cmp)]
                                     Expr::Float(f) => if f != y {return Ok(Rc::new(Expr::Bool(false)));}
                                     _ => unreachable!(),
                                 }

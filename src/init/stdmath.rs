@@ -87,11 +87,11 @@ pub fn init(envt: &mut Envt) {
     );
     envt.insert(
         String::from("__pi"),
-        Rc::new(Expr::Float(3.14159265359))
+        Rc::new(Expr::Float(std::f64::consts::PI))
     );
     envt.insert(
         String::from("__e"),
-        Rc::new(Expr::Float(2.71828182845))
+        Rc::new(Expr::Float(std::f64::consts::E))
     );
 
     envt.alias("exp", "__exp");
