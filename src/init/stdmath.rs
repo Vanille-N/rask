@@ -1,7 +1,7 @@
-use crate::exec::{Envt, EvalErr, Expr, eval};
-use std::rc::Rc;
+use crate::exec::{eval, Envt, EvalErr, Expr};
 use crate::init::Alias;
 use std::convert::TryInto;
+use std::rc::Rc;
 
 pub fn init(envt: &mut Envt) {
     envt.insert(
@@ -11,20 +11,18 @@ pub fn init(envt: &mut Envt) {
                 Err(EvalErr::WrongArgList)
             } else {
                 match eval(args[0].clone(), ctx) {
-                    Ok(val) => {
-                        match &*val {
-                            Expr::Integer(n) => Ok(Rc::new(Expr::Float((*n as f64).exp()))),
-                            Expr::Float(f) => Ok(Rc::new(Expr::Float(f.exp()))),
-                            _ => {
-                                eprintln!("{:?}", args[0]);
-                                Err(EvalErr::TypeError)
-                            }
+                    Ok(val) => match &*val {
+                        Expr::Integer(n) => Ok(Rc::new(Expr::Float((*n as f64).exp()))),
+                        Expr::Float(f) => Ok(Rc::new(Expr::Float(f.exp()))),
+                        _ => {
+                            eprintln!("{:?}", args[0]);
+                            Err(EvalErr::TypeError)
                         }
-                    }
+                    },
                     Err(e) => Err(e),
                 }
             }
-        })))
+        }))),
     );
     envt.insert(
         String::from("__pow"),
@@ -33,65 +31,55 @@ pub fn init(envt: &mut Envt) {
                 Err(EvalErr::WrongArgList)
             } else {
                 match eval(args[0].clone(), ctx) {
-                    Ok(val) => {
-                        match &*val {
-                            Expr::Integer(n) => {
-                                match eval(args[1].clone(), ctx) {
-                                    Ok(val) => {
-                                        match &*val {
-                                            Expr::Integer(m) => {
-                                                if *m >= 0 {
-                                                    match (*m).try_into() {
-                                                        Ok(u) => Ok(Rc::new(Expr::Integer(n.pow(u)))),
-                                                        Err(_) => Err(EvalErr::InvalidNumber),
-                                                    }
-                                                } else {
-                                                    match (*m).try_into() {
-                                                        Ok(i) => Ok(Rc::new(Expr::Float((*n as f64).powi(i)))),
-                                                        Err(_) => Err(EvalErr::InvalidNumber),
-                                                    }
-                                                }
-                                            }
-                                            Expr::Float(g) => Ok(Rc::new(Expr::Float((*n as f64).powf(*g)))),
-                                            _ => Err(EvalErr::TypeError),
+                    Ok(val) => match &*val {
+                        Expr::Integer(n) => match eval(args[1].clone(), ctx) {
+                            Ok(val) => match &*val {
+                                Expr::Integer(m) => {
+                                    if *m >= 0 {
+                                        match (*m).try_into() {
+                                            Ok(u) => Ok(Rc::new(Expr::Integer(n.pow(u)))),
+                                            Err(_) => Err(EvalErr::InvalidNumber),
+                                        }
+                                    } else {
+                                        match (*m).try_into() {
+                                            Ok(i) => Ok(Rc::new(Expr::Float((*n as f64).powi(i)))),
+                                            Err(_) => Err(EvalErr::InvalidNumber),
                                         }
                                     }
-                                    Err(e) => Err(e),
                                 }
-                            }
-                            Expr::Float(f) => match eval(args[1].clone(), ctx) {
-                                Ok(val) => {
-                                    match &*val {
-                                        Expr::Integer(m) => {
-                                            match (*m).try_into() {
-                                                Ok(i) => Ok(Rc::new(Expr::Float(f.powi(i)))),
-                                                Err(_) => Err(EvalErr::InvalidNumber),
-                                            }
-                                        }
-                                        Expr::Float(g) => Ok(Rc::new(Expr::Float(f.powf(*g)))),
-                                        _ => Err(EvalErr::TypeError),
-                                    }
-                                }
-                                Err(e) => Err(e),
-                            }
-                            _ => {
-                                eprintln!("{:?}", args[0]);
-                                Err(EvalErr::TypeError)
-                            }
+                                Expr::Float(g) => Ok(Rc::new(Expr::Float((*n as f64).powf(*g)))),
+                                _ => Err(EvalErr::TypeError),
+                            },
+                            Err(e) => Err(e),
+                        },
+                        Expr::Float(f) => match eval(args[1].clone(), ctx) {
+                            Ok(val) => match &*val {
+                                Expr::Integer(m) => match (*m).try_into() {
+                                    Ok(i) => Ok(Rc::new(Expr::Float(f.powi(i)))),
+                                    Err(_) => Err(EvalErr::InvalidNumber),
+                                },
+                                Expr::Float(g) => Ok(Rc::new(Expr::Float(f.powf(*g)))),
+                                _ => Err(EvalErr::TypeError),
+                            },
+                            Err(e) => Err(e),
+                        },
+                        _ => {
+                            eprintln!("{:?}", args[0]);
+                            Err(EvalErr::TypeError)
                         }
-                    }
+                    },
                     Err(e) => Err(e),
                 }
             }
-        })))
+        }))),
     );
     envt.insert(
         String::from("__pi"),
-        Rc::new(Expr::Float(std::f64::consts::PI))
+        Rc::new(Expr::Float(std::f64::consts::PI)),
     );
     envt.insert(
         String::from("__e"),
-        Rc::new(Expr::Float(std::f64::consts::E))
+        Rc::new(Expr::Float(std::f64::consts::E)),
     );
 
     envt.alias("exp", "__exp");

@@ -24,7 +24,7 @@ impl<T> List<T> {
 
     pub fn tail(&self) -> Self {
         Self {
-            head: self.head.as_ref().unwrap().next.clone()
+            head: self.head.as_ref().unwrap().next.clone(),
         }
     }
 
@@ -65,7 +65,9 @@ pub struct Iter<'a, T> {
 
 impl<T> List<T> {
     pub fn iter(&self) -> Iter<'_, T> {
-        Iter { next: self.head.as_deref() }
+        Iter {
+            next: self.head.as_deref(),
+        }
     }
 }
 

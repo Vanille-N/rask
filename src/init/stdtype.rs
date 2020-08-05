@@ -1,6 +1,6 @@
-use crate::exec::{Envt, EvalErr, Expr, eval};
-use std::rc::Rc;
+use crate::exec::{eval, Envt, EvalErr, Expr};
 use crate::init::Alias;
+use std::rc::Rc;
 
 pub fn init(envt: &mut Envt) {
     envt.insert(
@@ -14,9 +14,9 @@ pub fn init(envt: &mut Envt) {
                 Ok(val) => match &*val {
                     Expr::Integer(_) => Ok(Rc::new(Expr::Bool(true))),
                     _ => Ok(Rc::new(Expr::Bool(false))),
-                }
+                },
             }
-        })))
+        }))),
     );
     envt.insert(
         String::from("__float?"),
@@ -29,9 +29,9 @@ pub fn init(envt: &mut Envt) {
                 Ok(val) => match &*val {
                     Expr::Float(_) => Ok(Rc::new(Expr::Bool(true))),
                     _ => Ok(Rc::new(Expr::Bool(false))),
-                }
+                },
             }
-        })))
+        }))),
     );
     envt.insert(
         String::from("__real?"),
@@ -44,9 +44,9 @@ pub fn init(envt: &mut Envt) {
                 Ok(val) => match &*val {
                     Expr::Integer(_) | Expr::Float(_) => Ok(Rc::new(Expr::Bool(true))),
                     _ => Ok(Rc::new(Expr::Bool(false))),
-                }
+                },
             }
-        })))
+        }))),
     );
     envt.insert(
         String::from("__bool?"),
@@ -59,9 +59,9 @@ pub fn init(envt: &mut Envt) {
                 Ok(val) => match &*val {
                     Expr::Bool(_) => Ok(Rc::new(Expr::Bool(true))),
                     _ => Ok(Rc::new(Expr::Bool(false))),
-                }
+                },
             }
-        })))
+        }))),
     );
     envt.insert(
         String::from("__vector?"),
@@ -74,9 +74,9 @@ pub fn init(envt: &mut Envt) {
                 Ok(val) => match &*val {
                     Expr::Vec(_) => Ok(Rc::new(Expr::Bool(true))),
                     _ => Ok(Rc::new(Expr::Bool(false))),
-                }
+                },
             }
-        })))
+        }))),
     );
     envt.insert(
         String::from("__character?"),
@@ -89,9 +89,9 @@ pub fn init(envt: &mut Envt) {
                 Ok(val) => match &*val {
                     Expr::Char(_) => Ok(Rc::new(Expr::Bool(true))),
                     _ => Ok(Rc::new(Expr::Bool(false))),
-                }
+                },
             }
-        })))
+        }))),
     );
     envt.insert(
         String::from("__string?"),
@@ -104,9 +104,9 @@ pub fn init(envt: &mut Envt) {
                 Ok(val) => match &*val {
                     Expr::String(_) => Ok(Rc::new(Expr::Bool(true))),
                     _ => Ok(Rc::new(Expr::Bool(false))),
-                }
+                },
             }
-        })))
+        }))),
     );
     envt.alias("integer?", "__integer?");
     envt.alias("float?", "__float?");
