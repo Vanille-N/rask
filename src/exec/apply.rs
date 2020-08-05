@@ -208,15 +208,15 @@ fn apply_construct(
             if parameters.len() != 2 && parameters.len() != 3 {
                 return Some(Err(EvalErr::WrongArgList));
             }
-            match eval(parameters[0].clone(), &mut ctx.extend()) {
+            match eval(parameters.head().unwrap().clone(), &mut ctx.extend()) {
                 Ok(val) => {
                     if let Expr::Bool(b) = &*val {
                         if *b {
-                            Some(eval(parameters[1].clone(), &mut ctx.extend()))
-                        } else if let Some(p) = parameters.get(2) {
+                            Some(eval(parameters.tail().head().unwrap().clone(), &mut ctx.extend()))
+                        } else if let Some(p) = parameters.tail().tail().head() {
                             Some(eval(p.clone(), &mut ctx.extend()))
                         } else {
-                            Some(Ok(Rc::new(Expr::List(Rc::new(vec![])))))
+                            Some(Ok(Rc::new(Expr::List(Rc::new(List::new())))))
                         }
                     } else {
                         Some(Err(EvalErr::TypeError))
@@ -230,7 +230,7 @@ fn apply_construct(
                 return Some(Err(EvalErr::EmptyDefine));
             }
             let mut ident = Vec::new();
-            match &*parameters[0] {
+            match &*parameters.head().unwrap().clone() {
                 Expr::Atom(name) => ident.push(name.to_string()),
                 Expr::List(v) => {
                     for x in v.iter() {
@@ -249,7 +249,7 @@ fn apply_construct(
                 return Some(Err(EvalErr::InvalidDefine));
             }
             let mut actions = Vec::new();
-            for act in &parameters[1..] {
+            for act in parameters.tail().iter() {
                 actions.push(act.clone());
             }
             if actions.is_empty() {
@@ -260,13 +260,13 @@ fn apply_construct(
                     return Err(EvalErr::WrongArgList);
                 }
                 let mut ctx = envt.extend();
-                for i in 0..args.len() {
-                    match eval(args[i].clone(), &mut envt) {
-                        Ok(val) => ctx.insert(ident[i].clone(), val.clone()),
+                for (arg, id) in args.iter().zip(ident.iter()) {
+                    match eval(arg.clone(), &mut envt) {
+                        Ok(val) => ctx.insert(id.clone(), val.clone()),
                         Err(err) => return Err(err),
                     }
                 }
-                let mut res = Rc::new(Expr::List(Rc::new(vec![])));
+                let mut res = Rc::new(Expr::List(Rc::new(List::new())));
                 for act in &actions {
                     match eval(act.clone(), &mut ctx) {
                         Ok(val) => res = val,
