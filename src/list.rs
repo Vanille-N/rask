@@ -127,4 +127,14 @@ mod tests {
         assert_eq!(it.next(), Some(&'c'));
         assert_eq!(it.next(), None);
     }
+
+    #[test]
+    fn from_vec() {
+        let lst = List::from(vec!['a', 'b', 'c']);
+        let mut it = lst.iter();
+        assert_eq!(it.next(), Some(&'a'));
+        assert_eq!(it.next(), Some(&'b'));
+        assert_eq!(it.next(), Some(&'c'));
+        assert_eq!(it.next(), None);
+    }
 }
