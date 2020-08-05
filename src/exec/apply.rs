@@ -1,11 +1,12 @@
 use crate::exec::{eval, is_bindable, Envt, EvalErr, Expr};
 use std::rc::Rc;
+use crate::list::List;
 
-pub fn apply(lst: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
+pub fn apply(lst: List<Rc<Expr>>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     if lst.is_empty() {
         return Ok(Rc::new(Expr::List(Rc::new(List::new()))));
     }
-    match &*lst[0] {
+    match &**lst.head().unwrap() {
         Expr::Char(_)
         | Expr::Integer(_)
         | Expr::Float(_)
@@ -13,30 +14,26 @@ pub fn apply(lst: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
         | Expr::Cons(_, _)
         | Expr::Quote(_)
         | Expr::Quasiquote(_)
-        | Expr::Antiquote(_) => Err(EvalErr::CannotApply(lst[0].clone())),
-        Expr::List(_) => match &*lst[0] {
-            Expr::Atom(a) => apply_atom(&a, &lst[1..], ctx),
-            Expr::List(_) => {
-                let result = eval(lst[0].clone(), ctx)?;
+        | Expr::Antiquote(_) => Err(EvalErr::CannotApply(lst.head().unwrap().clone())),
+        Expr::List(_) => {
+                let result = eval(lst.head().unwrap().clone(), ctx)?;
                 match &*result {
-                    Expr::Func(f) => f(&lst[1..], ctx),
-                    Expr::Atom(a) => apply_atom(&a, &lst[1..], ctx),
+                    Expr::Func(f) => f(lst.tail(), ctx),
+                    Expr::Atom(a) => apply_atom(&a, lst.tail(), ctx),
                     _ => Err(EvalErr::CannotApply(result.clone())),
                 }
-            }
-            _ => Err(EvalErr::CannotApply(lst[0].clone())),
         },
-        Expr::Atom(a) => apply_atom(&a, &lst[1..], ctx),
+        Expr::Atom(a) => apply_atom(&a, lst.tail(), ctx),
         _ => unreachable!(),
     }
 }
 
-pub fn apply_atom(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
+pub fn apply_atom(a: &str, parameters: List<Rc<Expr>>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     if let Some(res) = apply_construct(a, parameters, ctx) {
         res
     } else if let Some(f) = ctx.get(&a.to_string()) {
         match &*f {
-            Expr::Func(f) => f(&parameters[..], ctx),
+            Expr::Func(f) => f(parameters.clone(), ctx),
             _ => Err(EvalErr::CannotApply(f.clone())),
         }
     } else {
@@ -48,7 +45,7 @@ pub fn apply_atom(a: &str, parameters: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc
 
 fn apply_construct(
     a: &str,
-    parameters: &[Rc<Expr>],
+    parameters: List<Rc<Expr>>,
     ctx: &mut Envt,
 ) -> Option<Result<Rc<Expr>, EvalErr>> {
     match &a[..] {
@@ -56,12 +53,12 @@ fn apply_construct(
             if parameters.is_empty() {
                 return Some(Err(EvalErr::EmptyDefine));
             }
-            match &*parameters[0] {
+            match &*parameters.head().unwrap().clone() {
                 Expr::Atom(x) if is_bindable(x) => {
-                    if parameters.len() == 1 {
+                    if parameters.tail().head().is_none() {
                         ctx.insert(x.to_string(), Rc::new(Expr::List(Rc::new(vec![]))));
                         Some(Ok(Rc::new(Expr::List(Rc::new(vec![])))))
-                    } else if parameters.len() == 2 {
+                    } else if parameters.tail().tail().head().is_none() {
                         match eval(parameters[1].clone(), &mut ctx.extend()) {
                             Ok(res) => {
                                 ctx.insert(x.to_string(), res);
