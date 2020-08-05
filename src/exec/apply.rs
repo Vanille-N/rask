@@ -115,7 +115,7 @@ fn apply_construct(
                             Ok(res)
                         }))),
                     );
-                    Some(Ok(Rc::new(Expr::List(Rc::new(vec![])))))
+                    Some(Ok(Rc::new(Expr::List(Rc::new(List::new())))))
                 }
                 _ => Some(Err(EvalErr::InvalidDefine)),
             }
@@ -125,13 +125,13 @@ fn apply_construct(
             if parameters.len() < 2 {
                 return Some(Err(EvalErr::WrongArgList));
             }
-            if let Expr::List(bindings) = &*parameters[0] {
+            if let Expr::List(bindings) = &*parameters.head().unwrap().clone() {
                 for bind in bindings.iter() {
                     if let Expr::List(lst) = &**bind {
                         if lst.len() == 2 {
-                            if let Expr::Atom(x) = &*lst[0] {
+                            if let Expr::Atom(x) = &*lst.head().unwrap().clone() {
                                 if is_bindable(&x) {
-                                    match eval(lst[1].clone(), &mut ctx.extend()) {
+                                    match eval(lst.tail().head().unwrap().clone(), &mut ctx.extend()) {
                                         Ok(val) => {
                                             new_envt.insert(x.to_string(), val.clone());
                                         }
@@ -153,8 +153,8 @@ fn apply_construct(
             } else {
                 return Some(Err(EvalErr::TypeError));
             }
-            let mut res = Rc::new(Expr::List(Rc::new(vec![])));
-            for act in parameters[1..].iter() {
+            let mut res = Rc::new(Expr::List(Rc::new(List::new())));
+            for act in parameters.tail().iter() {
                 match eval(act.clone(), &mut new_envt) {
                     Ok(val) => res = val,
                     Err(err) => return Some(Err(err)),
@@ -167,13 +167,13 @@ fn apply_construct(
             if parameters.len() < 2 {
                 return Some(Err(EvalErr::WrongArgList));
             }
-            if let Expr::List(bindings) = &*parameters[0] {
+            if let Expr::List(bindings) = &*parameters.head().unwrap().clone() {
                 for bind in bindings.iter() {
                     if let Expr::List(lst) = &**bind {
                         if lst.len() == 2 {
-                            if let Expr::Atom(x) = &*lst[0] {
+                            if let Expr::Atom(x) = &*lst.head().unwrap().clone() {
                                 if is_bindable(&x) {
-                                    match eval(lst[1].clone(), &mut new_envt) {
+                                    match eval(lst.tail().head().unwrap().clone(), &mut new_envt) {
                                         Ok(val) => {
                                             new_envt.insert(x.to_string(), val.clone());
                                         }
@@ -195,8 +195,8 @@ fn apply_construct(
             } else {
                 return Some(Err(EvalErr::TypeError));
             }
-            let mut res = Rc::new(Expr::List(Rc::new(vec![])));
-            for act in parameters[1..].iter() {
+            let mut res = Rc::new(Expr::List(Rc::new(List::new())));
+            for act in parameters.tail().iter() {
                 match eval(act.clone(), &mut new_envt) {
                     Ok(val) => res = val,
                     Err(err) => return Some(Err(err)),
