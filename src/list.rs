@@ -1,7 +1,7 @@
 // List struct
 use std::rc::Rc;
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct List<T> {
     head: Link<T>,
 }
@@ -26,6 +26,10 @@ impl<T> List<T> {
         Self {
             head: self.head.as_ref().unwrap().next.clone(),
         }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.head.is_none()
     }
 
     pub fn cons(&self, elem: T) -> Self {

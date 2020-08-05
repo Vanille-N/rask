@@ -3,7 +3,7 @@ use std::rc::Rc;
 
 pub fn apply(lst: &[Rc<Expr>], ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     if lst.is_empty() {
-        return Ok(Rc::new(Expr::List(Rc::new(Vec::new()))));
+        return Ok(Rc::new(Expr::List(Rc::new(List::new()))));
     }
     match &*lst[0] {
         Expr::Char(_)
