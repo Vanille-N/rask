@@ -1,5 +1,6 @@
 // List struct
 use std::rc::Rc;
+use std::iter::FromIterator;
 
 #[derive(Default, Clone)]
 pub struct List<T> {
@@ -89,6 +90,15 @@ impl<'a, T> Iterator for Iter<'a, T> {
     }
 }
 
+impl<T> FromIterator<T> for List<T> {
+    fn from_iter<I: IntoIterator<Item=T>>(iter: I) -> Self {
+        let mut lst = List::new();
+        for i in iter.rev() {
+            lst = lst.cons(i);
+        }
+        lst
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;
