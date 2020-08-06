@@ -59,7 +59,7 @@ mod test {
     }
 
     macro_rules! list {
-        ( $( $elem:expr ),* ) => { Expr::List(Rc::new(vec![$( Rc::new($elem) ),*])) }
+        ( $( $elem:expr ),* ) => { Expr::List(Rc::new(List::from(vec![$( Rc::new($elem) ),*]))) }
     }
     macro_rules! atom {
         ( $( $elem:tt )* ) => { Expr::Atom(Rc::new(String::from(concat!($( stringify!($elem) ),*)))) };
@@ -189,7 +189,7 @@ mod test {
                 if args.len() != 1 {
                     Err(EvalErr::WrongArgList)
                 } else {
-                    match eval(args[0].clone(), envt) {
+                    match eval(args.head().unwrap().clone(), envt) {
                         Ok(val) => {
                             println!("{:?}", val);
                             match *val {
