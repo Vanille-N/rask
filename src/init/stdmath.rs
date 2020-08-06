@@ -7,15 +7,14 @@ pub fn init(envt: &mut Envt) {
     envt.insert(
         String::from("__exp"),
         Rc::new(Expr::Func(Rc::new(|args, ctx| {
-            if args.len() != 1 {
+            if args.head().is_none() || args.tail().head().is_some() {
                 Err(EvalErr::WrongArgList)
             } else {
-                match eval(args[0].clone(), ctx) {
+                match eval(*args.head().unwrap(), ctx) {
                     Ok(val) => match &*val {
                         Expr::Integer(n) => Ok(Rc::new(Expr::Float((*n as f64).exp()))),
                         Expr::Float(f) => Ok(Rc::new(Expr::Float(f.exp()))),
                         _ => {
-                            eprintln!("{:?}", args[0]);
                             Err(EvalErr::TypeError)
                         }
                     },
@@ -30,9 +29,9 @@ pub fn init(envt: &mut Envt) {
             if args.len() != 2 {
                 Err(EvalErr::WrongArgList)
             } else {
-                match eval(args[0].clone(), ctx) {
+                match eval(*args.head().unwrap(), ctx) {
                     Ok(val) => match &*val {
-                        Expr::Integer(n) => match eval(args[1].clone(), ctx) {
+                        Expr::Integer(n) => match eval(*args.tail().head().unwrap(), ctx) {
                             Ok(val) => match &*val {
                                 Expr::Integer(m) => {
                                     if *m >= 0 {
@@ -52,7 +51,7 @@ pub fn init(envt: &mut Envt) {
                             },
                             Err(e) => Err(e),
                         },
-                        Expr::Float(f) => match eval(args[1].clone(), ctx) {
+                        Expr::Float(f) => match eval(*args.tail().head().unwrap(), ctx) {
                             Ok(val) => match &*val {
                                 Expr::Integer(m) => match (*m).try_into() {
                                     Ok(i) => Ok(Rc::new(Expr::Float(f.powi(i)))),
@@ -64,7 +63,6 @@ pub fn init(envt: &mut Envt) {
                             Err(e) => Err(e),
                         },
                         _ => {
-                            eprintln!("{:?}", args[0]);
                             Err(EvalErr::TypeError)
                         }
                     },
