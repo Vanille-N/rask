@@ -1,5 +1,6 @@
 use crate::parse::{Expr, ParseErr, Token};
 use std::rc::Rc;
+use crate::list::List;
 
 pub fn build(tokens: &[Token]) -> Vec<Result<Rc<Expr>, ParseErr>> {
     let mut exprs = Vec::new();
@@ -66,13 +67,13 @@ fn build_helper(tokens: &[Token], idx: &mut usize) -> Result<Expr, ParseErr> {
                 let expr = build_helper(tokens, idx)?;
                 if *idx < tokens.len() && tokens[*idx] == cl {
                     *idx += 1;
-                    Ok(Expr::Cons(Rc::new(v), Rc::new(expr)))
+                    Ok(Expr::Cons(Rc::new(List::from(v)), Rc::new(expr)))
                 } else {
                     Err(ParseErr::InvalidCons(*idx))
                 }
             } else {
                 *idx += 1;
-                Ok(Expr::List(Rc::new(v)))
+                Ok(Expr::List(Rc::new(List::from(v))))
             }
         }
         Token::VecParen => {
