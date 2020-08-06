@@ -10,7 +10,7 @@ pub fn init(envt: &mut Envt) {
             if args.head().is_none() || args.tail().head().is_some() {
                 Err(EvalErr::WrongArgList)
             } else {
-                match eval(*args.head().unwrap(), ctx) {
+                match eval(args.head().unwrap().clone(), ctx) {
                     Ok(val) => match &*val {
                         Expr::Integer(n) => Ok(Rc::new(Expr::Float((*n as f64).exp()))),
                         Expr::Float(f) => Ok(Rc::new(Expr::Float(f.exp()))),
@@ -29,9 +29,9 @@ pub fn init(envt: &mut Envt) {
             if args.len() != 2 {
                 Err(EvalErr::WrongArgList)
             } else {
-                match eval(*args.head().unwrap(), ctx) {
+                match eval(args.head().unwrap().clone(), ctx) {
                     Ok(val) => match &*val {
-                        Expr::Integer(n) => match eval(*args.tail().head().unwrap(), ctx) {
+                        Expr::Integer(n) => match eval(args.tail().head().unwrap().clone(), ctx) {
                             Ok(val) => match &*val {
                                 Expr::Integer(m) => {
                                     if *m >= 0 {
@@ -51,7 +51,7 @@ pub fn init(envt: &mut Envt) {
                             },
                             Err(e) => Err(e),
                         },
-                        Expr::Float(f) => match eval(*args.tail().head().unwrap(), ctx) {
+                        Expr::Float(f) => match eval(args.tail().head().unwrap().clone() , ctx) {
                             Ok(val) => match &*val {
                                 Expr::Integer(m) => match (*m).try_into() {
                                     Ok(i) => Ok(Rc::new(Expr::Float(f.powi(i)))),
