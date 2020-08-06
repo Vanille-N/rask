@@ -159,7 +159,7 @@ impl fmt::Debug for Expr {
                 if v.len() == 0 {
                     write!(f, "'()")
                 } else {
-                    write!(f, "({:?}", v[0])?;
+                    write!(f, "({:?}", v.head().unwrap())?;
                     for item in v.iter().skip(1) {
                         write!(f, " {:?}", &item)?;
                     }
@@ -230,8 +230,8 @@ pub fn corresponds(lt: &Expr, rt: &Expr) -> bool {
         List(v) => {
             if let List(w) = rt {
                 if v.len() == w.len() {
-                    for i in 0..v.len() {
-                        if !corresponds(&v[i], &w[i]) {
+                    for (vi, wi) in v.iter().zip(w.iter()) {
+                        if !corresponds(&vi, &wi) {
                             return false;
                         }
                     }
@@ -278,8 +278,8 @@ pub fn corresponds(lt: &Expr, rt: &Expr) -> bool {
         Cons(v, e) => {
             if let Cons(w, f) = rt {
                 if v.len() == w.len() {
-                    for i in 0..v.len() {
-                        if !corresponds(&v[i], &w[i]) {
+                    for (vi, wi) in v.iter().zip(w.iter()) {
+                        if !corresponds(&vi, &wi) {
                             return false;
                         }
                     }
