@@ -221,10 +221,10 @@ mod test {
             Rc::new(Expr::Func(Rc::new(|args, envt| {
                 if args.len() != 2 {
                     Err(EvalErr::WrongArgList)
-                } else if let Expr::Atom(a) = &*args[0] {
-                    let newval = eval(args[1].clone(), envt).unwrap();
+                } else if let Expr::Atom(a) = &**args.head().unwrap() {
+                    let newval = eval(args.tail().head().unwrap().clone(), envt).unwrap();
                     envt.update(&*a, newval);
-                    Ok(Rc::new(Expr::List(Rc::new(vec![]))))
+                    Ok(Rc::new(Expr::List(Rc::new(List::new()))))
                 } else {
                     Err(EvalErr::TypeError)
                 }
