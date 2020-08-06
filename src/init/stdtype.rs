@@ -9,7 +9,7 @@ pub fn init(envt: &mut Envt) {
             if args.len() > 1 {
                 return Err(EvalErr::WrongArgList);
             }
-            match eval(*args.head().unwrap(), ctx) {
+            match eval(args.head().unwrap().clone(), ctx) {
                 Err(e) => Err(e),
                 Ok(val) => match &*val {
                     Expr::Integer(_) => Ok(Rc::new(Expr::Bool(true))),
@@ -24,7 +24,7 @@ pub fn init(envt: &mut Envt) {
             if args.len() > 1 {
                 return Err(EvalErr::WrongArgList);
             }
-            match eval(*args.head().unwrap(), ctx) {
+            match eval(args.head().unwrap().clone(), ctx) {
                 Err(e) => Err(e),
                 Ok(val) => match &*val {
                     Expr::Float(_) => Ok(Rc::new(Expr::Bool(true))),
@@ -39,7 +39,7 @@ pub fn init(envt: &mut Envt) {
             if args.len() > 1 {
                 return Err(EvalErr::WrongArgList);
             }
-            match eval(*args.head().unwrap(), ctx) {
+            match eval(args.head().unwrap().clone(), ctx) {
                 Err(e) => Err(e),
                 Ok(val) => match &*val {
                     Expr::Integer(_) | Expr::Float(_) => Ok(Rc::new(Expr::Bool(true))),
@@ -54,7 +54,7 @@ pub fn init(envt: &mut Envt) {
             if args.len() > 1 {
                 return Err(EvalErr::WrongArgList);
             }
-            match eval(*args.head().unwrap(), ctx) {
+            match eval(args.head().unwrap().clone(), ctx) {
                 Err(e) => Err(e),
                 Ok(val) => match &*val {
                     Expr::Bool(_) => Ok(Rc::new(Expr::Bool(true))),
@@ -69,7 +69,7 @@ pub fn init(envt: &mut Envt) {
             if args.len() > 1 {
                 return Err(EvalErr::WrongArgList);
             }
-            match eval(*args.head().unwrap(), ctx) {
+            match eval(args.head().unwrap().clone(), ctx) {
                 Err(e) => Err(e),
                 Ok(val) => match &*val {
                     Expr::Vec(_) => Ok(Rc::new(Expr::Bool(true))),
@@ -84,7 +84,7 @@ pub fn init(envt: &mut Envt) {
             if args.len() > 1 {
                 return Err(EvalErr::WrongArgList);
             }
-            match eval(*args.head().unwrap(), ctx) {
+            match eval(args.head().unwrap().clone(), ctx) {
                 Err(e) => Err(e),
                 Ok(val) => match &*val {
                     Expr::Char(_) => Ok(Rc::new(Expr::Bool(true))),
@@ -99,7 +99,7 @@ pub fn init(envt: &mut Envt) {
             if args.len() > 1 {
                 return Err(EvalErr::WrongArgList);
             }
-            match eval(*args.head().unwrap(), ctx) {
+            match eval(args.head().unwrap().clone(), ctx) {
                 Err(e) => Err(e),
                 Ok(val) => match &*val {
                     Expr::String(_) => Ok(Rc::new(Expr::Bool(true))),
