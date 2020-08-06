@@ -1,6 +1,6 @@
 // List struct
 use std::rc::Rc;
-use std::iter::FromIterator;
+// use std::iter::FromIterator;
 
 #[derive(Default, Clone)]
 pub struct List<T> {
@@ -89,16 +89,16 @@ impl<'a, T> Iterator for Iter<'a, T> {
         })
     }
 }
-
-impl<T> FromIterator<T> for List<T> {
-    fn from_iter<I: IntoIterator<Item=T>>(iter: I) -> Self {
-        let mut lst = List::new();
-        for i in iter.iter().rev() {
-            lst = lst.cons(i);
-        }
-        lst
-    }
-}
+//
+// impl<T> FromIterator<T> for List<T> {
+//     fn from_iter<I: IntoIterator<Item=T>>(iter: I) -> Self {
+//         let mut lst = List::new();
+//         for i in iter.into_iter().rev() {
+//             lst = lst.cons(i);
+//         }
+//         lst
+//     }
+// }
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -160,12 +160,12 @@ mod tests {
         assert_eq!(lst.head(), Some(&'a'));
     }
 
-    #[test]
-    fn from_iter() {
-        let lst: List<usize> = vec![0, 1, 2].iter().collect();
-        assert_eq!(lst.head(), Some(&0));
-        assert_eq!(lst.tail().head(), Some(&1));
-        assert_eq!(lst.tail().tail().head(), Some(&2));
-        assert_eq!(lst.tail().tail().tail().head(), None));
-    }
+    // #[test]
+    // fn from_iter() {
+    //     let lst: List<usize> = vec![0, 1, 2].iter().collect();
+    //     assert_eq!(lst.head(), Some(&0));
+    //     assert_eq!(lst.tail().head(), Some(&1));
+    //     assert_eq!(lst.tail().tail().head(), Some(&2));
+    //     assert_eq!(lst.tail().tail().tail().head(), None);
+    // }
 }
