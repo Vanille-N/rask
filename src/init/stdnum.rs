@@ -7,7 +7,7 @@ pub fn init(envt: &mut Envt) {
         String::from("__+"),
         Rc::new(Expr::Func(Rc::new(|args, ctx| {
             let mut sum = Expr::Integer(0);
-            for x in args {
+            for x in args.iter() {
                 match eval(x.clone(), ctx) {
                     Ok(val) => match *val {
                         Expr::Integer(n) => match sum {
@@ -31,7 +31,7 @@ pub fn init(envt: &mut Envt) {
     envt.insert(
         String::from("__-"),
         Rc::new(Expr::Func(Rc::new(|args, ctx| {
-            let mut sum = match args.get(0) {
+            let mut sum = match args.head() {
                 None => return Ok(Rc::new(Expr::Integer(0))),
                 Some(val) => match eval(val.clone(), ctx) {
                     Ok(val) => match *val {
@@ -70,7 +70,7 @@ pub fn init(envt: &mut Envt) {
         String::from("__*"),
         Rc::new(Expr::Func(Rc::new(|args, ctx| {
             let mut sum = Expr::Integer(1);
-            for x in args {
+            for x in args.iter() {
                 match eval(x.clone(), ctx) {
                     Ok(val) => match *val {
                         Expr::Integer(0) => return Ok(Rc::new(Expr::Integer(0))),
@@ -96,7 +96,7 @@ pub fn init(envt: &mut Envt) {
     envt.insert(
         String::from("__/"),
         Rc::new(Expr::Func(Rc::new(|args, ctx| {
-            let mut sum = match args.get(0) {
+            let mut sum = match args.head() {
                 None => return Ok(Rc::new(Expr::Integer(0))),
                 Some(val) => match eval(val.clone(), ctx) {
                     Ok(val) => match *val {
@@ -142,7 +142,7 @@ pub fn init(envt: &mut Envt) {
     envt.insert(
         String::from("__="),
         Rc::new(Expr::Func(Rc::new(|args, ctx| {
-            let fst = match args.get(0) {
+            let fst = match args.head() {
                 None => return Err(EvalErr::WrongArgList),
                 Some(val) => match eval(val.clone(), ctx) {
                     Ok(val) => match *val {
@@ -196,7 +196,7 @@ pub fn init(envt: &mut Envt) {
     envt.insert(
         String::from("__<"),
         Rc::new(Expr::Func(Rc::new(|args, ctx| {
-            let mut pred = match args.get(0) {
+            let mut pred = match args.head() {
                 None => return Err(EvalErr::WrongArgList),
                 Some(val) => match eval(val.clone(), ctx) {
                     Ok(val) => match *val {
@@ -253,7 +253,7 @@ pub fn init(envt: &mut Envt) {
     envt.insert(
         String::from("__<="),
         Rc::new(Expr::Func(Rc::new(|args, ctx| {
-            let mut pred = match args.get(0) {
+            let mut pred = match args.head() {
                 None => return Err(EvalErr::WrongArgList),
                 Some(val) => match eval(val.clone(), ctx) {
                     Ok(val) => match *val {
@@ -310,7 +310,7 @@ pub fn init(envt: &mut Envt) {
     envt.insert(
         String::from("__>"),
         Rc::new(Expr::Func(Rc::new(|args, ctx| {
-            let mut pred = match args.get(0) {
+            let mut pred = match args.head() {
                 None => return Err(EvalErr::WrongArgList),
                 Some(val) => match eval(val.clone(), ctx) {
                     Ok(val) => match *val {
@@ -367,7 +367,7 @@ pub fn init(envt: &mut Envt) {
     envt.insert(
         String::from("__>="),
         Rc::new(Expr::Func(Rc::new(|args, ctx| {
-            let mut pred = match args.get(0) {
+            let mut pred = match args.head() {
                 None => return Err(EvalErr::WrongArgList),
                 Some(val) => match eval(val.clone(), ctx) {
                     Ok(val) => match *val {
