@@ -9,7 +9,7 @@ pub fn init(envt: &mut Envt) {
             if args.head().is_none() || args.tail().head().is_some() {
                 return Err(EvalErr::WrongArgList);
             }
-            match eval(*args.head().unwrap(), ctx) {
+            match eval(args.head().unwrap().clone(), ctx) {
                 Err(e) => Err(e),
                 Ok(val) => match &*val {
                     Expr::Bool(b) => Ok(Rc::new(Expr::Bool(!b))),

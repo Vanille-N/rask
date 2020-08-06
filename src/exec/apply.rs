@@ -29,7 +29,7 @@ pub fn apply(lst: List<Rc<Expr>>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
 }
 
 pub fn apply_atom(a: &str, parameters: List<Rc<Expr>>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
-    if let Some(res) = apply_construct(a, parameters, ctx) {
+    if let Some(res) = apply_construct(a, parameters.clone(), ctx) {
         res
     } else if let Some(f) = ctx.get(&a.to_string()) {
         match &*f {
