@@ -1,5 +1,6 @@
 use crate::exec::{apply, Envt, EvalErr, Expr};
 use std::rc::Rc;
+use crate::list::List;
 
 pub fn eval(expr: Rc<Expr>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
     match &*expr {
@@ -16,7 +17,7 @@ pub fn eval(expr: Rc<Expr>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
         Expr::String(_) => Ok(expr.clone()),
         Expr::Bool(_) => Ok(expr.clone()),
         Expr::Cons(_, _) => Err(EvalErr::ProperListRequired(expr.clone())),
-        Expr::List(items) => apply(&items, ctx),
+        Expr::List(items) => apply(**items, ctx),
         Expr::Func(_) => Ok(expr.clone()),
         Expr::Ellipsis | Expr::Dot => Err(EvalErr::CannotEval(expr.clone())),
         Expr::Vec(_) => Ok(expr.clone()),
@@ -32,7 +33,7 @@ pub fn quasi_eval(expr: Rc<Expr>, ctx: &mut Envt) -> Result<Rc<Expr>, EvalErr> {
             for i in items.iter() {
                 v.push(quasi_eval(i.clone(), ctx)?);
             }
-            Ok(Rc::new(Expr::List(Rc::new(v))))
+            Ok(Rc::new(Expr::List(Rc::new(List::from(v)))))
         }
         _ => Ok(expr.clone()),
     }
