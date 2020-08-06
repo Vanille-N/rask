@@ -6,10 +6,10 @@ pub fn init(envt: &mut Envt) {
     envt.insert(
         String::from("__not"),
         Rc::new(Expr::Func(Rc::new(|args, ctx| {
-            if args.len() > 1 {
+            if args.head().is_none() || args.tail().head().is_some() {
                 return Err(EvalErr::WrongArgList);
             }
-            match eval(args[0].clone(), ctx) {
+            match eval(*args.head().unwrap(), ctx) {
                 Err(e) => Err(e),
                 Ok(val) => match &*val {
                     Expr::Bool(b) => Ok(Rc::new(Expr::Bool(!b))),
