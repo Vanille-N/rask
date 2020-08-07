@@ -548,5 +548,9 @@ mod test {
         check!("(cdr '(0 1))" [envt]-> "(1)");
         check!("(cdr '(0))" [envt]-> "()");
         err!("(cdr '())" [envt]-> EvalErr::EmptyList);
+        check!("(cons 1 2)" [envt]-> "(1 . 2)");
+        check!("(cons 0 (cons 1 (cons 2 3)))" [envt]-> "(0 1 2 . 3)");
+        check!("(car '(1 . 2))" [envt]-> "1");
+        check!("(cdr '(1 2 . 3))" [envt]-> "(2 . 3)");
     }
 }
