@@ -50,13 +50,20 @@ pub fn init(envt: &mut Envt) {
                 return Err(EvalErr::WrongArgList);
             }
             let l = eval(args.head().unwrap().clone(), ctx)?;
-            if let Expr::List(lst) = &*l {
-                match lst.head() {
-                    Some(_) => Ok(Rc::new(Expr::List(Rc::new(lst.tail())))),
-                    None => Err(EvalErr::EmptyList),
+            match &*l {
+                Expr::List(lst) => {
+                    match lst.head() {
+                        Some(_) => Ok(Rc::new(Expr::List(Rc::new(lst.tail())))),
+                        None => Err(EvalErr::EmptyList),
+                    }
                 }
-            } else {
-                Err(EvalErr::TypeError)
+                Expr::Cons(lst, e) => {
+                    match lst.head() {
+                        Some(_) => Ok(Rc::new(Expr::Cons(Rc::new(lst.tail()), e.clone()))),
+                        None => Err(EvalErr::EmptyList),
+                    }
+                }
+                _ => Err(EvalErr::TypeError),
             }
         })))
     );
