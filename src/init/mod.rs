@@ -5,6 +5,7 @@ mod stdbool;
 mod stdmath;
 mod stdnum;
 mod stdtype;
+mod stdlist;
 
 pub trait Alias {
     fn alias(&mut self, s: &str, a: &str);
@@ -23,5 +24,6 @@ pub fn initialize_environment() -> Envt {
     stdtype::init(&mut envt);
     stdbool::init(&mut envt);
     stdmath::init(&mut envt);
+    stdlist::init(&mut envt);
     envt
 }
