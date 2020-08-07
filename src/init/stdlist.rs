@@ -44,7 +44,7 @@ pub fn init(envt: &mut Envt) {
             let l = eval(args.head().unwrap().clone(), ctx)?;
             if let Expr::List(lst) = &*l {
                 match lst.head() {
-                    Some(h) => Ok(Expr::List(lst.tail())),
+                    Some(_) => Ok(Rc::new(Expr::List(Rc::new(lst.tail())))),
                     None => Err(EvalErr::EmptyList),
                 }
             } else {
