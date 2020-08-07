@@ -213,7 +213,7 @@ mod test {
     }
 
     macro_rules! cons {
-        ( $( $elem:expr ),* ; $end:expr ) => {Expr::Cons(Rc::new(vec![$( Rc::new($elem) ),*]), Rc::new($end))}
+        ( $( $elem:expr ),* ; $end:expr ) => {Expr::Cons(Rc::new(List::from(vec![$( Rc::new($elem) ),*])), Rc::new($end))}
     }
     macro_rules! string {
         ( $e:expr ) => {
