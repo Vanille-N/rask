@@ -539,5 +539,10 @@ mod test {
         check!("(cons 0 l)" [envt]-> "(0 1 2 3)");
         check!("(cons 0 '(1 2 3))" [envt]-> "(0 1 2 3)");
         check!("(cons '() '())" [envt]-> "(())");
+        err!("(cons 0 2)" [envt]-> EvalErr::TypeError);
+        check!("(car l)" [envt]-> "1");
+        check!("(car '(0 1))" [envt]-> "0");s
+        err!("(car 1)" [envt]-> EvalErr::TypeError);
+        err!("(car '())" [envt]-> EvalErr::EmptyList);
     }
 }
