@@ -531,4 +531,13 @@ mod test {
         check!("(pow 2 3)" [envt]-> "8");
         check!("(pow 3.0 2)" [envt]-> "9.0");
     }
+
+    #[test]
+    fn lists_operations() {
+        let mut envt = crate::init::initialize_environment();
+        check!("(define l '(1 2 3))" [envt]-> "()");
+        check!("(cons 0 l)" [envt]-> "(0 1 2 3)");
+        check!("(cons 0 '(1 2 3))" [envt]-> "(0 1 2 3)");
+        check!("(cons '() '())" [envt]-> "(())");
+    }
 }
