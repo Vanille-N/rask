@@ -18,5 +18,23 @@ pub fn init(envt: &mut Envt) {
             }
         })))
     );
+    envt.insert(
+        String::from("__car"),
+        Rc::new(Expr::Func(Rc::new(|args, ctx| {
+            if args.head().is_none() || args.tail().head().is_some() {
+                return Err(EvalErr::WrongArgList);
+            }
+            let l = eval(args.head().unwrap().clone(), ctx)?;
+            if let Expr::List(lst) = &*l {
+                match lst.head() {
+                    Some(h) => Ok(h.clone()),
+                    None => Err(EvalErr::EmptyList),
+                }
+            } else {
+                Err(EvalErr::TypeError)
+            }
+        }))
+    );
     envt.alias("cons", "__cons");
+    envt.alias("car", "__car");
 }
