@@ -168,7 +168,7 @@ mod test {
 
     macro_rules! list {
         ( $( $elem:expr ),* ) => {
-            Expr::List(Rc::new(vec![$( Rc::new($elem) ),*]))
+            Expr::List(Rc::new(List::from(vec![$( Rc::new($elem) ),*])))
         }
     }
     macro_rules! vector {
