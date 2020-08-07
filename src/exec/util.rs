@@ -16,6 +16,7 @@ pub enum EvalErr {
     CannotBind(String),
     MathError,
     InvalidNumber,
+    EmptyList,
 }
 
 // No need to test this, it will be correct in practice
