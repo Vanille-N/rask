@@ -26,13 +26,20 @@ pub fn init(envt: &mut Envt) {
                 return Err(EvalErr::WrongArgList);
             }
             let l = eval(args.head().unwrap().clone(), ctx)?;
-            if let Expr::List(lst) = &*l {
-                match lst.head() {
-                    Some(h) => Ok(h.clone()),
-                    None => Err(EvalErr::EmptyList),
+            match &*l {
+                Expr::List(lst) => {
+                    match lst.head() {
+                        Some(h) => Ok(h.clone()),
+                        None => Err(EvalErr::EmptyList),
+                    }
                 }
-            } else {
-                Err(EvalErr::TypeError)
+                Expr::Cons(lst, _) => {
+                    match lst.head() {
+                        Some(h) => Ok(h.clone()),
+                        None => Err(EvalErr::EmptyList),
+                    }
+                }
+                _ => Err(EvalErr::TypeError),
             }
         })))
     );
