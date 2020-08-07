@@ -33,7 +33,7 @@ pub fn init(envt: &mut Envt) {
             } else {
                 Err(EvalErr::TypeError)
             }
-        }))
+        })))
     );
     envt.alias("cons", "__cons");
     envt.alias("car", "__car");

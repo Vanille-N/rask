@@ -56,6 +56,7 @@ impl cmp::PartialEq for EvalErr {
             EvalErr::CannotBind(_) => identical!(CannotBind(_)),
             EvalErr::MathError => identical!(MathError),
             EvalErr::InvalidNumber => identical!(InvalidNumber),
+            EvalErr::EmptyList => identical!(EmptyList),
         }
     }
 }
