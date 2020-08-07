@@ -1,6 +1,7 @@
 use crate::exec::{eval, Envt, EvalErr, Expr};
 use crate::init::Alias;
 use std::rc::Rc;
+use crate::list::List;
 
 pub fn init(envt: &mut Envt) {
     envt.insert(
@@ -11,10 +12,10 @@ pub fn init(envt: &mut Envt) {
             }
             let e = eval(args.head().unwrap().clone(), ctx)?;
             let l = eval(args.tail().head().unwrap().clone(), ctx)?;
-            if let Expr::List(lst) = &*l {
-                Ok(Rc::new(Expr::List(Rc::new(lst.cons(e.clone())))))
-            } else {
-                Err(EvalErr::TypeError)
+            match &*l {
+                Expr::List(lst) => Ok(Rc::new(Expr::List(Rc::new(lst.cons(e.clone()))))),
+                Expr::Cons(lst, tl) => Ok(Rc::new(Expr::Cons(Rc::new(lst.cons(e.clone())), tl.clone()))),
+                _ => Ok(Rc::new(Expr::Cons(Rc::new(List::from(vec![e])), l.clone()))),
             }
         })))
     );
