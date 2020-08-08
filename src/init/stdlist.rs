@@ -117,5 +117,10 @@ pub fn init(envt: &mut Envt) {
 (define (length lst)
   (if (empty? lst)
     0
-    (+ 1 (length (cdr lst)))))", envt);
+    (+ 1 (length (cdr lst)))))
+
+(define (concat lt rt)
+  (if (empty? lt)
+    rt
+    (cons (car lt) (concat (cdr lt) rt))))", envt);
 }
