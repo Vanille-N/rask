@@ -87,5 +87,7 @@ pub fn init(envt: &mut Envt) {
 (define (caar lst)
   (car (car lst)))
 (define (cdar lst)
-  (cdr (car lst)))", envt);
+  (cdr (car lst)))
+(define (cddr lst)
+  (cdr (cdr lst)))", envt);
 }
