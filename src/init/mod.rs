@@ -1,4 +1,5 @@
-use crate::exec::Envt;
+use crate::exec::{Envt, eval};
+use crate::parse::parse;
 use chainmap::ChainMap;
 
 mod stdbool;
@@ -26,4 +27,17 @@ pub fn initialize_environment() -> Envt {
     stdmath::init(&mut envt);
     stdlist::init(&mut envt);
     envt
+}
+
+
+pub fn define(src: &str, envt: &mut Envt) {
+    let lt = parse(src);
+    for i in 0..lt.len() {
+        match &lt[i] {
+            Err(_) => panic!("Failed to define"),
+            Ok(lt) => {
+                eval(lt.clone(), envt).expect("Failed to evaluate");
+            }
+        }
+    }
 }
