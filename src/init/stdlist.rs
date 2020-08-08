@@ -78,7 +78,7 @@ pub fn init(envt: &mut Envt) {
         })))
     );
     envt.insert(
-        String::from("__empty"),
+        String::from("__empty?"),
         Rc::new(Expr::Func(Rc::new(|args, ctx| {
             if args.head().is_none() || args.tail().head().is_some() {
                 return Err(EvalErr::WrongArgList);
@@ -100,6 +100,7 @@ pub fn init(envt: &mut Envt) {
     envt.alias("car", "__car");
     envt.alias("cdr", "__cdr");
     envt.alias("list", "__list");
+    envt.alias("empty?", "__empty?");
     define("
 (define (cadr lst)
   (car (cdr lst)))
