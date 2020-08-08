@@ -112,5 +112,10 @@ pub fn init(envt: &mut Envt) {
   (cdr (car lst)))
 
 (define (cddr lst)
-  (cdr (cdr lst)))", envt);
+  (cdr (cdr lst)))
+
+(define (length lst)
+  (if (empty? lst)
+    0
+    (+ 1 (length (cdr lst)))))", envt);
 }
