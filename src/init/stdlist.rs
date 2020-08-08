@@ -1,5 +1,5 @@
 use crate::exec::{eval, Envt, EvalErr, Expr};
-use crate::init::Alias;
+use crate::init::*;
 use std::rc::Rc;
 use crate::list::List;
 
@@ -81,4 +81,7 @@ pub fn init(envt: &mut Envt) {
     envt.alias("car", "__car");
     envt.alias("cdr", "__cdr");
     envt.alias("list", "__list");
+    define("
+(define (cadr lst)
+  (car (cdr lst)))", envt);
 }
