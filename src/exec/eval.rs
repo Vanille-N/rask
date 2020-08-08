@@ -556,5 +556,12 @@ mod test {
         check!("(list #\\a '() '+)" [envt]-> "(#\\a () +)");
         check!("(list (car l) (car (cdr l)))" [envt]-> "(1 2)");
         check!("(list (car l) (cadr l))" [envt]-> "(1 2)");
+        check!("(define lst '((0 1) (2 3)))" [envt]-> "()");
+        check!("(car lst)" [envt]-> "(0 1)");
+        check!("(cdr lst)" [envt]-> "((2 3))");
+        check!("(caar lst)" [envt]-> "0");
+        check!("(cadr lst)" [envt]-> "(2 3)");
+        check!("(cdar lst)" [envt]-> "(1)");
+        check!("(cddr lst)" [envt]-> "()");
     }
 }
