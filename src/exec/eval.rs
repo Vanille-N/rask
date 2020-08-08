@@ -563,5 +563,9 @@ mod test {
         check!("(cadr lst)" [envt]-> "(2 3)");
         check!("(cdar lst)" [envt]-> "(1)");
         check!("(cddr lst)" [envt]-> "()");
+        check!("(empty? '())" [envt]-> "#t");
+        check!("(empty? '(1 . 2))" [envt]-> "#f");
+        check!("(length '())" [envt]-> "0");
+        check!("(length '(a b c d))" [envt]-> "4");
     }
 }
