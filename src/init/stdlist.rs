@@ -67,7 +67,18 @@ pub fn init(envt: &mut Envt) {
             }
         })))
     );
+    envt.insert(
+        String::from("__list"),
+        Rc::new(Expr::Func(Rc::new(|args, ctx| {
+            let mut v = Vec::new();
+            for item in args.iter() {
+                v.push(eval(item.clone(), ctx)?);
+            }
+            Ok(Rc::new(Expr::List(Rc::new(List::from(v)))))
+        })))
+    );
     envt.alias("cons", "__cons");
     envt.alias("car", "__car");
     envt.alias("cdr", "__cdr");
+    envt.alias("list", "__list");
 }
