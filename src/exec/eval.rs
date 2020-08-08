@@ -552,5 +552,9 @@ mod test {
         check!("(cons 0 (cons 1 (cons 2 3)))" [envt]-> "(0 1 2 . 3)");
         check!("(car '(1 . 2))" [envt]-> "1");
         check!("(cdr '(1 2 . 3))" [envt]-> "(2 . 3)");
+        check!("(list 0 1 2 3)" [envt]-> "(0 1 2 3)");
+        check!("(list #\\a '() '+)" [envt]-> "(#\\a () +)");
+        check!("(list (car l) (car (cdr l)))" [envt]-> "(1 2)");
+        check!("(list (car l) (cadr l))" [envt]-> "(1 2)");
     }
 }
