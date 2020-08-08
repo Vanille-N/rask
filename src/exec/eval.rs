@@ -566,6 +566,8 @@ mod test {
         check!("(empty? '())" [envt]-> "#t");
         check!("(empty? '(1 . 2))" [envt]-> "#f");
         check!("(length '())" [envt]-> "0");
-        check!("(length '(a b c d))" [envt]-> "4");
+        check!("(length '(1 2 6 5))" [envt]-> "4");
+        check!("(concat '() '(1 2))" [envt]-> "(1 2)");
+        check!("(concat '(1 2 3) '(4 5 6))" [envt]-> "(1 2 3 4 5 6)");
     }
 }
