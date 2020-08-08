@@ -60,7 +60,7 @@ pub fn init(envt: &mut Envt) {
                 Expr::Cons(lst, e) => {
                     match lst.head() {
                         Some(_) => Ok(Rc::new(Expr::Cons(Rc::new(lst.tail()), e.clone()))),
-                        None => Err(EvalErr::EmptyList),
+                        None => Ok( e.clone()),
                     }
                 }
                 _ => Err(EvalErr::TypeError),
@@ -77,6 +77,25 @@ pub fn init(envt: &mut Envt) {
             Ok(Rc::new(Expr::List(Rc::new(List::from(v)))))
         })))
     );
+    envt.insert(
+        String::from("__empty"),
+        Rc::new(Expr::Func(Rc::new(|args, ctx| {
+            if args.head().is_none() || args.tail().head().is_some() {
+                return Err(EvalErr::WrongArgList);
+            }
+            let l = eval(args.head().unwrap().clone(), ctx)?;
+            match &*l {
+                Expr::List(lst) => {
+                    match lst.head() {
+                        Some(_) => Ok(Rc::new(Expr::Bool(false))),
+                        None => Ok(Rc::new(Expr::Bool(true))),
+                    }
+                }
+                Expr::Cons(_, _) => Ok(Rc::new(Expr::Bool(false))),
+                _ => Err(EvalErr::TypeError),
+            }
+        })))
+    );
     envt.alias("cons", "__cons");
     envt.alias("car", "__car");
     envt.alias("cdr", "__cdr");
@@ -84,10 +103,13 @@ pub fn init(envt: &mut Envt) {
     define("
 (define (cadr lst)
   (car (cdr lst)))
+
 (define (caar lst)
   (car (car lst)))
+
 (define (cdar lst)
   (cdr (car lst)))
+
 (define (cddr lst)
   (cdr (cdr lst)))", envt);
 }
