@@ -83,5 +83,7 @@ pub fn init(envt: &mut Envt) {
     envt.alias("list", "__list");
     define("
 (define (cadr lst)
-  (car (cdr lst)))", envt);
+  (car (cdr lst)))
+(define (caar lst)
+  (car (car lst)))", envt);
 }
