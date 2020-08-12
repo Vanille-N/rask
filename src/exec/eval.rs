@@ -578,5 +578,9 @@ mod test {
         check!("a" [envt]-> "1");
         check!("(set! a 2)" [envt]-> "()");
         check!("a" [envt]-> "2");
+        check!("(define (f) (set! a 3))" [envt]-> "()");
+        check!("a" [envt]-> "2");
+        check!("(f)" [envt]-> "()");
+        check!("a" [envt]-> "3");
     }
 }
