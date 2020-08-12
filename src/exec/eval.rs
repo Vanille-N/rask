@@ -597,5 +597,8 @@ mod test {
         check!("(quote (+ 1 2))" [envt]-> "(+ 1 2)");
         check!("(eval (+ 1 2))" [envt]-> "3");
         check!("(eval '(+ 1 2))" [envt]-> "3");
+        check!("(let [(a (lambda (x) (+ x 1)))]
+                    ((eval a) 3))" [envt]-> "4");
+        check!("(let [(a 3)] (eval (quote a)))" [envt]-> "3");
     }
 }
