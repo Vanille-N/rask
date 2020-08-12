@@ -120,6 +120,77 @@ fn apply_construct(
                 _ => Some(Err(EvalErr::InvalidDefine)),
             }
         }
+        "set!" => {
+            if parameters.is_empty() {
+                return Some(Err(EvalErr::EmptyDefine));
+            }
+            match &*parameters.head().unwrap().clone() {
+                Expr::Atom(x) if is_bindable(x) => {
+                    if parameters.tail().head().is_none() {
+                        ctx.update_or(x, Rc::new(Expr::List(Rc::new(List::new()))));
+                        Some(Ok(Rc::new(Expr::List(Rc::new(List::new())))))
+                    } else if parameters.tail().tail().head().is_none() {
+                        match eval(parameters.tail().head().unwrap().clone(), &mut ctx.extend()) {
+                            Ok(res) => {
+                                ctx.update_or(x, res);
+                                Some(Ok(Rc::new(Expr::List(Rc::new(List::new())))))
+                            }
+                            Err(err) => Some(Err(err)),
+                        }
+                    } else {
+                        Some(Err(EvalErr::InvalidDefine))
+                    }
+                }
+                Expr::Atom(x) => Some(Err(EvalErr::CannotBind(x.to_string()))),
+                Expr::List(fndef) => {
+                    let mut ident = Vec::new();
+                    for x in fndef.iter() {
+                        match &**x {
+                            Expr::Atom(name) if is_bindable(name) => ident.push(name.to_string()),
+                            Expr::Atom(name) => {
+                                return Some(Err(EvalErr::CannotBind(name.to_string())))
+                            }
+                            _ => return Some(Err(EvalErr::InvalidDefine)),
+                        }
+                    }
+                    if ident.is_empty() {
+                        return Some(Err(EvalErr::InvalidDefine));
+                    }
+                    let mut actions = Vec::new();
+                    for act in parameters.tail().iter() {
+                        actions.push(act.clone());
+                    }
+                    if actions.is_empty() {
+                        return Some(Err(EvalErr::InvalidDefine));
+                    }
+                    ctx.update_or(
+                        &ident[0].clone(),
+                        Rc::new(Expr::Func(Rc::new(move |args, mut envt| {
+                            if args.len() != ident.len() - 1 {
+                                return Err(EvalErr::WrongArgList);
+                            }
+                            let mut ctx = envt.extend();
+                            for (arg, id) in args.iter().zip(ident.iter().skip(1)) {
+                                match eval(arg.clone(), &mut envt) {
+                                    Ok(val) => ctx.update_or(id, val.clone()),
+                                    Err(err) => return Err(err),
+                                }
+                            }
+                            let mut res = Rc::new(Expr::List(Rc::new(List::new())));
+                            for act in &actions {
+                                match eval(act.clone(), &mut ctx) {
+                                    Ok(val) => res = val,
+                                    Err(err) => return Err(err),
+                                }
+                            }
+                            Ok(res)
+                        }))),
+                    );
+                    Some(Ok(Rc::new(Expr::List(Rc::new(List::new())))))
+                }
+                _ => Some(Err(EvalErr::InvalidDefine)),
+            }
+        }
         "let" => {
             let mut new_envt = ctx.extend();
             if parameters.len() < 2 {
