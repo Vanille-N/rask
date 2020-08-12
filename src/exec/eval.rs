@@ -595,5 +595,7 @@ mod test {
         check!("(quote a)" [envt]-> "a");
         check!("(quote 1)" [envt]-> "1");
         check!("(quote (+ 1 2))" [envt]-> "(+ 1 2)");
+        check!("(eval (+ 1 2))" [envt]-> "3");
+        check!("(eval '(+ 1 2))" [envt]-> "3");
     }
 }
