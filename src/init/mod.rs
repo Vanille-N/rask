@@ -26,6 +26,7 @@ pub fn initialize_environment() -> Envt {
     stdbool::init(&mut envt);
     stdmath::init(&mut envt);
     stdlist::init(&mut envt);
+    stdmisc::init(&mut envt);
     envt
 }
 
