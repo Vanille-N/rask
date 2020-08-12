@@ -582,5 +582,10 @@ mod test {
         check!("a" [envt]-> "2");
         check!("(f)" [envt]-> "()");
         check!("a" [envt]-> "3");
+        check!("(define (g x) (+ x a))" [envt]-> "()");
+        check!("a" [envt]-> "3");
+        check!("(g 1)" [envt]-> "4");
+        check!("(set! a 4)" [envt]-> "()");
+        check!("(g 1)" [envt]-> "5");
     }
 }
