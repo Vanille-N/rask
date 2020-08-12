@@ -570,4 +570,13 @@ mod test {
         check!("(concat '() '(1 2))" [envt]-> "(1 2)");
         check!("(concat '(1 2 3) '(4 5 6))" [envt]-> "(1 2 3 4 5 6)");
     }
+
+    #[test]
+    fn set() {
+        let mut envt = crate::init::initialize_environment();
+        check!("(define a 1)" [envt]-> "()");
+        check!("a" [envt]-> "1");
+        check!("(set! a 2)" [envt]-> "()");
+        check!("a" [envt]-> "2");
+    }
 }
