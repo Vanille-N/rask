@@ -5,7 +5,7 @@ use std::rc::Rc;
 pub fn init(envt: &mut Envt) {
     envt.insert(
         String::from("__quote"),
-        Rc::new(Expr::Func(Rc::new(|args, ctx| {
+        Rc::new(Expr::Func(Rc::new(|args, _ctx| {
             if args.head().is_none() || args.tail().head().is_some() {
                 return Err(EvalErr::WrongArgList);
             }

@@ -7,6 +7,7 @@ mod stdmath;
 mod stdnum;
 mod stdtype;
 mod stdlist;
+mod stdmisc;
 
 pub trait Alias {
     fn alias(&mut self, s: &str, a: &str);
