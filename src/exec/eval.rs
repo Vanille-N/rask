@@ -592,7 +592,8 @@ mod test {
     #[test]
     fn quote_fn() {
         let mut envt = crate::init::initialize_environment();
-        check!("(quote 1)" [envt]-> "'1");
-        check!("(quote (+ 1 2))" [envt]-> "'(+ 1 2)");
+        check!("(quote a)" [envt]-> "a");
+        check!("(quote 1)" [envt]-> "1");
+        check!("(quote (+ 1 2))" [envt]-> "(+ 1 2)");
     }
 }
