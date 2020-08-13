@@ -601,4 +601,13 @@ mod test {
                     ((eval a) 3))" [envt]-> "4");
         check!("(let [(a 3)] (eval (quote a)))" [envt]-> "3");
     }
+
+    #[test]
+    fn conditional() {
+        let mut envt = crate::init::initialize_environment();
+        check!("
+(cond
+    [#f 'no]
+    [#t 'yes])" [envt]-> "yes");
+    }
 }
