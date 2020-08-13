@@ -347,6 +347,37 @@ fn apply_construct(
                 Ok(res)
             })))))
         }
+        "cond" => {
+            for arg in parameters.iter() {
+                match arg {
+                    Expr::List(lst) => {
+                        let it = lst.iter()
+                        let cond = match it.next() {
+                            Some(hd) => hd,
+                            None => return Err(EvalErr::WrongArgList),
+                        };
+                        let exec = match it.next() {
+                            Some(hd) => hd,
+                            None => return Err(EvalErr::WrongArgList),
+                        };
+                        if it.next().is_some() {
+                            return Err(EvalErr::WrongArgList);
+                        }
+                        if let Expr::Atom("else") = cond {
+                            return eval(exec, &mut envt);
+                        }
+                        let test = eval(cond, &mut envt)?;
+                        if let Expr::Bool(b) = &*test {
+                            if b {
+                                return eval(exec, &mut envt);
+                            }
+                        }
+                    }
+                    _ => return Err(EvalErr::TypeError),
+                }
+            }
+            Ok(Rc::new(Expr::List(Rc::new(List::from(Vec::new())))))
+        }
         _ => None,
     }
 }
