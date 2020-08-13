@@ -611,9 +611,9 @@ mod test {
     [#t 'yes])" [envt]-> "yes");
         check!("
 (cond
-    [(> 1 2) 'no)]
-    [(> 2 5) 'no)]
-    [(= 5 6) 'no)]
+    [(> 1 2) 'no]
+    [(> 2 5) 'no]
+    [(= 5 6) 'no]
     [(= (+ 1 1) 2) 'yes])" [envt]-> "yes");
         check!("
 (cond
