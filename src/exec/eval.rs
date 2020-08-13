@@ -615,5 +615,10 @@ mod test {
     [(> 2 5) 'no)]
     [(= 5 6) 'no)]
     [(= (+ 1 1) 2) 'yes])" [envt]-> "yes");
+        check!("
+(cond
+    [(> 3 4) 'no]
+    [(= 1 -1) 'no]
+    [else 'yes])" [envt]-> "yes");
     }
 }
