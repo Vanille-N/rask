@@ -349,34 +349,39 @@ fn apply_construct(
         }
         "cond" => {
             for arg in parameters.iter() {
-                match arg {
+                match &**arg {
                     Expr::List(lst) => {
-                        let it = lst.iter()
+                        let mut it = lst.iter();
                         let cond = match it.next() {
                             Some(hd) => hd,
-                            None => return Err(EvalErr::WrongArgList),
+                            None => return Some(Err(EvalErr::WrongArgList)),
                         };
                         let exec = match it.next() {
                             Some(hd) => hd,
-                            None => return Err(EvalErr::WrongArgList),
+                            None => return Some(Err(EvalErr::WrongArgList)),
                         };
                         if it.next().is_some() {
-                            return Err(EvalErr::WrongArgList);
+                            return Some(Err(EvalErr::WrongArgList));
                         }
-                        if let Expr::Atom("else") = cond {
-                            return eval(exec, &mut envt);
+                        if let Expr::Atom(a) = &**cond {
+                            if **a == "else" {
+                                return Some(eval(exec.clone(), &mut ctx.extend()));
+                            }
                         }
-                        let test = eval(cond, &mut envt)?;
+                        let test = match eval(cond.clone(), &mut ctx.extend()) {
+                            Err(e) => return Some(Err(e)),
+                            Ok(res) => res,
+                        };
                         if let Expr::Bool(b) = &*test {
-                            if b {
-                                return eval(exec, &mut envt);
+                            if *b {
+                                return Some(eval(exec.clone(), &mut ctx.extend()));
                             }
                         }
                     }
-                    _ => return Err(EvalErr::TypeError),
+                    _ => return Some(Err(EvalErr::TypeError)),
                 }
             }
-            Ok(Rc::new(Expr::List(Rc::new(List::from(Vec::new())))))
+            Some(Ok(Rc::new(Expr::List(Rc::new(List::from(Vec::new()))))))
         }
         _ => None,
     }
